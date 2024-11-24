@@ -80,10 +80,10 @@ public class linkedlist {
         }
     }
 
-    boolean search(Book book) {
+    boolean search(int id) {
         Node temp = head;
         while (temp != null) {
-            if (temp.book == book) { // we transverse the value with
+            if (temp.book.getBookID() == id) {
                 return true;
             }
             temp = temp.next;
