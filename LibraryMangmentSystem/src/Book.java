@@ -3,4 +3,5 @@ public class Book {
     private String bookTitle;
     private String Author;
     private String genere;
+    private Boolean availablityStatus;
 }
