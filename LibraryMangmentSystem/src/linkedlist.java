@@ -80,7 +80,7 @@ public class linkedlist {
         }
     }
 
-    boolean search(int id) {
+    boolean search(String id) {
         Node temp = head;
         while (temp != null) {
             if (temp.book.getBookID() == id) {
@@ -91,7 +91,7 @@ public class linkedlist {
         return false;
     }
 
-    Book get(int index) {
+    Book get(int index) { // Check id
         Node temp = head;
         for (int i = 0; i < index && temp != null; i++) {
             temp = temp.next;

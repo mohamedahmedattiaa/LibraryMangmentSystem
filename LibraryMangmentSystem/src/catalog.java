@@ -1,7 +1,7 @@
 public class catalog {
     linkedlist linkedlist = new linkedlist();
 
-    public Boolean add(Book book ,int id) {
+    public Boolean add(Book book ,String id) {
         if (book == null) {
             System.out.println("error");
             return false;
@@ -14,10 +14,12 @@ public class catalog {
         }
      }
      public String updateBook(Book book ,Boolean statues){
+        String id = book.getBookID();
         book.setAvailablityStatus(statues);
         return book.toString();
+        // correct it and change get in linkedlist
      }
-     public  Boolean search (int id){
+     public  Boolean search (String id){
          return linkedlist.search(id);
      }
 

@@ -1,26 +1,23 @@
 import java.util.Date;
 
 public class Loan {
-    private int loanID;
+    private String loanID;
     private String bookId;
     private String memberId;
     private Date issueDate;
     private Date returnDate;
+    private IDGenerator idGenerator;
 
-    public Loan(int loanID, String bookId, String memberId, Date issueDate, Date returnDate) {
-        this.loanID = loanID;
+    public Loan( String bookId, String memberId, Date issueDate, Date returnDate) {
+        this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
         this.memberId = memberId;
         this.issueDate = issueDate;
         this.returnDate = returnDate;
     }
 
-    public int getLoanID() {
+    public String getLoanID() {
         return loanID;
-    }
-
-    public void setLoanID(int loanID) {
-        this.loanID = loanID;
     }
 
     public String getBookId() {
@@ -54,6 +51,4 @@ public class Loan {
     public void setReturnDate(Date returnDate) {
         this.returnDate = returnDate;
     }
-
-
 }

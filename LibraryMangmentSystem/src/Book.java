@@ -1,16 +1,17 @@
 public class Book {
-    private int bookID;
+    private String bookID;
     private String bookTitle;
     private String author;
     private String genere;
     private Boolean availablityStatus;
+    private IDGenerator idGenerator;
 
-    public Book(int bookID, String bookTitle, String author , String genere , Boolean availablityStatus) {
-        this.bookID = bookID;
+        public Book( String bookTitle, String author , String genere ) {
+        this.bookID = IDGenerator.generateBookID();
         this.bookTitle = bookTitle;
         this.author = author;
         this.genere = genere;
-        this.availablityStatus = availablityStatus;
+        this.availablityStatus = true;
 
     }
 
@@ -46,13 +47,10 @@ public class Book {
         this.bookTitle = bookTitle;
     }
 
-    public int getBookID() {
+    public String getBookID() {
         return bookID;
     }
 
-    public void setBookID(int bookID) {
-        this.bookID = bookID;
-    }
 
     @Override
     public String toString() {
