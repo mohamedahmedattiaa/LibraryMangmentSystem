@@ -1,9 +1,9 @@
 public class Node {
-    int data;
+    Book book;
     Node next;
 
-    Node(int data){
-        this.data =data;
+    Node(Book book){
+        this.book = book;
         this.next =null;
     }
 }

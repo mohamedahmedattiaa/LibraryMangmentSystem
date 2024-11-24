@@ -6,14 +6,14 @@ public class linkedlist {
         head = null;
     }
 
-    void insertAtBeginning(int data) {
-        Node newNode = new Node(data);
+    void insertAtBeginning(Book book) {
+        Node newNode = new Node(book);
         newNode.next = head;
         head = newNode;
     }
 
-    void insertAtEnd(int data) {
-        Node newNode = new Node(data);
+    void insertAtEnd(Book book) {
+        Node newNode = new Node(book);
         if (head == null) {
             head = newNode;
             return;
@@ -25,12 +25,12 @@ public class linkedlist {
         temp.next = newNode;
     }
 
-    void insetAtPosition(int data, int pos) {
+    void insetAtPosition(Book book, int pos) {
         if (pos == 0) {
-            insertAtBeginning(data);
+            insertAtBeginning(book);
             return;
         }
-        Node newNode = new Node(data);
+        Node newNode = new Node(book);
         Node temp = head;
         for (int i = 0; i < pos - 1 && temp != null; i++) {
             temp = temp.next; // transverse with the values
@@ -46,7 +46,7 @@ public class linkedlist {
     void display() {
         Node temp = head;
         while (temp != null) {
-            System.out.print(temp.data + " "); // transverse the values
+            System.out.print(temp.book + " "); // transverse the values
             temp = temp.next;
         }
         System.out.println();
@@ -80,10 +80,10 @@ public class linkedlist {
         }
     }
 
-    boolean search(int x) {
+    boolean search(Book book) {
         Node temp = head;
         while (temp != null) {
-            if (temp.data == x) { // we transverse the value with
+            if (temp.book == book) { // we transverse the value with
                 return true;
             }
             temp = temp.next;
@@ -91,48 +91,17 @@ public class linkedlist {
         return false;
     }
 
-    int get(int index) {
+    Book get(int index) {
         Node temp = head;
         for (int i = 0; i < index && temp != null; i++) {
             temp = temp.next;
         }
         if (temp != null) {
-            return temp.data;
+            return temp.book;
         } else {
             throw new IndexOutOfBoundsException("Index out of bounce in this linked list");
         }
     }
-
-    int findMax() {
-        if (head == null) {
-            throw new IllegalStateException("The list is empty");
-        }
-        int max = head.data;
-        Node temp = head;
-        while (temp != null) {
-            if (temp.data > max) {
-                max = temp.data;
-            }
-            temp = temp.next;
-        }
-        return max;
-    }
-
-    int findMin() {
-        if (head == null) {
-            throw new IllegalStateException("The list is empty");
-        }
-        int min = head.data;
-        Node temp = head;
-        while (temp != null) {
-            if (temp.data < min) {
-                min = temp.data;
-            }
-            temp = temp.next;
-        }
-        return min;
-    }
-
     int countOfNodesInLinkedlist() {
         Node temp = head;
         int count = 0;
