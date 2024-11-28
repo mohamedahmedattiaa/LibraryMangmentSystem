@@ -1,5 +1,5 @@
 public class catalog {
-    private linkedlist bookList;
+    private static linkedlist bookList;
 
     public catalog() {
         this.bookList = new linkedlist();
@@ -19,7 +19,7 @@ public class catalog {
         return "Book with ID " + bookId + " not found.";
     }
 
-    public Book searchBook(String bookId) {
+    public static Book searchBook(String bookId) {
         return bookList.Searchbook(bookId);
     }
 

@@ -2,17 +2,24 @@
 import java.time.LocalDate;
 import java.util.Date;
 
-public class Loan {
+public class Loan  {
     private String loanID;
     private String bookId;
     private String memberId;
     private Date issueDate;
     private Date returnDate;
     private IDGenerator idGenerator;
-    public Loan( String bookId,  String memberId ){
-        this.loanID = IDGenerator.generateLoanID();
+    private Loan( String bookId,  String memberId ){  // why book is an attribute
+        this.loanID = IDGenerator.generateLoanID();  // defining loan will clarify
         this.bookId = bookId;
         this.memberId = memberId;
+        this.issueDate = new Date();
+        this.returnDate = null;
+    }
+    public Loan(){  // why book is an attribute
+        this.loanID = IDGenerator.generateLoanID();  // defining loan will clarify
+        this.bookId = getBookId();
+        this.memberId =getMemberId();
         this.issueDate = new Date();
         this.returnDate = null;
     }
@@ -41,17 +48,23 @@ public class Loan {
         return returnDate != null;
     }
 
-    public void borrowBook(catalog catalog, Member member) {
-        Book book = catalog.searchBook(bookId);
+    public void borrowBook( Member member ,String bookid) {  // should we send catalog not a book , and member ID ??
+        Book book = catalog.searchBook(bookid);
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
+            //serach for member
             System.out.println(member.getName() + " borrowed " + book.getBookTitle() + " on " + issueDate);
-        } else {
-            System.out.println("Book is unavailable.");
+         new Loan();
+         bookId = bookid;
+         memberId = member.getmemberId();
+            System.out.println("Book is borrowed.");
+        }
+        else {
+            System.out.println("Book is not available.");
         }
     }
 
-    public void returnBook(catalog catalog, Member member) {
+    public void returnBook(Member member , String bookId) {
         Book book = catalog.searchBook(bookId);
         if (book != null) {
             book.setAvailablityStatus(true);

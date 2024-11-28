@@ -1,19 +1,19 @@
 public class Member {
-    private String bookId;
+    private String memberId; //?????
     private String name;
     private String contactInfo;
     private linkedlist booksBorrowed;
     private IDGenerator idGenerator;
 
     public Member( String name, String contactInfo) {
-        this.bookId = IDGenerator.generateMemberID();
+        this.memberId = IDGenerator.generateMemberID();
         this.name = name;
         this.contactInfo = contactInfo;
         this.booksBorrowed = new linkedlist();
 
     }
 
-    public String getBookId() {return bookId;}
+    public String getmemberId() {return memberId;}
 
     public String getName() {
         return name;
@@ -24,7 +24,7 @@ public class Member {
     }
 
 
-    public void borrowBook(Book book) {
+    public void borrowBook(Book book) { // id??
         if(book.getAvailablityStatus()) {
             booksBorrowed.insertAtBeginning(book);
           book.setAvailablityStatus(false);
@@ -34,7 +34,7 @@ public class Member {
         }
     }
 
-    public void returnBook(Book book) {
+    public void returnBook(Book book) { // id
         if(booksBorrowed.Search(book.getBookID())){
             booksBorrowed.delete(book.getBookID());
             book.setAvailablityStatus(true);
