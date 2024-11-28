@@ -52,6 +52,23 @@ public class linkedlist {
         System.out.println();
     }
 
+    public void delete(String bookId) {
+        if (head == null) return;
+
+        if (head.book.getBookID().equals(bookId)) {
+            head = head.next;
+            return;
+        }
+
+        Node current = head;
+        while (current.next != null && !current.next.book.getBookID().equals(bookId)) {
+            current = current.next;
+        }
+
+        if (current.next != null) {
+            current.next = current.next.next;
+        }
+    }
     void deleteAtEnd() {
         if (head == null || head.next == null) {
             head = null;
@@ -80,16 +97,28 @@ public class linkedlist {
         }
     }
 
-    boolean search(String id) {
+    Book Searchbook(String id) {
         Node temp = head;
         while (temp != null) {
-            if (temp.book.getBookID() == id) {
+            if (temp.book.getBookID().equals(id)) {
+                return temp.book;
+            }
+            temp = temp.next;
+        }
+        return null;
+    }
+
+    public boolean Search(String id) {
+        Node temp = head;
+        while (temp != null) {
+            if (temp.book.getBookID().equals(id)) {
                 return true;
             }
             temp = temp.next;
         }
         return false;
     }
+
 
     Book get(int index) { // Check id
         Node temp = head;
