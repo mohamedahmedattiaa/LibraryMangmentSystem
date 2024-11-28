@@ -6,13 +6,12 @@ public class Book {
     private Boolean availablityStatus;
     private IDGenerator idGenerator;
 
-        public Book( String bookTitle, String author , String genere ) {
+        public Book( String bookTitle, String author , String genere) {
         this.bookID = IDGenerator.generateBookID();
         this.bookTitle = bookTitle;
         this.author = author;
         this.genere = genere;
         this.availablityStatus = true;
-
     }
 
     public Boolean getAvailablityStatus() {
@@ -27,39 +26,27 @@ public class Book {
         return genere;
     }
 
-    public void setGenere(String genere) {
-        this.genere = genere;
-    }
-
     public String getAuthor() {
         return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
     }
 
     public String getBookTitle() {
         return bookTitle;
     }
 
-    public void setBookTitle(String bookTitle) {
-        this.bookTitle = bookTitle;
-    }
-
     public String getBookID() {
         return bookID;
     }
 
-
     @Override
     public String toString() {
         return "Book{" +
-                "bookID=" + bookID +
+                "bookID='" + bookID + '\'' +
                 ", bookTitle='" + bookTitle + '\'' +
                 ", author='" + author + '\'' +
                 ", genere='" + genere + '\'' +
                 ", availablityStatus=" + availablityStatus +
+                ", idGenerator=" + idGenerator +
                 '}';
     }
 }
