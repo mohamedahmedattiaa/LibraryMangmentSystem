@@ -1,26 +1,30 @@
 public class catalog {
-    linkedlist linkedlist = new linkedlist();
+    private linkedlist bookList;
 
-    public Boolean add(Book book ,String id) {
-        if (book == null) {
-            System.out.println("error");
-            return false;
-        } else if (linkedlist.search(id)) {
-            System.out.println("Book already exists");
-            return false;
-        } else {
-            linkedlist.insertAtBeginning(book);
-            return true;
+    public catalog() {
+        this.bookList = new linkedlist();
+    }
+
+    public void addBook(Book book) {
+        bookList.insertAtEnd(book);
+        System.out.println("Added to catalog: " + book);
+    }
+
+    public String updateBook(String bookId, boolean availabilityStatus) {
+        Book book = bookList.Searchbook(bookId);
+        if (book != null) {
+            book.setAvailablityStatus(availabilityStatus);
+            return "Book updated: " + book;
         }
-     }
-     public String updateBook(Book book ,Boolean statues){
-        String id = book.getBookID();
-        book.setAvailablityStatus(statues);
-        return book.toString();
-        // correct it and change get in linkedlist
-     }
-     public  Boolean search (String id){
-         return linkedlist.search(id);
-     }
+        return "Book with ID " + bookId + " not found.";
+    }
 
+    public Book searchBook(String bookId) {
+        return bookList.Searchbook(bookId);
+    }
+
+    public void displayCatalog() {
+        System.out.println("Library Catalog:");
+        bookList.display();
+    }
 }
