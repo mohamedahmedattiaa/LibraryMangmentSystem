@@ -1,7 +1,6 @@
 
 import java.time.LocalDate;
 import java.util.Date;
-
 public class Loan  {
     private String loanID;
     private String bookId;
@@ -9,7 +8,8 @@ public class Loan  {
     private Date issueDate;
     private Date returnDate;
     private IDGenerator idGenerator;
-    private Loan( String bookId,  String memberId ){  // why book is an attribute
+
+    public Loan( String bookId,  String memberId ){  // why book is an attribute
         this.loanID = IDGenerator.generateLoanID();  // defining loan will clarify
         this.bookId = bookId;
         this.memberId = memberId;
