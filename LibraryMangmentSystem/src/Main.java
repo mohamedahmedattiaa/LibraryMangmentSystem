@@ -20,15 +20,8 @@ public class Main {
         Member member1 = new Member("John Doe", "john.doe@example.com");
         Member member2 = new Member("Alice Smith", "alice.smith@example.com");
 
-        // Display the initial catalog
+        System.out.println(catalog.FindBookByTitle("MOBY DicK"));
 
-        System.out.println("Initial Catalog:");
-        catalog.displayCatalog();
-
-  Loan  loan = new Loan();
-        loan.borrowBook(member1, "B100");  // Borrow the book
-        System.out.println("\nLoan Details for John Doe:");
-        loan.displayLoanDetails();  // Display loan details for John Doe
 
     }
 }

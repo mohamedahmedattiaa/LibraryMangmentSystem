@@ -107,6 +107,16 @@ public class linkedlist {
         }
         return null;
     }
+    String Findbook(String bookTitle) {
+        Node temp = head;
+        while (temp != null) {
+            if (temp.book.getBookTitle().equals(bookTitle)) {
+                return temp.book.getBookID();
+            }
+            temp = temp.next;
+        }
+        return null;
+    }
 
     public boolean Search(String id) {
         Node temp = head;

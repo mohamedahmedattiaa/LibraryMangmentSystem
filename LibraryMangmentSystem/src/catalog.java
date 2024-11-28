@@ -27,4 +27,18 @@ public class catalog {
         System.out.println("Library Catalog:");
         bookList.display();
     }
+
+    public static String FindBookByTitle(String bookTitle) {
+        bookTitle = bookTitle.toLowerCase();
+        String bookid = bookList.Findbook(bookTitle);
+        Book book =catalog.searchBook(bookid);
+        if (book == null) {
+            return ("Book not found: " + bookTitle);
+        } else if (book.getAvailablityStatus() == false) {
+            return ("Book not available: " + bookTitle);
+        } else if (book.getAvailablityStatus() == true) {
+            return "Book found: " + bookTitle + " in section : " + book.getBookID().charAt(0) + " in roof number : " + book.getBookID().charAt(1) + " the number of the Book is :" + book.getBookID().charAt(2) + book.getBookID().charAt(3);
+        }
+        return null;
+    }
 }

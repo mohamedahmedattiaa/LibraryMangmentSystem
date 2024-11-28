@@ -8,7 +8,7 @@ public class Book {
 
         public Book( String bookTitle, String author , String genere) {
         this.bookID = IDGenerator.generateBookID();
-        this.bookTitle = bookTitle;
+        this.bookTitle = bookTitle.toLowerCase();
         this.author = author;
         this.genere = genere;
         this.availablityStatus = true;
@@ -31,7 +31,7 @@ public class Book {
     }
 
     public String getBookTitle() {
-        return bookTitle;
+        return bookTitle.toLowerCase();
     }
 
     public String getBookID() {
@@ -42,7 +42,7 @@ public class Book {
     public String toString() {
         return "Book{" +
                 "bookID='" + bookID + '\'' +
-                ", bookTitle='" + bookTitle + '\'' +
+                ", bookTitle='" + bookTitle.toLowerCase() + '\'' +
                 ", author='" + author + '\'' +
                 ", genere='" + genere + '\'' +
                 ", availablityStatus=" + availablityStatus +
