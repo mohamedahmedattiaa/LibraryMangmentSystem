@@ -11,7 +11,7 @@ public class Members {
     public static void display() {
         System.out.println("Members:"+" "+members);
     }
-    public static Member SearchMember(String memberID){
+    public static Member SearchMember(String memberID){ // test
 String Temp = memberID;
 for(Member member: members) {
     if (Temp.toLowerCase().equals(member.getmemberId().toLowerCase())) {
@@ -25,8 +25,6 @@ for(Member member: members) {
         return null;
     }
 }
-
-
  return null;
     }
 }
