@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Date;
 
 public class Loan {
@@ -47,8 +48,8 @@ public class Loan {
         this.returnDate = returnDate;
     }
 
-    public static void borrowBook(String memberID, String bookId, catalog catalog) {
-        Member member = Members.SearchMember(memberID);
+    public static void borrowBook(String memberID, String bookId, catalog catalog) throws IOException {
+        Member member = dataBaseMembers.SearchMember(memberID);
         Book book = catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
@@ -64,9 +65,9 @@ public class Loan {
         }
     }
 
-    public static void returnBook(String memberId, String bookId, catalog catalog) {
+    public static void returnBook(String memberId, String bookId, catalog catalog) throws IOException {
         Book book = catalog.searchBook(bookId);
-Member member = Members.SearchMember(memberId);
+Member member = dataBaseMembers.SearchMember(memberId);
         if (book != null) {
             if (!book.getAvailablityStatus()) {
                 book.setAvailablityStatus(true);
@@ -79,7 +80,7 @@ Member member = Members.SearchMember(memberId);
 
                 if (!PendingRequestsQueue.isEmpty()) {
                     Loan nextLoan = PendingRequestsQueue.dequeue();
-                    Member nextMember = Members.SearchMember(nextLoan.memberId);
+                    Member nextMember = dataBaseMembers.SearchMember(nextLoan.memberId);
                     System.out.println("Processing next request for book: " + bookId + " for member: " + nextMember.getName() + " , memberId: " + nextMember.getmemberId());
                     borrowBook(nextMember.getmemberId(), bookId, catalog); // edited
                 }
