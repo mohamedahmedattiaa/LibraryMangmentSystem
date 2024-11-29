@@ -1,5 +1,5 @@
 public class Member {
-    private String memberId; //?????
+    private String memberId;
     private String name;
     private String contactInfo;
     private linkedlist booksBorrowed;
@@ -12,7 +12,6 @@ public class Member {
         this.booksBorrowed = new linkedlist();
 
     }
-
     public String getmemberId() {return memberId;}
 
     public String getName() {
