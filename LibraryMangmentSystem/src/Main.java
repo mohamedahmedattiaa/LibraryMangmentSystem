@@ -1,8 +1,7 @@
-import javax.swing.*;
-import java.time.LocalDate;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         catalog catalog = new catalog();
         PendingRequestsQueue pendingRequestsQueue = new PendingRequestsQueue();
 
@@ -17,19 +16,18 @@ public class Main {
         catalog.addBook(book4);
         System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
 // Borrow and return books
-        Loan loan = new Loan();
-        Member member1 = new Member("atta", "Ahmed1121@gmail.com");
+        Member member1 = new Member("atta", "ezz@gmail.com");
         Member member2 = new Member("ezz", "Mohamed1122@gmail.com");
         Member member3 = new Member("a7med", "Ezz@gmail.com");
-        System.out.println(member1.getmemberId());
-        Members.add(member1);
-        Members.add(member2);
-        Members.add(member3);
-        Loan.borrowBook("M200","B100",catalog);
-        Loan.borrowBook("M201","B100",catalog);
-        System.out.println("--------------------------------------------------------------------------------------------");
-        Loan.returnBook("M200","B100",catalog);
-        PendingRequestsQueue.display(); //test
+        dataBaseMembers.add(member1);
+        dataBaseMembers.add(member2);
+        dataBaseMembers.add(member3);
+        System.out.println(dataBaseMembers.display());
+        Loan.borrowBook("M200","B100", catalog); // what if he borrowed the same book twice??
+        Loan.borrowBook("M201","B100", catalog);
+        pendingRequestsQueue.display();
+        System.out.println("//////////////////////////////////////////////");
+        Loan.returnBook("M200","B100", catalog); // it created a new LOAn ID same solution as member ID
     }
 }
 
