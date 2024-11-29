@@ -1,25 +1,24 @@
-
-import java.time.LocalDate;
 import java.util.Date;
-public class Loan extends PendingRequestsQueue  {
+
+public class Loan {
     private String loanID;
     private String bookId;
     private String memberId;
+    private Member member;
     private Date issueDate;
     private Date returnDate;
-    private IDGenerator idGenerator;
 
-    public Loan( String bookId,  String memberId ){  // why book is an attribute
-        this.loanID = IDGenerator.generateLoanID();  // defining loan will clarify
+    public Loan(String bookId, String memberId) {
+        this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
         this.memberId = memberId;
         this.issueDate = new Date();
         this.returnDate = null;
     }
-    public Loan(){  // why book is an attribute
-        this.loanID = IDGenerator.generateLoanID();  // defining loan will clarify
+    public Loan(){
+        this.loanID = IDGenerator.generateLoanID();
         this.bookId = getBookId();
-        this.memberId =getMemberId();
+        this.memberId = getMemberId();
         this.issueDate = new Date();
         this.returnDate = null;
     }
@@ -44,53 +43,57 @@ public class Loan extends PendingRequestsQueue  {
         return returnDate;
     }
 
-    public boolean isReturned() {
-        return returnDate != null;
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
     }
-    PendingRequestsQueue P = new PendingRequestsQueue();
-    public void borrowBook( Member member ,String bookid) {  // should we send catalog not a book , and member ID ??
-        Book book = catalog.searchBook(bookid);
+
+    public static void borrowBook(Member member, String bookId, catalog catalog) {
+        Book book = catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
-            //serach for member
-            System.out.println(member.getName() + " borrowed " + book.getBookTitle() + " on " + issueDate);
-
-         bookId = bookid;
-         memberId = member.getmemberId();
-            System.out.println("Book is borrowed.");
-        }
-        if (book != null && book.getAvailablityStatus()==false){
-
-            P.enqueue(bookid,member.getmemberId());
-        }
-        else {
-            System.out.println("Book is not available.");
+            Loan loan = new Loan(bookId, member.getmemberId());
+            System.out.println("Loan successfully created: " + loan.getLoanID() + " for book '" + book.getBookTitle() + "' by member '" + member.getName() + "'.");
+        } else {
+            System.out.println("Book '" + bookId + "' is not available. Adding request for member '" + member.getName() + "'.");
+            Loan loan = new Loan(bookId, member.getmemberId());
+            PendingRequestsQueue.enqueue(loan);  // Add the loan request to the queue
         }
     }
 
-    public void returnBook(Member member , String bookId) {
+    public static void returnBook(Member member, String bookId, catalog catalog) {
         Book book = catalog.searchBook(bookId);
+
         if (book != null) {
-            book.setAvailablityStatus(true);
-            this.returnDate = new Date();
-            System.out.println(member.getName() + " returned " + book.getBookTitle() + " on " + returnDate);
-            if(P.equals(book)){
-                P.dequeue();
+            if (!book.getAvailablityStatus()) {
+                book.setAvailablityStatus(true);
+                Loan currentLoan = new Loan(bookId, member.getmemberId());
+                Date returnDate = new Date();
+                currentLoan.setReturnDate(returnDate);
+
+                System.out.println("Book '" + book.getBookTitle() + "' returned by member '" + member.getName() + "'.");
+                System.out.println("Return Date: " + returnDate);
+
+                if (!PendingRequestsQueue.isEmpty()) {
+                    Loan nextLoan = PendingRequestsQueue.dequeue();
+                    String nextMemberId = nextLoan.getMemberId();
+                    System.out.println("Processing next request for book: " + bookId + " for member: " + member.getName() + " , memberId: " + member.getmemberId());
+                    borrowBook(new Member(nextMemberId, "Unknown"), bookId, catalog);
+                }
+            } else {
+                System.out.println("Book '" + book.getBookTitle() + "' is already available.");
             }
         } else {
-            System.out.println("This book is not part of the catalog.");
+            System.out.println("Book with ID '" + bookId + "' not found in catalog.");
         }
     }
 
-    public void displayLoanDetails() {
-        System.out.println("Loan ID: " + loanID);
-        System.out.println("Book ID: " + bookId);
-        System.out.println("Member ID: " + memberId);
-        System.out.println("Issue Date: " + issueDate);
-        if (returnDate != null) {
-            System.out.println("Return Date: " + returnDate);
-        } else {
-            System.out.println("Book not yet returned.");
-        }
+    @Override
+    public String toString() {
+        return "Loan Details:\n" +
+                "Loan ID      : " + loanID + "\n" +
+                "Book ID      : " + bookId + "\n" +
+                "Member ID    : " + memberId + "\n" +
+                "Issue Date   : " + issueDate + "\n" +
+                "Return Date  : " + (returnDate != null ? returnDate : "Not returned yet");
     }
 }
