@@ -23,7 +23,7 @@ public class Member {
     }
 
 
-    public void borrowBook(Book book) { // id??
+    public void borrowBook(Book book) { //             why
         if(book.getAvailablityStatus()) {
             booksBorrowed.insertAtBeginning(book);
           book.setAvailablityStatus(false);
@@ -42,4 +42,5 @@ public class Member {
             System.out.println(name+" Book is already in the catalog "+book.getBookTitle());
         }
     }
+
 }
