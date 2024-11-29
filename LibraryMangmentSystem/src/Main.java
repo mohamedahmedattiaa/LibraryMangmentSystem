@@ -29,7 +29,7 @@ public class Main {
         Loan.borrowBook("M201","B100",catalog);
         System.out.println("--------------------------------------------------------------------------------------------");
         Loan.returnBook("M200","B100",catalog);
-        PendingRequestsQueue.display();
+        PendingRequestsQueue.display(); //test
     }
 }
 
