@@ -18,22 +18,18 @@ public class Main {
         System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
 // Borrow and return books
         Loan loan = new Loan();
-        Member member1 = new Member("Ahmed", "Ahmed1121@gmail.com");
-        Member member2 = new Member("Mohamed", "Mohamed1122@gmail.com");
-        Member member3 = new Member("Ezz", "Ezz@gmail.com");
-
-        loan.borrowBook(member1, "B100", catalog);
-        loan.borrowBook(member2, "B100", catalog);
-        loan.borrowBook(member1, "B101", catalog);
-        loan.borrowBook(member2, "B101", catalog);
-        loan.borrowBook(member3, "B102", catalog);
-        loan.borrowBook(member3, "B103", catalog);
-        loan.borrowBook(member1, "B103", catalog);
-        loan.returnBook(member1, "B100",catalog);
-
+        Member member1 = new Member("atta", "Ahmed1121@gmail.com");
+        Member member2 = new Member("ezz", "Mohamed1122@gmail.com");
+        Member member3 = new Member("a7med", "Ezz@gmail.com");
+        System.out.println(member1.getmemberId());
+        Members.add(member1);
+        Members.add(member2);
+        Members.add(member3);
+        Loan.borrowBook("M200","B100",catalog);
+        Loan.borrowBook("M201","B100",catalog);
+        System.out.println("--------------------------------------------------------------------------------------------");
+        Loan.returnBook("M200","B100",catalog);
         PendingRequestsQueue.display();
-
-
     }
 }
 
