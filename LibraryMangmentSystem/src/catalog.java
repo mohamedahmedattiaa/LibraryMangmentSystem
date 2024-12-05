@@ -46,5 +46,7 @@ public class catalog {
                 " in roof number: " + bookID.charAt(1) +
                 " the number of the Book is: " + bookID.substring(2);
     }
-
+    public void Sorting(String SortedBy){
+        bookList.sorting(SortedBy);
+    }
 }
