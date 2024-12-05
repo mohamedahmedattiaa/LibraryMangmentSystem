@@ -1,7 +1,7 @@
 package LoginPage;
 import javax.swing.*;
 import java.awt.*;
-
+//vv
 public class AdminGUI extends JFrame {
     public AdminGUI() {
         JFrame frame = new JFrame("Admin panel");
