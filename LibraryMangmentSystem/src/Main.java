@@ -29,7 +29,7 @@ public class Main {
 //        System.out.println("//////////////////////////////////////////////");
 //        Loan.returnBook("M200","B100", catalog);// it created a new LOAn ID same solution as member ID
         catalog.displayCatalog();
-        catalog.S("author");
+        catalog.Sorting("author");
         catalog.displayCatalog();
     }
 }
