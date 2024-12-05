@@ -6,7 +6,7 @@ public class Book {
     private Boolean availablityStatus;
     private IDGenerator idGenerator;
 
-        public Book( String bookTitle, String author , String genere) {
+        public Book(String bookTitle, String author , String genere) {
         this.bookID = IDGenerator.generateBookID();
         this.bookTitle = bookTitle.toLowerCase();
         this.author = author;
@@ -25,9 +25,22 @@ public class Book {
     public String getGenere() {
         return genere;
     }
-
+  // hello
     public String getAuthor() {
         return author;
+    }
+
+
+    public void setBookTitle(String bookTitle) {
+        this.bookTitle = bookTitle;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setGenere(String genere) {
+        this.genere = genere;
     }
 
     public String getBookTitle() {
@@ -46,7 +59,6 @@ public class Book {
                 ", author='" + author + '\'' +
                 ", genere='" + genere + '\'' +
                 ", availablityStatus=" + availablityStatus +
-                ", idGenerator=" + idGenerator +
                 '}';
     }
 }

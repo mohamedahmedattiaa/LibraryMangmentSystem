@@ -46,7 +46,8 @@ public class linkedlist {
     void display() {
         Node temp = head;
         while (temp != null) {
-            System.out.print(temp.book + " "); // transverse the values
+            System.out.print(temp.book + " ");
+            System.out.println();// transverse the values
             temp = temp.next;
         }
         System.out.println();
@@ -141,13 +142,52 @@ public class linkedlist {
             throw new IndexOutOfBoundsException("Index out of bounce in this linked list");
         }
     }
-    int countOfNodesInLinkedlist() {
-        Node temp = head;
-        int count = 0;
-        while (temp != null) {// transverse the values
-            temp = temp.next;
-            count++;
-        }
-        return count;
+    public void sorting(String Sortedby){
+        head = mergeSort(head,Sortedby);
     }
-}
+
+    public Node mergeSort(Node head,String SortedBy) {
+        if(head == null || head.next == null) return head;
+        Node middle = getMiddle(head);
+        Node next =middle.next;
+        middle.next = null;
+
+        Node left = mergeSort(head,SortedBy);
+        Node right = mergeSort(next,SortedBy);
+        return merge(left,right,SortedBy);
+    }
+
+    private Node getMiddle(Node head) {
+        if (head == null) return head;
+
+        Node slow = head, fast = head;
+        while (fast.next != null && fast.next.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    public  Node merge(Node left,Node right ,String SortedBy) {
+        if(left == null ) return right;
+        if(right == null ) return left;
+        boolean check = false;
+        switch (SortedBy) {
+            case "title":
+            case "Title":
+                check = left.book.getBookTitle().compareTo(right.book.getBookTitle()) <= 0;
+                break;
+            case "Author":
+            case "author":
+                check = left.book.getAuthor().compareTo(right.book.getAuthor()) <= 0;
+                break;
+        }
+               if (check) {
+                   left.next = merge(left.next, right, SortedBy);
+                   return left;
+               } else {
+                   right.next = merge(left, right.next, SortedBy);
+                   return right;
+               }
+        }
+    }
