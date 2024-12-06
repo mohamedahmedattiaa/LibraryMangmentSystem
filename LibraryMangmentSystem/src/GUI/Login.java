@@ -1,5 +1,4 @@
-package LoginPage;
-
+package GUI;
 import javax.swing.*;
 import java.awt.*;
 
@@ -20,7 +19,7 @@ public class Login extends JFrame {
         frame.setLayout(null);
 
         // إعداد الخلفية
-        ImageIcon backgroundIcon = new ImageIcon("LoginPage/book.jpg");
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/GUI/book.jpg"));
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setBounds(0, 0, 735, 956);
 
@@ -47,17 +46,18 @@ public class Login extends JFrame {
         styleButton(signUpButton, 300, 500);
 
         // إعداد أزرار الراديو
+        // Configure Classes.Member Radio Button
         memberRadioButton = new JRadioButton("Member");
-        librarianRadioButton = new JRadioButton("Librarian");
-
         memberRadioButton.setBounds(300, 400, 90, 30);
+        memberRadioButton.setForeground(Color.WHITE); // Set text color
+        memberRadioButton.setOpaque(false); // Make background transparent
+
+// Configure Librarian Radio Button
+        librarianRadioButton = new JRadioButton("Librarian");
         librarianRadioButton.setBounds(410, 400, 90, 30);
+        librarianRadioButton.setForeground(Color.WHITE); // Set text color
+        librarianRadioButton.setOpaque(false); // Make background transparent
 
-        memberRadioButton.setBackground(new Color(0, 0, 0, 0));
-        librarianRadioButton.setBackground(new Color(0, 0, 0, 0));
-
-        memberRadioButton.setForeground(Color.WHITE);
-        librarianRadioButton.setForeground(Color.WHITE);
 
         // إضافة أزرار الراديو إلى ButtonGroup
         ButtonGroup roleGroup = new ButtonGroup();
@@ -71,25 +71,25 @@ public class Login extends JFrame {
 
             // التحقق من اختيار الراديو
             if (!memberRadioButton.isSelected() && !librarianRadioButton.isSelected()) {
-                JOptionPane.showMessageDialog(frame, "Please select a role (Member or Librarian)", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Please select a role (Classes.Member or Librarian)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if (memberRadioButton.isSelected()) {
                 // تحقق الدخول كعضو
                 if (id.equals("user") && pass.equals("1234")) {
-                    JOptionPane.showMessageDialog(frame, "Welcome Member!");
+                    JOptionPane.showMessageDialog(frame, "Welcome Classes.Member!");
                     frame.dispose(); // غلق نافذة تسجيل الدخول
-                    new AdminGUI(); // الانتقال إلى شاشة Member
+                    new  MemberGUI(); // الانتقال إلى شاشة Classes.Member
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Invalid Member ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Invalid Classes.Member ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else if (librarianRadioButton.isSelected()) {
                 // تحقق الدخول كأمين مكتبة
                 if (id.equals("librarian") && pass.equals("5678")) {
                     JOptionPane.showMessageDialog(frame, "Welcome Librarian!");
                     frame.dispose(); // غلق نافذة تسجيل الدخول
-                    new Login(); // الانتقال إلى شاشة Librarian
+                    new LibrarianGUI(); // الانتقال إلى شاشة Librarian
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid Librarian ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
                 }

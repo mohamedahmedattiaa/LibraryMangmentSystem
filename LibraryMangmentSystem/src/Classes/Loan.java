@@ -1,3 +1,5 @@
+package Classes;
+
 import java.io.IOException;
 import java.util.Date;
 
@@ -48,25 +50,25 @@ public class Loan {
         this.returnDate = returnDate;
     }
 
-    public static void borrowBook(String memberID, String bookId, catalog catalog) throws IOException {
+    public static void borrowBook(String memberID, String bookId, Catalog catalog) throws IOException {
         Member member = dataBaseMembers.SearchMember(memberID);
-        Book book = catalog.searchBook(bookId);
+        Book book = Catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
             Loan loan = new Loan(bookId, member.getmemberId());
-            System.out.println("Loan successfully created: " + loan.getLoanID() + " for book '" + book.getBookTitle() + "' by member '" + member.getName() + "'.");
+            System.out.println("Classes.Loan successfully created: " + loan.getLoanID() + " for book '" + book.getBookTitle() + "' by member '" + member.getName() + "'.");
         } else if(book != null && !book.getAvailablityStatus()) {
-            System.out.println("Book '" + bookId + "' is not available. Adding request for member '" + member.getName() + "'.");
+            System.out.println("Classes.Book '" + bookId + "' is not available. Adding request for member '" + member.getName() + "'.");
             Loan loan = new Loan(bookId, member.getmemberId());
             PendingRequestsQueue.enqueue(loan);  // Add the loan request to the queue
         }
         else {
-            System.out.println("Book with ID '" + bookId + "' not found in catalog.");
+            System.out.println("Classes.Book with ID '" + bookId + "' not found in catalog.");
         }
     }
 
-    public static void returnBook(String memberId, String bookId, catalog catalog) throws IOException {
-        Book book = catalog.searchBook(bookId);
+    public static void returnBook(String memberId, String bookId, Catalog catalog) throws IOException {
+        Book book = Catalog.searchBook(bookId);
 Member member = dataBaseMembers.SearchMember(memberId);
         if (book != null) {
             if (!book.getAvailablityStatus()) {
@@ -75,7 +77,7 @@ Member member = dataBaseMembers.SearchMember(memberId);
                 Date returnDate = new Date();
                 currentLoan.setReturnDate(returnDate);
 
-                System.out.println("Book '" + book.getBookTitle() + "' returned by member '" + member.getName() + "'.");
+                System.out.println("Classes.Book '" + book.getBookTitle() + "' returned by member '" + member.getName() + "'.");
                 System.out.println("Return Date: " + returnDate);
 
                 if (!PendingRequestsQueue.isEmpty()) {
@@ -85,10 +87,10 @@ Member member = dataBaseMembers.SearchMember(memberId);
                     borrowBook(nextMember.getmemberId(), bookId, catalog); // edited
                 }
             } else {
-                System.out.println("Book '" + book.getBookTitle() + "' is already available.");
+                System.out.println("Classes.Book '" + book.getBookTitle() + "' is already available.");
             }
         } else {
-            System.out.println("Book with ID '" + bookId + "' not found in catalog.");
+            System.out.println("Classes.Book with ID '" + bookId + "' not found in catalog.");
         }
     }
 

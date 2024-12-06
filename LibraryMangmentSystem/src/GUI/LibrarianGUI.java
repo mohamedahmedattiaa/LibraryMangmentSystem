@@ -1,9 +1,9 @@
-package LoginPage;
+package GUI;
 import javax.swing.*;
 import java.awt.*;
 //vv
-public class AdminGUI extends JFrame {
-    public AdminGUI() {
+public class LibrarianGUI extends JFrame {
+    public LibrarianGUI() {
         JFrame frame = new JFrame("Admin panel");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setSize(800,600);

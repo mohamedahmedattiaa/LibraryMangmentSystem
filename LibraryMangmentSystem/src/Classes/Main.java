@@ -1,8 +1,10 @@
+package Classes;
+
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        catalog catalog = new catalog();
+        Catalog catalog = new Catalog();
         PendingRequestsQueue pendingRequestsQueue = new PendingRequestsQueue();
 
 // Add books to the catalog
@@ -10,6 +12,8 @@ public class Main {
         Book book2 = new Book("1984",  "Ibraham lincolin", "Dystopian");
         Book book3 = new Book("The AdventureLand", "Wealm sheckspear", "Dystopian");
         Book book4 = new Book("THE GREATEST Fan", "Albert fred", "Fiction");
+
+
         catalog.addBook(book1);
         catalog.addBook(book2);
         catalog.addBook(book3);
@@ -23,11 +27,11 @@ public class Main {
         dataBaseMembers.add(member2);
         dataBaseMembers.add(member3);
         System.out.println(dataBaseMembers.display());
-//        Loan.borrowBook("M200","B100", catalog); // what if he borrowed the same book twice??
-//        Loan.borrowBook("M201","B100", catalog);
+//        Classes.Loan.borrowBook("M200","B100", catalog); // what if he borrowed the same book twice??
+//        Classes.Loan.borrowBook("M201","B100", catalog);
 //        pendingRequestsQueue.display();
 //        System.out.println("//////////////////////////////////////////////");
-//        Loan.returnBook("M200","B100", catalog);// it created a new LOAn ID same solution as member ID
+//        Classes.Loan.returnBook("M200","B100", catalog);// it created a new LOAn ID same solution as member ID
         catalog.displayCatalog();
         catalog.Sorting("author");
         catalog.displayCatalog();

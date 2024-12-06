@@ -1,7 +1,9 @@
-public class catalog {
+package Classes;
+
+public class Catalog {
     public static linkedlist bookList;
 
-    public catalog() {
+    public Catalog() {
         this.bookList = new linkedlist();
     }
 
@@ -14,9 +16,9 @@ public class catalog {
         Book book = bookList.Searchbook(bookId);
         if (book != null) {
             book.setAvailablityStatus(false);
-            return "Book updated: " + book;
+            return "Classes.Book updated: " + book;
         }
-        return "Book with ID " + bookId + " not found.";
+        return "Classes.Book with ID " + bookId + " not found.";
     }
 
     public static Book searchBook(String bookId) {
@@ -24,7 +26,7 @@ public class catalog {
     }
 
     public void displayCatalog() {
-        System.out.println("Library Catalog:");
+        System.out.println("Library Classes.Catalog:");
         bookList.display();
     }
 
@@ -32,19 +34,19 @@ public class catalog {
         bookTitle = bookTitle.toLowerCase();
         String bookid = bookList.Findbook(bookTitle);
         if (bookid == null) {
-            return "Book not found: " + bookTitle;
+            return "Classes.Book not found: " + bookTitle;
         }
-        Book book = catalog.searchBook(bookid);
+        Book book = Catalog.searchBook(bookid);
         if (book == null) {
-            return "Book not found: " + bookTitle;
+            return "Classes.Book not found: " + bookTitle;
         }
         if (!book.getAvailablityStatus()) {
-            return "Book not available: " + bookTitle;
+            return "Classes.Book not available: " + bookTitle;
         }
         String bookID = book.getBookID();
         return "Book found: " + bookTitle + " in section: " + bookID.charAt(0) +
                 " in roof number: " + bookID.charAt(1) +
-                " the number of the Book is: " + bookID.substring(2);
+                " the number of the Classes.Book is: " + bookID.substring(2);
     }
     public void Sorting(String SortedBy){
         bookList.sorting(SortedBy);

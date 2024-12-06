@@ -1,3 +1,5 @@
+package Classes;
+
 import java.util.LinkedList;
 import java.io.*;
 
@@ -51,7 +53,7 @@ public class dataBaseMembers {
             }
 
         }
-         return "End OF Member List";
+         return "End OF Classes.Member List";
     }
 
     public static Member SearchMember(String memberID) throws IOException {
