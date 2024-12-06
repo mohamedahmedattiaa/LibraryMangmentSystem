@@ -16,9 +16,9 @@ public class Catalog {
         Book book = bookList.Searchbook(bookId);
         if (book != null) {
             book.setAvailablityStatus(false);
-            return "Classes.Book updated: " + book;
+            return "Book updated: " + book;
         }
-        return "Classes.Book with ID " + bookId + " not found.";
+        return "Book with ID " + bookId + " not found.";
     }
 
     public static Book searchBook(String bookId) {
@@ -26,7 +26,7 @@ public class Catalog {
     }
 
     public void displayCatalog() {
-        System.out.println("Library Classes.Catalog:");
+        System.out.println("Library Catalog:");
         bookList.display();
     }
 
@@ -34,19 +34,19 @@ public class Catalog {
         bookTitle = bookTitle.toLowerCase();
         String bookid = bookList.Findbook(bookTitle);
         if (bookid == null) {
-            return "Classes.Book not found: " + bookTitle;
+            return "Book not found: " + bookTitle;
         }
         Book book = Catalog.searchBook(bookid);
         if (book == null) {
-            return "Classes.Book not found: " + bookTitle;
+            return "Book not found: " + bookTitle;
         }
         if (!book.getAvailablityStatus()) {
-            return "Classes.Book not available: " + bookTitle;
+            return "Book not available: " + bookTitle;
         }
         String bookID = book.getBookID();
         return "Book found: " + bookTitle + " in section: " + bookID.charAt(0) +
                 " in roof number: " + bookID.charAt(1) +
-                " the number of the Classes.Book is: " + bookID.substring(2);
+                " the number of the Book is: " + bookID.substring(2);
     }
     public void Sorting(String SortedBy){
         bookList.sorting(SortedBy);

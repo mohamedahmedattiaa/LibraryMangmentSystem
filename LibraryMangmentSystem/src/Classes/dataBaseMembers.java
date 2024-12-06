@@ -1,9 +1,6 @@
 package Classes;
-
 import java.util.LinkedList;
 import java.io.*;
-
-
 public class dataBaseMembers {
     private static LinkedList<Member> members = new LinkedList<>();
     static BufferedWriter writer;
@@ -53,7 +50,7 @@ public class dataBaseMembers {
             }
 
         }
-         return "End OF Classes.Member List";
+         return "End OF Member List";
     }
 
     public static Member SearchMember(String memberID) throws IOException {

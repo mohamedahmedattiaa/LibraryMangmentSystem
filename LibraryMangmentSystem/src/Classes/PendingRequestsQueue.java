@@ -8,7 +8,7 @@ public class PendingRequestsQueue {
 
     public static void enqueue(Loan loan) {
         request.add(loan);
-        System.out.println("Classes.Loan request added for book '" + loan.getBookId() + "' by member '" + loan.getMemberId() + "'.");
+        System.out.println("Loan request added for book " + loan.getBookId() + " by member '" + loan.getMemberId() + ".");
     }
 
     public static Loan dequeue() {
@@ -22,7 +22,7 @@ public class PendingRequestsQueue {
     public static void display() {
         System.out.println("Loan Requests:");
         for (Loan loan : request) {
-            System.out.println("Classes.Book ID: " + loan.getBookId() + ", Classes.Member: " + loan.getMemberId());
+            System.out.println("Book ID: " + loan.getBookId() + ", Member: " + loan.getMemberId());
         }
     }
 }

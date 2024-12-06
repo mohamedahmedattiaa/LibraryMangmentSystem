@@ -1,6 +1,7 @@
 package GUI;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class Login extends JFrame {
     private JTextField idText;
