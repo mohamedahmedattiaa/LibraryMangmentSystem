@@ -1,6 +1,7 @@
 package Classes;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Loan {
@@ -10,20 +11,21 @@ public class Loan {
     private Member member;
     private Date issueDate;
     private Date returnDate;
+    private static final int dueDate = 14;
 
     public Loan(String bookId, String memberId) {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
         this.memberId = memberId;
-        this.issueDate = new Date();
-        this.returnDate = null;
+        this.issueDate = new Date(); // Current date as issue date
+        this.returnDate = calculateDueDate(issueDate); // Automatically set due date
     }
     public Loan(){
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = getBookId();
         this.memberId = getMemberId();
         this.issueDate = new Date();
-        this.returnDate = null;
+        this.returnDate = calculateDueDate(issueDate);;
     }
 
     public String getLoanID() {
@@ -95,6 +97,13 @@ public class Loan {
         } else {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
+    }
+
+    private Date calculateDueDate(Date issueDate) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(issueDate);
+        calendar.add(Calendar.DAY_OF_YEAR, dueDate); // Add loan period days
+        return calendar.getTime();
     }
 
     @Override
