@@ -29,12 +29,12 @@ public class Catalog {
         return bookList.Searchbook(bookId);
     }
 
-    public void displayCatalog() {
+    public static void displayCatalog() {
         System.out.println("Library Catalog:");
         bookList.display();
     }
 
-    public String FindBookByTitle(String bookTitle) {
+    public static String FindBookByTitle(String bookTitle) {
         bookTitle = bookTitle.toLowerCase();
         String bookid = bookList.Findbook(bookTitle);
         if (bookid == null) {
@@ -52,7 +52,7 @@ public class Catalog {
                 " in roof number: " + bookID.charAt(1) +
                 " the number of the Book is: " + bookID.substring(2);
     }
-    public void Sorting(String SortedBy){
+    public static void Sorting(String SortedBy){
         bookList.sorting(SortedBy);
     }
 }
