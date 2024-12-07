@@ -3,7 +3,11 @@ package GUI;
 import javax.swing.*;
 
 public class Main {
-    public static void main(String[]args){
-        SwingUtilities.invokeLater(Login::new);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Login loginWindow = new Login();
+            loginWindow.setVisible(true);
+        });
+        new LibrarianGUI();
     }
 }

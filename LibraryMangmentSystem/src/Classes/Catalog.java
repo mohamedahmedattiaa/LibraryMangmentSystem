@@ -12,9 +12,10 @@ public class Catalog {
         System.out.println("Added to catalog: " + book);
     }
 
-    public static void removeBook(String bookId) {
+    public static boolean removeBook(String bookId) {
         bookList.deleteAtEnd();
         System.out.println("Removed from catalog: " + bookId);
+        return false;
     }
     public static String updateBook(String bookId, boolean availabilityStatus) {
         Book book = bookList.Searchbook(bookId);
