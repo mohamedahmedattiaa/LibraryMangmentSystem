@@ -7,12 +7,16 @@ public class Catalog {
         this.bookList = new linkedlist();
     }
 
-    public void addBook(Book book) {
+    public static void addBook(Book book) {
         bookList.insertAtEnd(book);
         System.out.println("Added to catalog: " + book);
     }
 
-    public String updateBook(String bookId, boolean availabilityStatus) {
+    public static void removeBook(Book book) {
+        bookList.deleteAtEnd();
+        System.out.println("Removed from catalog: " + book);
+    }
+    public static String updateBook(String bookId, boolean availabilityStatus) {
         Book book = bookList.Searchbook(bookId);
         if (book != null) {
             book.setAvailablityStatus(false);
