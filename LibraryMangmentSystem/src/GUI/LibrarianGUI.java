@@ -9,10 +9,8 @@ import Classes.linkedlist;
 import GUI.Login;
 
 public class LibrarianGUI extends JFrame {
-    linkedlist bookList;
     private JTextArea displayArea;
     public LibrarianGUI() {
-        bookList = new linkedlist();
         setTitle("Librarian Panel");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
