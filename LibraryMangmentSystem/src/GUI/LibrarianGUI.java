@@ -152,6 +152,7 @@ public class LibrarianGUI extends JFrame {
                 addBookDialog.dispose(); // Close the dialog after adding the book
             });
 
+            cancelButton.addActionListener(event -> addBookDialog.dispose());
             // Add button to dialog and set the dialog visible
             addBookDialog.add(confirmButton);
             addBookDialog.add(cancelButton);
