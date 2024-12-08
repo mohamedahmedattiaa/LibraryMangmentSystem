@@ -68,7 +68,7 @@ public class Loan {
         } else {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
-    }
+    } // bla bla bla
 
     public static void returnBook(String memberId, String bookId, Catalog catalog) throws IOException {
         Book book = Catalog.searchBook(bookId);
