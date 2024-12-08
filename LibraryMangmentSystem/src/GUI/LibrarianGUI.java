@@ -1,4 +1,5 @@
 package GUI;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -6,7 +7,6 @@ import java.awt.event.ActionListener;
 import Classes.Book;
 import Classes.Catalog;
 import Classes.Node;
-import java.io.File;
 import javax.swing.ImageIcon;
 
 public class LibrarianGUI extends JFrame {
@@ -97,6 +97,7 @@ public class LibrarianGUI extends JFrame {
     }
 
     private void switchPage(String pageName) {
+        System.out.println("Switching to page: " + pageName); // Debugging line
         cardLayout.show(mainPanel, pageName);
     }
 
@@ -108,93 +109,149 @@ public class LibrarianGUI extends JFrame {
     }
 
     private JPanel createAddBookPanel() {
-        JPanel addBookPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        addBookPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel addBookPanel = new JPanel();
+        addBookPanel.setLayout(new BorderLayout());
 
-        JTextField bookTitleField = new JTextField();
-        JTextField bookAuthorField = new JTextField();
-        JTextField bookGenreField = new JTextField();
-
-        addBookPanel.add(new JLabel("Title:"));
-        addBookPanel.add(bookTitleField);
-        addBookPanel.add(new JLabel("Author:"));
-        addBookPanel.add(bookAuthorField);
-        addBookPanel.add(new JLabel("Genre:"));
-        addBookPanel.add(bookGenreField);
-
+        // Create the "Add Book" button
         JButton addButton = new JButton("Add Book");
         addButton.addActionListener(e -> {
-            String title = bookTitleField.getText();
-            String author = bookAuthorField.getText();
-            String genre = bookGenreField.getText();
 
-            if (title.isEmpty() || author.isEmpty() || genre.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                Book newBook = new Book(title, author, genre);
-                Catalog.addBook(newBook);
-                refreshTable();
-                JOptionPane.showMessageDialog(this, "Book added successfully!");
-            }
+            JDialog addBookDialog = new JDialog(this, "Add New Book", true);
+            addBookDialog.setSize(400, 250);
+            addBookDialog.setLayout(new GridLayout(4, 2, 10, 10));
+            addBookDialog.setLocationRelativeTo(this);
+
+            JTextField bookTitleField = new JTextField();
+            JTextField bookAuthorField = new JTextField();
+            JTextField bookGenreField = new JTextField();
+
+            addBookDialog.add(new JLabel("Title:"));
+            addBookDialog.add(bookTitleField);
+            addBookDialog.add(new JLabel("Author:"));
+            addBookDialog.add(bookAuthorField);
+            addBookDialog.add(new JLabel("Genre:"));
+            addBookDialog.add(bookGenreField);
+
+            // Add "Add" button in dialog
+            JButton confirmButton = new JButton("Add Book");
+            JButton cancelButton = new JButton("Cancel");
+            confirmButton.addActionListener(event -> {
+                String title = bookTitleField.getText();
+                String author = bookAuthorField.getText();
+                String genre = bookGenreField.getText();
+
+                if (title.isEmpty() || author.isEmpty() || genre.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // Add book to catalog
+                    Book newBook = new Book(title, author, genre);
+                    Catalog.addBook(newBook);
+                    refreshTable();
+                    JOptionPane.showMessageDialog(this, "Book added successfully!");
+                }
+                addBookDialog.dispose(); // Close the dialog after adding the book
+            });
+
+            // Add button to dialog and set the dialog visible
+            addBookDialog.add(confirmButton);
+            addBookDialog.add(cancelButton);
+            addBookDialog.setVisible(true);
         });
 
-        addBookPanel.add(addButton);
-
+        addBookPanel.add(addButton, BorderLayout.CENTER);
         return addBookPanel;
     }
 
+
     private JPanel createRemoveBookPanel() {
-        JPanel removeBookPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        removeBookPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel removeBookPanel = new JPanel(new BorderLayout());
 
-        JTextField bookIdField = new JTextField();
-        removeBookPanel.add(new JLabel("Enter Book ID:"));
-        removeBookPanel.add(bookIdField);
-
+        // Create the "Remove Book" button
         JButton removeButton = new JButton("Remove Book");
         removeButton.addActionListener(e -> {
-            String bookID = bookIdField.getText();
-            if (bookID.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a Book ID!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                boolean removed = Catalog.removeBook(bookID);
-                if (removed) {
-                    refreshTable();
-                    JOptionPane.showMessageDialog(this, "Book removed successfully!");
+            // Open the "Remove Book" dialog
+            JDialog removeBookDialog = new JDialog(this, "Remove Book", true);
+            removeBookDialog.setSize(400, 150);
+            removeBookDialog.setLayout(new GridLayout(3, 1, 10, 10));
+            removeBookDialog.setLocationRelativeTo(this);
+
+            // Create a text field for Book ID
+            JTextField bookIdField = new JTextField();
+
+            // Create "Remove" button in dialog
+            JButton confirmRemoveButton = new JButton("Remove Book");
+            confirmRemoveButton.addActionListener(event -> {
+                String bookId = bookIdField.getText();
+
+                if (bookId.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please enter a Book ID!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Book not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                    boolean removed = Catalog.removeBook(bookId);
+                    if (removed) {
+                        refreshTable();
+                        JOptionPane.showMessageDialog(this, "Book removed successfully!");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Book not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
-            }
+                removeBookDialog.dispose(); // Close the dialog after removing the book
+            });
+
+            // Add components to the dialog
+            removeBookDialog.add(new JLabel("Enter Book ID:"));
+            removeBookDialog.add(bookIdField);
+            removeBookDialog.add(confirmRemoveButton);
+
+            // Show the dialog
+            removeBookDialog.setVisible(true);
         });
 
-        removeBookPanel.add(removeButton);
-
+        removeBookPanel.add(removeButton, BorderLayout.CENTER);
         return removeBookPanel;
     }
 
+
     private JPanel createSearchPanel() {
-        JPanel searchPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel searchPanel = new JPanel(new BorderLayout());
 
-        JTextField searchField = new JTextField();
-        searchPanel.add(new JLabel("Enter Book Title or Author:"));
-        searchPanel.add(searchField);
-
+        // Create the "Search Book" button
         JButton searchButton = new JButton("Search Book");
         searchButton.addActionListener(e -> {
-            String searchQuery = searchField.getText();
-            if (searchQuery.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a search query!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String results = Catalog.FindBookByTitle(searchQuery);
-                JOptionPane.showMessageDialog(this, results.isEmpty() ? "No books found!" : results);
-            }
+            // Open the "Search Book" dialog
+            JDialog searchBookDialog = new JDialog(this, "Search Book", true);
+            searchBookDialog.setSize(400, 150);
+            searchBookDialog.setLayout(new GridLayout(3, 1, 10, 10));
+            searchBookDialog.setLocationRelativeTo(this);
+
+            // Create a text field for search query
+            JTextField searchField = new JTextField();
+
+            JButton confirmSearchButton = new JButton("Search Book");
+            confirmSearchButton.addActionListener(event -> {
+                String searchQuery = searchField.getText();
+
+                if (searchQuery.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please enter a search query!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    String results = Catalog.FindBookByTitle(searchQuery);
+                    JOptionPane.showMessageDialog(this, results.isEmpty() ? "No books found!" : results);
+                }
+                searchBookDialog.dispose(); // Close the dialog after searching
+            });
+
+            // Add components to the dialog
+            searchBookDialog.add(new JLabel("Enter Book Title or Author:"));
+            searchBookDialog.add(searchField);
+            searchBookDialog.add(confirmSearchButton);
+
+            // Show the dialog
+            searchBookDialog.setVisible(true);
         });
 
-        searchPanel.add(searchButton);
-
+        searchPanel.add(searchButton, BorderLayout.CENTER);
         return searchPanel;
     }
+
 
     private void refreshTable() {
         tableModel.setRowCount(0);
