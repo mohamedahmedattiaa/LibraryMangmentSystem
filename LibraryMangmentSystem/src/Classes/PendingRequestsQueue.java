@@ -51,7 +51,7 @@ public class PendingRequestsQueue {
             }
         }
 
-        return loans;
+        return loans; // edit
     }
 }
 
