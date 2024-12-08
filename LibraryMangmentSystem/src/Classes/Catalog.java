@@ -1,10 +1,9 @@
 package Classes;
 
 public class Catalog {
-    public static linkedlist bookList;
+    public static linkedlist bookList =new linkedlist();
 
     public Catalog() {
-        this.bookList = new linkedlist();
     }
 
     public static void addBook(Book book) {
@@ -13,9 +12,15 @@ public class Catalog {
     }
 
     public static boolean removeBook(String bookId) {
-        bookList.deleteAtEnd();
-        System.out.println("Removed from catalog: " + bookId);
-        return false;
+        boolean isRemoved = bookList.deleteById(bookId);
+        if (isRemoved) {
+            System.out.println("Book with ID " + bookId + " removed successfully.");
+        } else {
+            System.out.println("Book with ID " + bookId + " not found.");
+        }
+        System.out.println("After removing:");
+        bookList.display();
+        return isRemoved;
     }
     public static String updateBook(String bookId, boolean availabilityStatus) {
         Book book = bookList.Searchbook(bookId);
@@ -31,7 +36,6 @@ public class Catalog {
     }
 
     public static void displayCatalog() {
-        System.out.println("Library Catalog:");
         bookList.display();
     }
 

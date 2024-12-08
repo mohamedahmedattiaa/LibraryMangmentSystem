@@ -27,14 +27,16 @@ public class Main {
         dataBaseMembers.add(member2);
         dataBaseMembers.add(member3);
         System.out.println(dataBaseMembers.display());
-//        Classes.Loan.borrowBook("M200","B100", catalog); // what if he borrowed the same book twice??
-//        Classes.Loan.borrowBook("M201","B100", catalog);
-//        pendingRequestsQueue.display();
-//        System.out.println("//////////////////////////////////////////////");
-//        Classes.Loan.returnBook("M200","B100", catalog);// it created a new LOAn ID same solution as member ID
-        catalog.displayCatalog();
-        catalog.Sorting("author");
-        catalog.displayCatalog();
+        Loan.borrowBook("M200","B100", catalog); // what if he borrowed the same book twice??
+        Loan.borrowBook("M201","B100", catalog);
+         pendingRequestsQueue.display();
+         System.out.println("//////////////////////////////////////////////");
+         pendingRequestsQueue.display();
+         Loan.borrowBook("M202","B100", catalog);
+//        Loan.returnBook("M200","B100", catalog);// it created a new LOAn ID same solution as member ID
+//        catalog.displayCatalog();
+//        catalog.Sorting("author");
+//        catalog.displayCatalog();
     }
 }
 

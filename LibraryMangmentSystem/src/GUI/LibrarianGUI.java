@@ -1,64 +1,74 @@
 package GUI;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import Classes.Book;
 import Classes.Catalog;
-import Classes.linkedlist;
-import GUI.Login;
+import Classes.Node;
+import java.io.File;
+import javax.swing.ImageIcon;
 
 public class LibrarianGUI extends JFrame {
-    private JTextArea displayArea;
+    private DefaultTableModel tableModel;
+    private JTable bookTable;
+    private CardLayout cardLayout; // For switching pages
+    private JPanel mainPanel; // Container for all pages
+
     public LibrarianGUI() {
         setTitle("Librarian Panel");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        // Initialize table model and JTable
+        tableModel = new DefaultTableModel(new String[]{"Title", "Author", "Genre"}, 0);
+        bookTable = new JTable(tableModel);
+
+        // CardLayout for the main content area
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout); // Correctly set up with CardLayout
+
+        // Add separate panels to the CardLayout
+        mainPanel.add(createCatalogPanel(), "View Catalog");
+        mainPanel.add(createAddBookPanel(), "Add Book");
+        mainPanel.add(createRemoveBookPanel(), "Remove Book");
+        mainPanel.add(createSearchPanel(), "Search Book");
+
+        // Ensure the background image is compatible with CardLayout.
+        JPanel backgroundPanel = new JPanel(new BorderLayout());
+        JLabel background = createBackgroundImage();
+        backgroundPanel.add(background, BorderLayout.CENTER);
+
+        // Add to mainPanel inside CardLayout
+        backgroundPanel.add(mainPanel, BorderLayout.NORTH);
+
+        add(backgroundPanel, BorderLayout.CENTER);
+
+        // Navigation panel
         JPanel navPanel = new JPanel();
         navPanel.setLayout(new GridLayout(5, 1, 10, 10));
         navPanel.setPreferredSize(new Dimension(220, getHeight()));
         navPanel.setBackground(new Color(92, 64, 51));
-        addNavButton(navPanel, "Add Book", e -> showAddBookPanel());
-        addNavButton(navPanel, "Remove Book", e -> showRemoveBookPanel());
-        addNavButton(navPanel, "Search Book", e -> showSearchPanel());
-        addNavButton(navPanel, "View Catalog", e -> showCatalogPanel());
+
+        addNavButton(navPanel, "Add Book", e -> switchPage("Add Book"));
+        addNavButton(navPanel, "Remove Book", e -> switchPage("Remove Book"));
+        addNavButton(navPanel, "Search Book", e -> switchPage("Search Book"));
+        addNavButton(navPanel, "View Catalog", e -> switchPage("View Catalog"));
         addNavButton(navPanel, "Logout", e -> logout());
+
         add(navPanel, BorderLayout.WEST);
 
-        JLabel imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        imageLabel.setVerticalAlignment(SwingConstants.CENTER);
-        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/GUI/color.jpg"));
-        imageLabel.setIcon(backgroundIcon);
-        add(imageLabel, BorderLayout.CENTER);
-        getContentPane().setBackground(new Color(240, 240, 240));
         setLocationRelativeTo(null);
         setVisible(true);
-        imageLabel.setPreferredSize(new Dimension(800, 600));
+    }
 
-
-//
-        displayArea = new JTextArea();
-        displayArea.setEditable(false);
-        displayArea.setFont(new Font("Arial", Font.PLAIN, 14));
-        JScrollPane scrollPane = new JScrollPane(displayArea);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(scrollPane, BorderLayout.CENTER);
-        displayArea.append("Text to display here\n");
-        displayArea.setText("");
-
-
-
-
-        displayArea = new JTextArea();
-        displayArea.setEditable(false);
-        //JScrollPane scrollPane = new JScrollPane(displayArea);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        displayArea.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(scrollPane, BorderLayout.CENTER);
-        getContentPane().setBackground(new Color(70, 16, 0));
-        setLocationRelativeTo(null);
-        setVisible(true);
+    private JLabel createBackgroundImage() {
+        // Load the background image
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/GUI/color.jpg")); // Ensure the path is correct
+        JLabel background = new JLabel(backgroundIcon);
+        background.setLayout(new BorderLayout());
+        return background;
     }
 
     private void addNavButton(JPanel panel, String text, ActionListener actionListener) {
@@ -79,72 +89,121 @@ public class LibrarianGUI extends JFrame {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(141, 110, 99));
             }
-            // 150 red, 75 green, and 0 blue.
-            //92, 64, 51
-            //rgb(70, 16, 0)
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(121, 85, 72));
             }
         });
     }
 
-    private void showAddBookPanel() {
-        JPanel addBookPanel = new JPanel();
-        addBookPanel.setLayout(new GridLayout(3, 2, 10, 10));
+    private void switchPage(String pageName) {
+        cardLayout.show(mainPanel, pageName);
+    }
+
+    private JPanel createCatalogPanel() {
+        JPanel catalogPanel = new JPanel(new BorderLayout());
+        JScrollPane tableScrollPane = new JScrollPane(bookTable);
+        catalogPanel.add(tableScrollPane, BorderLayout.CENTER);
+        return catalogPanel;
+    }
+
+    private JPanel createAddBookPanel() {
+        JPanel addBookPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         addBookPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JTextField bookTitleField = new JTextField();
         JTextField bookAuthorField = new JTextField();
-        JTextField bookGenereField = new JTextField();
+        JTextField bookGenreField = new JTextField();
 
         addBookPanel.add(new JLabel("Title:"));
         addBookPanel.add(bookTitleField);
         addBookPanel.add(new JLabel("Author:"));
         addBookPanel.add(bookAuthorField);
-        addBookPanel.add(new JLabel("Genere:"));
-        addBookPanel.add(bookGenereField);
+        addBookPanel.add(new JLabel("Genre:"));
+        addBookPanel.add(bookGenreField);
 
-        int result = JOptionPane.showConfirmDialog(this, addBookPanel, "Add Book", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result == JOptionPane.OK_OPTION) {
+        JButton addButton = new JButton("Add Book");
+        addButton.addActionListener(e -> {
             String title = bookTitleField.getText();
             String author = bookAuthorField.getText();
-            String genere = bookGenereField.getText();
+            String genre = bookGenreField.getText();
 
-            if (title.isEmpty() || author.isEmpty() || genere.isEmpty()) {
+            if (title.isEmpty() || author.isEmpty() || genre.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                Book newBook = new Book(title, author, genere);
-               // Catalog.bookList.addBook(newBook);
+                Book newBook = new Book(title, author, genre);
                 Catalog.addBook(newBook);
+                refreshTable();
                 JOptionPane.showMessageDialog(this, "Book added successfully!");
             }
-        }
+        });
+
+        addBookPanel.add(addButton);
+
+        return addBookPanel;
     }
 
-    private void showRemoveBookPanel() {
-        String bookID = JOptionPane.showInputDialog(this, "Enter Book ID to Remove:");
-        if (bookID != null) {
-            boolean removed = Catalog.removeBook(bookID);
-            if (removed) {
-                JOptionPane.showMessageDialog(this, "Book removed successfully!");
+    private JPanel createRemoveBookPanel() {
+        JPanel removeBookPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+        removeBookPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField bookIdField = new JTextField();
+        removeBookPanel.add(new JLabel("Enter Book ID:"));
+        removeBookPanel.add(bookIdField);
+
+        JButton removeButton = new JButton("Remove Book");
+        removeButton.addActionListener(e -> {
+            String bookID = bookIdField.getText();
+            if (bookID.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a Book ID!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, "Book not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                boolean removed = Catalog.removeBook(bookID);
+                if (removed) {
+                    refreshTable();
+                    JOptionPane.showMessageDialog(this, "Book removed successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Book not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        }
+        });
+
+        removeBookPanel.add(removeButton);
+
+        return removeBookPanel;
     }
 
-    private void showSearchPanel() {
-        String searchQuery = JOptionPane.showInputDialog(this, "Enter Book Title or Author to Search:");
-        if (searchQuery != null) {
-            String results = Catalog.FindBookByTitle(searchQuery);
-            displayArea.setText(results);
-        }
+    private JPanel createSearchPanel() {
+        JPanel searchPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField searchField = new JTextField();
+        searchPanel.add(new JLabel("Enter Book Title or Author:"));
+        searchPanel.add(searchField);
+
+        JButton searchButton = new JButton("Search Book");
+        searchButton.addActionListener(e -> {
+            String searchQuery = searchField.getText();
+            if (searchQuery.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a search query!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                String results = Catalog.FindBookByTitle(searchQuery);
+                JOptionPane.showMessageDialog(this, results.isEmpty() ? "No books found!" : results);
+            }
+        });
+
+        searchPanel.add(searchButton);
+
+        return searchPanel;
     }
 
-    private void showCatalogPanel() {
-        StringBuilder catalogDisplay = new StringBuilder("Library Catalog:\n");
-        Catalog.displayCatalog();
-        displayArea.setText(catalogDisplay.toString());
+    private void refreshTable() {
+        tableModel.setRowCount(0);
+        Node current = Catalog.bookList.getHead();
+        while (current != null) {
+            Book book = current.getBook();
+            tableModel.addRow(new Object[]{book.getBookTitle(), book.getAuthor(), book.getGenere()});
+            current = current.getNext();
+        }
     }
 
     private void logout() {
