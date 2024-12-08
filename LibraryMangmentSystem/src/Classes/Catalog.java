@@ -39,7 +39,7 @@ public class Catalog {
         bookList.display();
     }
 
-    public static String FindBookByTitle(String bookTitle) {
+   /* public static String FindBookByTitle(String bookTitle) {
         bookTitle = bookTitle.toLowerCase();
         String bookid = bookList.Findbook(bookTitle);
         if (bookid == null) {
@@ -56,7 +56,24 @@ public class Catalog {
         return "Book found: " + bookTitle + " in section: " + bookID.charAt(0) +
                 " in roof number: " + bookID.charAt(1) +
                 " the number of the Book is: " + bookID.substring(2);
-    }
+    }*/
+   public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
+       Node foundBooks = null;
+
+       // Traverse all the books and check if the title or author matches the query
+       Node temp = bookList.getHead(); // Traverse the linked list using the head of bookList
+       while (temp != null) {
+           Book book = temp.book;
+           if (book.getBookTitle().contains(searchQuery) || book.getAuthor().contains(searchQuery)) {
+               Node newNode = new Node(book);
+               foundBooks = bookList.merge(foundBooks, newNode, sortedBy); // Sort the books using the merge function
+           }
+           temp = temp.next; // Move to the next node
+       }
+
+       return foundBooks;
+   }
+
     public static void Sorting(String SortedBy){
         bookList.sorting(SortedBy);
     }

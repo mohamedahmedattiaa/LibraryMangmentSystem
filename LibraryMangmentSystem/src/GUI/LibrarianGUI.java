@@ -8,7 +8,7 @@ import Classes.Book;
 import Classes.Catalog;
 import Classes.Node;
 import javax.swing.ImageIcon;
-
+import Classes.linkedlist;
 public class LibrarianGUI extends JFrame {
     private DefaultTableModel tableModel;
     private JTable bookTable;
@@ -107,151 +107,254 @@ public class LibrarianGUI extends JFrame {
         catalogPanel.add(tableScrollPane, BorderLayout.CENTER);
         return catalogPanel;
     }
-
     private JPanel createAddBookPanel() {
         JPanel addBookPanel = new JPanel();
-        addBookPanel.setLayout(new BorderLayout());
+        addBookPanel.setLayout(new GridBagLayout()); // استخدام GridBagLayout
+        addBookPanel.setBackground(new Color(240, 240, 240)); // لون خلفية فاتح
 
-        // Create the "Add Book" button
-        JButton addButton = new JButton("Add Book");
-        addButton.addActionListener(e -> {
+        // إعداد GridBagConstraints لتوسيط العناصر
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // مساحة بين العناصر
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER;
 
-            JDialog addBookDialog = new JDialog(this, "Add New Book", true);
-            addBookDialog.setSize(400, 250);
-            addBookDialog.setLayout(new GridLayout(4, 2, 10, 10));
-            addBookDialog.setLocationRelativeTo(this);
+        // إنشاء الحقول
+        JTextField bookTitleField = new JTextField();
+        JTextField bookAuthorField = new JTextField();
+        JTextField bookGenreField = new JTextField();
 
-            JTextField bookTitleField = new JTextField();
-            JTextField bookAuthorField = new JTextField();
-            JTextField bookGenreField = new JTextField();
+        // ضبط حجم الحقول
+        Dimension textFieldSize = new Dimension(200, 30); // حجم الحقول
+        bookTitleField.setPreferredSize(textFieldSize);
+        bookAuthorField.setPreferredSize(textFieldSize);
+        bookGenreField.setPreferredSize(textFieldSize);
 
-            addBookDialog.add(new JLabel("Title:"));
-            addBookDialog.add(bookTitleField);
-            addBookDialog.add(new JLabel("Author:"));
-            addBookDialog.add(bookAuthorField);
-            addBookDialog.add(new JLabel("Genre:"));
-            addBookDialog.add(bookGenreField);
+        // تصميم الحقول
+        styleTextField(bookTitleField);
+        styleTextField(bookAuthorField);
+        styleTextField(bookGenreField);
 
-            // Add "Add" button in dialog
-            JButton confirmButton = new JButton("Add Book");
-            JButton cancelButton = new JButton("Cancel");
-            confirmButton.addActionListener(event -> {
-                String title = bookTitleField.getText();
-                String author = bookAuthorField.getText();
-                String genre = bookGenreField.getText();
+        // تصميم النصوص
+        JLabel titleLabel = createStyledLabel("Title:");
+        JLabel authorLabel = createStyledLabel("Author:");
+        JLabel genreLabel = createStyledLabel("Genre:");
 
-                if (title.isEmpty() || author.isEmpty() || genre.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    // Add book to catalog
-                    Book newBook = new Book(title, author, genre);
-                    Catalog.addBook(newBook);
-                    refreshTable();
-                    JOptionPane.showMessageDialog(this, "Book added successfully!");
-                }
-                addBookDialog.dispose(); // Close the dialog after adding the book
-            });
+        // إضافة العناصر إلى اللوحة
+        gbc.gridx = 0; // العمود الأول
+        gbc.gridy = 0; // الصف الأول
+        addBookPanel.add(titleLabel, gbc);
 
-            cancelButton.addActionListener(event -> addBookDialog.dispose());
-            // Add button to dialog and set the dialog visible
-            addBookDialog.add(confirmButton);
-            addBookDialog.add(cancelButton);
-            addBookDialog.setVisible(true);
-        });
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        addBookPanel.add(bookTitleField, gbc);
 
-        addBookPanel.add(addButton, BorderLayout.CENTER);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        addBookPanel.add(authorLabel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        addBookPanel.add(bookAuthorField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        addBookPanel.add(genreLabel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        addBookPanel.add(bookGenreField, gbc);
+
+        // إضافة الأزرار
+        JButton confirmButton = new JButton("Add Book");
+        JButton cancelButton = new JButton("Cancel");
+
+        styleButton(confirmButton);
+        styleButton(cancelButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel(); // لوحة خاصة بالأزرار
+        buttonPanel.setBackground(new Color(240, 240, 240));
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(cancelButton);
+        addBookPanel.add(buttonPanel, gbc);
+
         return addBookPanel;
     }
 
+    // تصميم النصوص
+    private JLabel createStyledLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Serif", Font.BOLD, 18)); // نوع الخط وحجمه
+        label.setForeground(new Color(90, 90, 90)); // لون رمادي غامق
+        label.setHorizontalAlignment(JLabel.CENTER); // توسيط النص
+        return label;
+    }
+
+    // تصميم الحقول
+    private void styleTextField(JTextField textField) {
+        textField.setBackground(new Color(245, 245, 245)); // لون خلفية الحقول
+        textField.setForeground(Color.DARK_GRAY); // لون النص داخل الحقول
+        textField.setCaretColor(Color.BLACK); // لون مؤشر الكتابة
+        textField.setFont(new Font("Arial", Font.PLAIN, 16)); // حجم الخط
+        textField.setHorizontalAlignment(JTextField.CENTER); // توسيط النص داخل الحقل
+        textField.setBorder(BorderFactory.createLineBorder(new Color(100, 100, 100), 1)); // حدود خفيفة
+    }
+
+    // تصميم الأزرار
+    private void styleButton(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setPreferredSize(new Dimension(120, 35)); // حجم الأزرار
+        button.setBackground(new Color(100, 149, 237)); // لون أزرق فاتح
+        button.setForeground(Color.WHITE); // لون النص أبيض
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(new Color(70, 130, 180), 2)); // حدود زرقاء
+
+        // تأثير Hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(65, 105, 225));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(100, 149, 237));
+            }
+        });
+    }
+
+
+
 
     private JPanel createRemoveBookPanel() {
-        JPanel removeBookPanel = new JPanel(new BorderLayout());
+        JPanel removeBookPanel = new JPanel();
+        removeBookPanel.setLayout(new BorderLayout(10, 10));
 
-        // Create the "Remove Book" button
-        JButton removeButton = new JButton("Remove Book");
+        // Create a panel for the input section
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridBagLayout()); // Center components
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Add some padding
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
+        // Add "Enter Book ID" label
+        JLabel bookIdLabel = new JLabel("Enter Book ID:");
+        inputPanel.add(bookIdLabel, gbc);
+
+        // Add the text field for Book ID
+        gbc.gridy++;
+        JTextField bookIdField = new JTextField(15); // Smaller text area
+        inputPanel.add(bookIdField, gbc);
+
+        // Add the input panel to the center of the main panel
+        removeBookPanel.add(inputPanel, BorderLayout.CENTER);
+
+        // Create a panel for buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        // Create the "Remove" button
+        JButton removeButton = new JButton("Remove");
+        JLabel statusLabel = new JLabel(""); // Label to show status message
+
         removeButton.addActionListener(e -> {
-            // Open the "Remove Book" dialog
-            JDialog removeBookDialog = new JDialog(this, "Remove Book", true);
-            removeBookDialog.setSize(400, 150);
-            removeBookDialog.setLayout(new GridLayout(3, 1, 10, 10));
-            removeBookDialog.setLocationRelativeTo(this);
+            String bookId = bookIdField.getText();
 
-            // Create a text field for Book ID
-            JTextField bookIdField = new JTextField();
+            if (bookId.isEmpty()) {
+                statusLabel.setText("Please enter a Book ID!");
+                statusLabel.setForeground(Color.RED);
+            } else {
+                // Assuming Catalog.removeBook returns the book name or null if not found
+                boolean bookName = Catalog.removeBook(bookId);
 
-            // Create "Remove" button in dialog
-            JButton confirmRemoveButton = new JButton("Remove Book");
-            confirmRemoveButton.addActionListener(event -> {
-                String bookId = bookIdField.getText();
-
-                if (bookId.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Please enter a Book ID!", "Error", JOptionPane.ERROR_MESSAGE);
+                if (bookName) {
+                    refreshTable();
+                    statusLabel.setText("Book removed successfully: " + bookName);
+                    statusLabel.setForeground(Color.GREEN);
+                    bookIdField.setText(""); // Clear the text field after successful removal
                 } else {
-                    boolean removed = Catalog.removeBook(bookId);
-                    if (removed) {
-                        refreshTable();
-                        JOptionPane.showMessageDialog(this, "Book removed successfully!");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Book not found!", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                    statusLabel.setText("Book not found!");
+                    statusLabel.setForeground(Color.RED);
                 }
-                removeBookDialog.dispose(); // Close the dialog after removing the book
-            });
-
-            // Add components to the dialog
-            removeBookDialog.add(new JLabel("Enter Book ID:"));
-            removeBookDialog.add(bookIdField);
-            removeBookDialog.add(confirmRemoveButton);
-
-            // Show the dialog
-            removeBookDialog.setVisible(true);
+            }
         });
 
-        removeBookPanel.add(removeButton, BorderLayout.CENTER);
+        // Create the "Cancel" button
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> {
+            bookIdField.setText(""); // Clear the text field
+            statusLabel.setText(""); // Clear the status message
+        });
+
+        // Add buttons to the button panel
+        buttonPanel.add(removeButton);
+        buttonPanel.add(cancelButton);
+
+        // Add the button panel to the bottom of the main panel
+        removeBookPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Add the status label below the buttons
+        removeBookPanel.add(statusLabel, BorderLayout.NORTH);
+
         return removeBookPanel;
     }
-
-
     private JPanel createSearchPanel() {
-        JPanel searchPanel = new JPanel(new BorderLayout());
+        JPanel searchPanel = new JPanel(new BorderLayout(10, 10));
 
-        // Create the "Search Book" button
+        // Create a panel for the search field and button with icon
+        JPanel searchFieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+
+        // Create the "Search Book" field
+        JTextField searchField = new JTextField(20);
+
+        // Create the search icon
+        ImageIcon searchIcon = new ImageIcon("path/to/search_icon.png"); // Update this with the correct path to your icon
+        JLabel searchIconLabel = new JLabel(searchIcon);
+
+        // Add the icon to the left of the search field
+        searchFieldPanel.add(searchIconLabel);
+        searchFieldPanel.add(searchField);
+
+        // Create the search button
         JButton searchButton = new JButton("Search Book");
         searchButton.addActionListener(e -> {
-            // Open the "Search Book" dialog
-            JDialog searchBookDialog = new JDialog(this, "Search Book", true);
-            searchBookDialog.setSize(400, 150);
-            searchBookDialog.setLayout(new GridLayout(3, 1, 10, 10));
-            searchBookDialog.setLocationRelativeTo(this);
+            String searchQuery = searchField.getText().trim();
 
-            // Create a text field for search query
-            JTextField searchField = new JTextField();
+            if (searchQuery.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a search query!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                // Find books based on title or author, and return sorted results
+                String sortedBy = "Title"; // You can switch to "Author" based on your requirement
+                Node sortedBooks = Catalog.FindBookByTitleOrAuthor(searchQuery, sortedBy);
 
-            JButton confirmSearchButton = new JButton("Search Book");
-            confirmSearchButton.addActionListener(event -> {
-                String searchQuery = searchField.getText();
-
-                if (searchQuery.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Please enter a search query!", "Error", JOptionPane.ERROR_MESSAGE);
+                if (sortedBooks == null) {
+                    JOptionPane.showMessageDialog(this, "No books found!", "Search Results", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    String results = Catalog.FindBookByTitle(searchQuery);
-                    JOptionPane.showMessageDialog(this, results.isEmpty() ? "No books found!" : results);
+                    StringBuilder result = new StringBuilder();
+                    Node current = sortedBooks;
+
+                    while (current != null) {
+                        result.append(current.getBook().getBookTitle())
+                                .append(" by ")
+                                .append(current.getBook().getAuthor())
+                                .append("\n");
+                        current = current.getNext();
+                    }
+
+                    // Show the results in a message dialog
+                    JOptionPane.showMessageDialog(this, result.toString(), "Search Results", JOptionPane.INFORMATION_MESSAGE);
                 }
-                searchBookDialog.dispose(); // Close the dialog after searching
-            });
-
-            // Add components to the dialog
-            searchBookDialog.add(new JLabel("Enter Book Title or Author:"));
-            searchBookDialog.add(searchField);
-            searchBookDialog.add(confirmSearchButton);
-
-            // Show the dialog
-            searchBookDialog.setVisible(true);
+            }
         });
 
-        searchPanel.add(searchButton, BorderLayout.CENTER);
+        // Add the components to the search panel
+        searchPanel.add(searchFieldPanel, BorderLayout.CENTER);
+        searchPanel.add(searchButton, BorderLayout.SOUTH);
+
         return searchPanel;
     }
+
 
 
     private void refreshTable() {
