@@ -11,7 +11,7 @@ public class Loan {
     private Member member;
     private Date issueDate;
     private Date returnDate;
-
+ // test2
     public Loan(String bookId, String memberId) {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
