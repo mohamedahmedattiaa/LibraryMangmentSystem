@@ -12,19 +12,16 @@ public class Login extends JFrame {
     private JRadioButton librarianRadioButton;
 
     public Login() {
-        // إعداد الإطار
         JFrame frame = new JFrame("Library Management System - Login");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setSize(735, 956);
         frame.setResizable(false);
         frame.setLayout(null);
 
-        // إعداد الخلفية
         ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/GUI/book.jpg"));
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setBounds(0, 0, 735, 956);
 
-        // إعداد النصوص وعناصر الإدخال
         JLabel idLabel = new JLabel("ID:");
         idLabel.setForeground(Color.WHITE);
         idLabel.setBounds(200, 300, 100, 30);
@@ -39,38 +36,32 @@ public class Login extends JFrame {
         password = new JPasswordField(15);
         password.setBounds(300, 350, 200, 30);
 
-        // إعداد الأزرار
         loginButton = new JButton("Login");
         styleButton(loginButton, 300, 450);
 
         signUpButton = new JButton("Sign Up");
         styleButton(signUpButton, 300, 500);
 
-        // إعداد أزرار الراديو
-        // Configure Classes.Member Radio Button
+
         memberRadioButton = new JRadioButton("Member");
         memberRadioButton.setBounds(300, 400, 90, 30);
         memberRadioButton.setForeground(Color.WHITE); // Set text color
-        memberRadioButton.setOpaque(false); // Make background transparent
+        memberRadioButton.setOpaque(false);
 
-// Configure Librarian Radio Button
         librarianRadioButton = new JRadioButton("Librarian");
         librarianRadioButton.setBounds(410, 400, 90, 30);
-        librarianRadioButton.setForeground(Color.WHITE); // Set text color
-        librarianRadioButton.setOpaque(false); // Make background transparent
+        librarianRadioButton.setForeground(Color.WHITE);
+        librarianRadioButton.setOpaque(false);
 
 
-        // إضافة أزرار الراديو إلى ButtonGroup
         ButtonGroup roleGroup = new ButtonGroup();
         roleGroup.add(memberRadioButton);
         roleGroup.add(librarianRadioButton);
 
-        // إجراء عند الضغط على زر Login
         loginButton.addActionListener(e -> {
             String id = idText.getText();
             String pass = new String(password.getPassword());
 
-            // التحقق من اختيار الراديو
             if (!memberRadioButton.isSelected() && !librarianRadioButton.isSelected()) {
                 JOptionPane.showMessageDialog(frame, "Please select a role (Classes.Member or Librarian)", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -81,16 +72,15 @@ public class Login extends JFrame {
                 if (id.equals("user") && pass.equals("1234")) {
                     JOptionPane.showMessageDialog(frame, "Welcome Classes.Member!");
                     frame.dispose(); // غلق نافذة تسجيل الدخول
-                    new  MemberGUI(); // الانتقال إلى شاشة Classes.Member
+                    new  MemberGUI();
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid Classes.Member ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else if (librarianRadioButton.isSelected()) {
-                // تحقق الدخول كأمين مكتبة
                 if (id.equals("librarian") && pass.equals("5678")) {
                     JOptionPane.showMessageDialog(frame, "Welcome Librarian!");
-                    frame.dispose(); // غلق نافذة تسجيل الدخول
-                    new LibrarianGUI(); // الانتقال إلى شاشة Librarian
+                    frame.dispose();
+                    new LibrarianGUI();
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid Librarian ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
                 }

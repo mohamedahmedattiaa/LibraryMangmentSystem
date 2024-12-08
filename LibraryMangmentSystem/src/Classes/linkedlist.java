@@ -8,6 +8,10 @@ public class linkedlist {
         head = null;
     }
 
+    public Node getHead() {
+        return head;
+    }
+
     void insertAtBeginning(Book book) {
         Node newNode = new Node(book);
         newNode.next = head;
@@ -71,6 +75,24 @@ public class linkedlist {
         if (current.next != null) {
             current.next = current.next.next;
         }
+    }
+    public boolean deleteById(String bookId) { //B100
+        if (head == null) {  // B100 0
+            return false;
+        }
+        if (head.book.getBookID().equals(bookId)) {
+            head = head.next;
+            return true;
+        }
+        Node current = head;
+        while (current.next != null) {
+            if (current.next.book.getBookID().equals(bookId)) {
+                current.next = current.next.next;
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
     }
     void deleteAtEnd() {
         if (head == null || head.next == null) {

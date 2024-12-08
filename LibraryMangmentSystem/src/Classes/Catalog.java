@@ -1,18 +1,28 @@
 package Classes;
 
 public class Catalog {
-    public static linkedlist bookList;
+    public static linkedlist bookList =new linkedlist();
 
     public Catalog() {
-        this.bookList = new linkedlist();
     }
 
-    public void addBook(Book book) {
+    public static void addBook(Book book) {
         bookList.insertAtEnd(book);
         System.out.println("Added to catalog: " + book);
     }
 
-    public String updateBook(String bookId, boolean availabilityStatus) {
+    public static boolean removeBook(String bookId) {
+        boolean isRemoved = bookList.deleteById(bookId);
+        if (isRemoved) {
+            System.out.println("Book with ID " + bookId + " removed successfully.");
+        } else {
+            System.out.println("Book with ID " + bookId + " not found.");
+        }
+        System.out.println("After removing:");
+        bookList.display();
+        return isRemoved;
+    }
+    public static String updateBook(String bookId, boolean availabilityStatus) {
         Book book = bookList.Searchbook(bookId);
         if (book != null) {
             book.setAvailablityStatus(false);
@@ -25,12 +35,11 @@ public class Catalog {
         return bookList.Searchbook(bookId);
     }
 
-    public void displayCatalog() {
-        System.out.println("Library Catalog:");
+    public static void displayCatalog() {
         bookList.display();
     }
 
-    public String FindBookByTitle(String bookTitle) {
+    public static String FindBookByTitle(String bookTitle) {
         bookTitle = bookTitle.toLowerCase();
         String bookid = bookList.Findbook(bookTitle);
         if (bookid == null) {
@@ -48,7 +57,7 @@ public class Catalog {
                 " in roof number: " + bookID.charAt(1) +
                 " the number of the Book is: " + bookID.substring(2);
     }
-    public void Sorting(String SortedBy){
+    public static void Sorting(String SortedBy){
         bookList.sorting(SortedBy);
     }
 }
