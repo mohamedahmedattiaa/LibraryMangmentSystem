@@ -78,7 +78,7 @@ public class Report {
         }
     }
 
-    private void displayOverdueBooks(Catalog catalog) {
+    public  static void displayOverdueBooks(Catalog catalog) {
         Date currentDate = new Date(); // something error here
         System.out.println("\nOverdue Books:");
         for (Loan loan : Loan.activeLoans) {
@@ -88,9 +88,14 @@ public class Report {
                     System.out.println("Loan ID: " + loan.getLoanID() + " | Book: " + book.getBookTitle() +
                             " | Member: " + loan.getMemberId() + " | Return Date: " + loan.getReturnDate());
                 }
+                else{
+                    System.out.println("The book is not available");
+                }
             }
+
+            }
+        System.out.println("No overdue books found.");
         }
-    }
 
     private void displayPendingLoans(Catalog catalog) {
         System.out.println("\nPending Loans in the Library:");

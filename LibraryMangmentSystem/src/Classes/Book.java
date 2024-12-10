@@ -5,7 +5,7 @@ public class Book {
     private String bookTitle;
     private String author;
     private String genere;
-    private Boolean availablityStatus;
+    private boolean availablityStatus;
     private IDGenerator idGenerator;
 
         public Book(String bookTitle, String author , String genere) {
@@ -13,15 +13,16 @@ public class Book {
         this.bookTitle = bookTitle.toLowerCase();
         this.author = author;
         this.genere = genere;
-        this.availablityStatus = true;
+        this.availablityStatus = (Boolean) true;
     }
 
-    public Boolean getAvailablityStatus() {
+    public boolean getAvailablityStatus() {
         return availablityStatus;
     }
 
-    public void setAvailablityStatus(Boolean availablityStatus) {
-        this.availablityStatus = availablityStatus;
+    public void setAvailablityStatus(boolean availablityStatus) {
+
+            this.availablityStatus = availablityStatus;
     }
 
     public String getGenere() {return genere;}

@@ -1,6 +1,8 @@
 package Classes;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -114,5 +116,10 @@ public class Loan {
                 "Member ID    : " + memberId + "\n" +
                 "Issue Date   : " + issueDate + "\n" +
                 "Return Date  : " + (returnDate != null ? returnDate : "Not returned yet");
+    }
+    public void setReturnDate() {               // setting the date to overdue ( ONLY FOR TESTING DON`T DELETE)
+        Calendar returnDate1 = Calendar.getInstance();
+        returnDate1.set(2023,1,1);
+        this.returnDate = returnDate1.getTime();
     }
 }

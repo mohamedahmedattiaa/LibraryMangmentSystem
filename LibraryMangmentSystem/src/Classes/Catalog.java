@@ -28,7 +28,7 @@ public class Catalog {
     public static String updateBook(String bookId, boolean availabilityStatus) {
         Book book = bookList.Searchbook(bookId);
         if (book != null) {
-            book.setAvailablityStatus(false);
+           book.setAvailablityStatus(false);
             return "Book updated: " + book;
         }
         return "Book with ID " + bookId + " not found.";
