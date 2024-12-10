@@ -33,7 +33,7 @@ public class PendingRequestsQueue {
             request.addAll(loanList);
             System.out.println("Loan requests sorted by Member ID.");
         }
-                                                                            // why to ues timsort because it is easier on code , faster because we don`t have too much complicated data
+                                                                             // why to ues timsort because it is easier on code , faster because we don`t have too much complicated data
         public static void sortloanBydate (){                               // for librarian
             List<Loan> loanList = new ArrayList<>(request);                 // we convert the queue to an array to access the built-in sort method
             loanList.sort(Comparator.comparing(Loan::getIssueDate));        // compare member id between each other

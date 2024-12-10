@@ -3,10 +3,7 @@ package Classes;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class Loan {
     private String loanID;
@@ -108,6 +105,28 @@ public class Loan {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
     }
+
+    public static void sortloanBydate (){                                             // for librarian
+        List<Loan> loanList = new ArrayList<>(activeLoans);
+        List<Loan> returnedlist =new ArrayList<>(returnedLoans);
+        returnedlist.sort(Comparator.comparing(Loan::getIssueDate));                                                                        // we convert the queue to an array to access the built-in sort method
+        loanList.sort(Comparator.comparing(Loan::getIssueDate));
+        returnedlist.clear();                                                                     // compare member id between each other
+        activeLoans.clear();
+        activeLoans.addAll(loanList);
+        returnedLoans.addAll(returnedlist);
+        System.out.println("Loan requests sorted by date.");
+    }
+
+
+    public static void sortloanByMemberID (){                                   // for librarian
+        List<Loan> loanList = new ArrayList<>(activeLoans);                     // we convert the queue to an array to access the built-in sort method
+        loanList.sort(Comparator.comparing(Loan::getMemberId));             // compare member id between each other
+        activeLoans.clear();
+        activeLoans.addAll(loanList);
+        System.out.println("Loan requests sorted by Member ID.");
+    }
+
     @Override
     public String toString() {
         return "Loan Details:\n" +

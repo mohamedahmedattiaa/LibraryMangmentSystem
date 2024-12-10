@@ -17,6 +17,10 @@ public class Member {
         this.booksBorrowed = new linkedlist();
 
     }
+
+    public Member() {
+    }
+
     public String getmemberId() {return memberId;}
 
     public String getName() {

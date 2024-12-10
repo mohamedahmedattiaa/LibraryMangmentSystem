@@ -16,6 +16,9 @@ public class Book {
         this.availablityStatus = (Boolean) true;
     }
 
+    public Book() {
+    }
+
     public boolean getAvailablityStatus() {
         return availablityStatus;
     }
