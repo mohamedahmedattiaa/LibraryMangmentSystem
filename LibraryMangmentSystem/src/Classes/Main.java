@@ -9,7 +9,7 @@ public class Main {
 
 // Add books to the catalog
         Book book1 = new Book("c", "George washonton", "Fiction");
-        Book book2 = new Book("d",  "Ibraham lincolin", "Dystopian");
+        Book book2 = new Book("d", "Ibraham lincolin", "Dystopian");
         Book book3 = new Book("a", "Wealm sheckspear", "Dystopian");
         Book book4 = new Book("e", "Albert fred", "Fiction");
 
@@ -27,9 +27,10 @@ public class Main {
         dataBaseMembers.add(member2);
         dataBaseMembers.add(member3);
 //        System.out.println(dataBaseMembers.display());
-        Loan.borrowBook("M202","B100", catalog); // what if he borrowed the same book twice??
-        Loan.borrowBook("M201","B100", catalog); // SHOULD I GET THE OVERDUE DATE FOR THE RETURNED BOOKS ALSO ?
-        Loan.borrowBook("M200","B100", catalog);
+        Loan.borrowBook("M202", "B100", catalog); // what if he borrowed the same book twice??
+        Loan.borrowBook("M201", "B102", catalog); // SHOULD I GET THE OVERDUE DATE FOR THE RETURNED BOOKS ALSO ?
+        Loan.borrowBook("M200", "B101", catalog);
+        Loan.borrowBook("M202" ,"B100" ,catalog);
 //         pendingRequestsQueue.display();
 //         System.out.println("//////////////////////////////////////////////");
 //         pendingRequestsQueue.display();
@@ -42,8 +43,14 @@ public class Main {
 //        System.out.println(Loan.activeLoans.toString());
 //
 //        Report.displayOverdueBooks(catalog);
-            Loan.sortloanByMemberID();
-        System.out.println(Loan.activeLoans.toString());
+        System.out.println("/////////////////////////////////////////");
+        Loan.sortloanByMemberID();
+        Report report = new Report();
+//        Catalog.Sorting("title");
+//        Catalog.displayCatalog();
+//        report.displayActiveLoans(catalog);
+        report.displayPopularGenre(catalog);
     }
+
 }
 

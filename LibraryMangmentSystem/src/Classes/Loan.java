@@ -20,11 +20,8 @@ public class Loan {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
         this.memberId = memberId;
-        this.issueDate = new Date();
-        Calendar calendar = Calendar.getInstance(); // adds 14 days to the issue date
-        calendar.setTime(this.issueDate);
-        calendar.add(Calendar.DAY_OF_YEAR, 14);
-        this.returnDate = calendar.getTime();
+        LocalDate issueDate = LocalDate.now();
+        LocalDate returnDate = issueDate.plusDays(14);
     }
     public Loan(){
         this.loanID = IDGenerator.generateLoanID();
@@ -38,7 +35,7 @@ public class Loan {
         return loanID;
     }
 
-    public String getBookId() {
+    public  String getBookId() {
         return bookId;
     }
 
@@ -67,6 +64,7 @@ public class Loan {
             activeLoans.add(loan);
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
                     " by member " + member.getName() + "your return date is: " + loan.getReturnDate() + ".");
+
         } else if (book != null && !book.getAvailablityStatus()) {
             System.out.println("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".");
             Loan loan = new Loan(bookId, member.getmemberId());
@@ -124,6 +122,7 @@ public class Loan {
         loanList.sort(Comparator.comparing(Loan::getMemberId));             // compare member id between each other
         activeLoans.clear();
         activeLoans.addAll(loanList);
+
         System.out.println("Loan requests sorted by Member ID.");
     }
 
@@ -141,4 +140,6 @@ public class Loan {
         returnDate1.set(2023,1,1);
         this.returnDate = returnDate1.getTime();
     }
+
+
 }

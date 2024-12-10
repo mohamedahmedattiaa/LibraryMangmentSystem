@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class Report {
+public class  Report {
     PendingRequestsQueue pendingRequestsQueue =new PendingRequestsQueue();
+    Loan loan = new Loan();
     public void generateReportForMember(String memberId, Catalog catalog) throws IOException {
         System.out.println("\nGenerating report for Member ID: " + memberId);
 
@@ -67,7 +68,7 @@ public class Report {
 //        displayPopularGenre(catalog);
     }
 
-    private void displayActiveLoans(Catalog catalog) {
+    public void displayActiveLoans(Catalog catalog) {
         System.out.println("\nActive Loans in the Library:"); // multiple borrow
         for (Loan loan : Loan.activeLoans) {
             Book book = catalog.searchBook(loan.getBookId());
@@ -108,30 +109,48 @@ public class Report {
         }
     }
 
-//    private void displayPopularGenre(Catalog catalog) {
-//        // Create a HashMap to track genre counts
-//        Map<String, Integer> genreCountMap = new HashMap<>();
-//
-//        // Iterate over all active loans
-//        for (Loan loan : Loan.activeLoans) {
-//            Book book = catalog.searchBook(loan.getBookId());
-//            if (book != null) {
-//                String genre = book.getGenere(); // Assuming the Book class has a getGenre method
-//
-//                // Increment the count of the genre in the HashMap
-//                genreCountMap.put(genre, genreCountMap.getOrDefault(genre, 0) + 1);
-//            }
-//        }
-//
-//        // Convert the map to a list of entries to sort it by count
-//        List<Map.Entry<String, Integer>> sortedGenres = new ArrayList<>(genreCountMap.entrySet());
-//        sortedGenres.sort((entry1, entry2) -> Integer.compare(entry2.getValue(), entry1.getValue()));
-//
-//        // Display the most popular genre(s)
-//        System.out.println("\nPopular Genres:");
-//        for (Map.Entry<String, Integer> entry : sortedGenres) {
-//            System.out.println("Genre: " + entry.getKey() + " | Count: " + entry.getValue());
-//        }
-//    }
+    public void displayPopularGenre(Catalog catalog) {
+        if (Loan.activeLoans.isEmpty()) {
+            System.out.println("No active loans to calculate popular genres.");
+            return;
+        }
+
+        String mostPopularGenre = null;
+        int maxCount = 0;
+
+        // Iterate through all loans to determine the most popular genre
+        for (Loan loan : Loan.activeLoans) {
+            Book book = catalog.searchBook(loan.getBookId());
+            if (book != null) {
+                String genre = book.getGenere(); // Assuming `getGenere()` returns the genre of the book
+                int count = 0;
+
+                // Count occurrences of this genre in active loans
+                for (Loan innerLoan : Loan.activeLoans) {
+                    Book innerBook = catalog.searchBook(innerLoan.getBookId());
+                    if (innerBook != null && innerBook.getGenere().equals(genre)) {
+                        count++;
+                    }
+                }
+
+                // Update the most popular genre if the current genre has more loans
+                if (count > maxCount) {
+                    maxCount = count;
+                    mostPopularGenre = genre;
+                }
+            }
+        }
+
+        if (mostPopularGenre != null) {
+            System.out.println("Most Popular Genre: " + mostPopularGenre + " with " + maxCount + " loans.");
+        } else {
+            System.out.println("No genres found.");
+        }
+    }
+
+
 
 }
+
+
+

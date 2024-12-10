@@ -42,7 +42,7 @@ public class Catalog {
         bookList.display();
     }
 
-   /* public static String FindBookByTitle(String bookTitle) {
+   public static String FindBookByTitle(String bookTitle) {
         bookTitle = bookTitle.toLowerCase();
         String bookid = bookList.Findbook(bookTitle);
         if (bookid == null) {
@@ -59,7 +59,7 @@ public class Catalog {
         return "Book found: " + bookTitle + " in section: " + bookID.charAt(0) +
                 " in roof number: " + bookID.charAt(1) +
                 " the number of the Book is: " + bookID.substring(2);
-    }*/
+    }
 
    public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
        Node foundBooks = null;
