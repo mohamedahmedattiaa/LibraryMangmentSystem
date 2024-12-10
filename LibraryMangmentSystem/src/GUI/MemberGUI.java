@@ -40,7 +40,7 @@ public class MemberGUI extends JFrame {
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         displayArea.setFont(new Font("Arial", Font.PLAIN, 14));
         add(scrollPane, BorderLayout.CENTER);
-
+        RedirectSystemOut.redirectToTextArea(displayArea); //  IDK BUT IT IS WORKIIIIIINGGGGGGGG YAAAAAAYYYYY
         getContentPane().setBackground(new Color(240, 240, 240));
 
         setLocationRelativeTo(null);
