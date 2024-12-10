@@ -76,23 +76,24 @@ public class linkedlist {
             current.next = current.next.next;
         }
     }
-    public boolean deleteById(String bookId) { //B100
-        if (head == null) {  // B100 0
-            return false;
-        }
-        if (head.book.getBookID().equals(bookId)) {
-            head = head.next;
-            return true;
-        }
+    public boolean deleteById(String bookId) {
         Node current = head;
-        while (current.next != null) {
-            if (current.next.book.getBookID().equals(bookId)) {
-                current.next = current.next.next;
-                return true;
+        Node previous = null;
+
+        while (current != null) {
+            // Assuming each Node contains a Book object and Book has a getBookID() method
+            if (current.book.getBookID().equals(bookId)) {
+                if (previous == null) { // Deleting the head node
+                    head = current.next;
+                } else {
+                    previous.next = current.next;
+                }
+                return true; // Book found and deleted
             }
+            previous = current;
             current = current.next;
         }
-        return false;
+        return false; // Book not found
     }
     void deleteAtEnd() {
         if (head == null || head.next == null) {

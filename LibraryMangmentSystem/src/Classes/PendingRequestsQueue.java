@@ -3,13 +3,12 @@ package Classes;
 import java.util.*;
 
 public class PendingRequestsQueue {
-    private static Queue<Loan> request = new LinkedList<>();
+    public static Queue<Loan> request = new LinkedList<>();
 
     public static void enqueue(Loan loan) {
         request.add(loan);
         System.out.println("Loan request added for book " + loan.getBookId() + " by member '" + loan.getMemberId() + ".");
     }
-  // test
     public static Loan dequeue() {
         if(request.isEmpty()) {
             return null;

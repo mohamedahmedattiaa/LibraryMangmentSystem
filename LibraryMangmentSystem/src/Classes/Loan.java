@@ -3,6 +3,8 @@ package Classes;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Loan {
     private String loanID;
@@ -11,7 +13,10 @@ public class Loan {
     private Member member;
     private Date issueDate;
     private Date returnDate;
- // test2
+
+    public static Queue<Loan> activeLoans = new LinkedList<>();
+    public static Queue<Loan> returnedLoans = new LinkedList<>();
+
     public Loan(String bookId, String memberId) {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
@@ -60,7 +65,9 @@ public class Loan {
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
             Loan loan = new Loan(bookId, member.getmemberId());
-            System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() + " by member " + member.getName() + "your return date is: " + loan.getReturnDate() + ".");
+            activeLoans.add(loan);
+            System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
+                    " by member " + member.getName() + "your return date is: " + loan.getReturnDate() + ".");
         } else if (book != null && !book.getAvailablityStatus()) {
             System.out.println("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".");
             Loan loan = new Loan(bookId, member.getmemberId());
@@ -68,7 +75,7 @@ public class Loan {
         } else {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
-    } // bla bla bla
+    }
 
     public static void returnBook(String memberId, String bookId, Catalog catalog) throws IOException {
         Book book = Catalog.searchBook(bookId);
@@ -81,7 +88,8 @@ public class Loan {
                     System.out.println("yous passed the return date");
                 }
                 book.setAvailablityStatus(true);
-
+                activeLoans.remove(currentLoan);
+                returnedLoans.add(currentLoan);
                 System.out.println("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".");
                 System.out.println("Return Date: " + returnDate);
 
@@ -98,7 +106,6 @@ public class Loan {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
     }
-
     @Override
     public String toString() {
         return "Loan Details:\n" +

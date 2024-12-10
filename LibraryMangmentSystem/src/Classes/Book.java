@@ -24,14 +24,11 @@ public class Book {
         this.availablityStatus = availablityStatus;
     }
 
-    public String getGenere() {
-        return genere;
-    }
-  // hello
+    public String getGenere() {return genere;}
+
     public String getAuthor() {
         return author;
     }
-
 
     public void setBookTitle(String bookTitle) {
         this.bookTitle = bookTitle;

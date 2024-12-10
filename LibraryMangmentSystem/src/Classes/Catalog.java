@@ -1,14 +1,17 @@
 package Classes;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class Catalog {
     public static linkedlist bookList =new linkedlist();
-
     public Catalog() {
     }
 
     public static void addBook(Book book) {
         bookList.insertAtEnd(book);
         System.out.println("Added to catalog: " + book);
+
     }
 
     public static boolean removeBook(String bookId) {
@@ -57,6 +60,7 @@ public class Catalog {
                 " in roof number: " + bookID.charAt(1) +
                 " the number of the Book is: " + bookID.substring(2);
     }*/
+
    public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
        Node foundBooks = null;
 
