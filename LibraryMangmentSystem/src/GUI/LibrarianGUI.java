@@ -1,5 +1,4 @@
 package GUI;
-//
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -29,7 +28,8 @@ public class LibrarianGUI extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        mainPanel.add(createReportsPanel(), "View Catalog");
+        mainPanel.add(createReportsPanel(), "View Reports");
+        mainPanel.add(createViewBooksPanel(), "View Catalog");
         mainPanel.add(createAddBookPanel(), "Add Book");
         mainPanel.add(createRemoveBookPanel(), "Remove Book");
         mainPanel.add(createSearchPanel(), "Search Book");
@@ -401,6 +401,54 @@ public class LibrarianGUI extends JFrame {
             current = current.getNext();
         }
     }
+    private JPanel createViewBooksPanel() {
+        JPanel viewBooksPanel = new JPanel(new BorderLayout());
+
+        // إنشاء زر "View Books"
+        JButton viewBooksButton = new JButton("View Books");
+
+        // جدول لعرض الكتب
+        String[] columnNames = {"Book ID", "Title", "Author", "Availability"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable booksTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(booksTable);
+
+        // زر التحديث
+        viewBooksButton.addActionListener(e -> {
+            try {
+                // تصفية الجدول قبل إضافة البيانات
+                tableModel.setRowCount(0);
+
+                // عرض الكتب من الكاتالوج
+                Catalog.displayCatalog(); // عرض الكتب باستخدام displayCatalog()
+
+                // إضافة الكتب إلى الجدول
+                Node temp = Catalog.bookList.getHead(); // استعراض الكتب من الكاتالوج
+                while (temp != null) {
+                    Book book = temp.getBook();
+                    Object[] row = {
+                            book.getBookID(),
+                            book.getBookTitle(),
+                            book.getAuthor(),
+                            book.getAvailablityStatus() ? "Available" : "Not Available"
+                    };
+                    tableModel.addRow(row);
+                    temp = temp.getNext(); // الانتقال إلى الكتاب التالي
+                }
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(viewBooksPanel, "Error displaying books: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // إضافة الجدول والزر إلى اللوحة
+        viewBooksPanel.add(scrollPane, BorderLayout.CENTER);
+        viewBooksPanel.add(viewBooksButton, BorderLayout.SOUTH);
+
+        return viewBooksPanel;
+    }
+
+
 
 
     private void logout() {
