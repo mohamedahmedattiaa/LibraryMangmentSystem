@@ -98,7 +98,7 @@ public class  Report {
         System.out.println("No overdue books found.");
         }
 
-    private void displayPendingLoans(Catalog catalog) {
+    public void displayPendingLoans(Catalog catalog) {
         System.out.println("\nPending Loans in the Library:");
         for (Loan loan : PendingRequestsQueue.request) {
             Book book = catalog.searchBook(loan.getBookId());
