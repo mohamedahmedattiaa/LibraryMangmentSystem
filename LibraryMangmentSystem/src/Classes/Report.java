@@ -108,6 +108,7 @@ public class  Report {
             }
         }
     }
+    //
 
     public void displayPopularGenre(Catalog catalog) {
         if (Loan.activeLoans.isEmpty()) {
