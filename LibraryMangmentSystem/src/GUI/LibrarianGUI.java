@@ -18,7 +18,7 @@ public class LibrarianGUI extends JFrame {
 
     public LibrarianGUI() {
         setTitle("Librarian Panel");
-        setSize(800, 600);
+        setSize(800, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -28,10 +28,9 @@ public class LibrarianGUI extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        mainPanel.add(createReportsPanel(), "View Reports");
-        mainPanel.add(createViewBooksPanel(), "View Catalog");
+        mainPanel.add(createCombinedViewPanel(), "View Info");
         mainPanel.add(createAddBookPanel(), "Add Book");
-        mainPanel.add(createRemoveBookPanel(), "Remove Book");
+        mainPanel.add(createUpdateOrRemoveBookPanel(), "Remove Book");
         mainPanel.add(createSearchPanel(), "Search Book");
 
         add(mainPanel, BorderLayout.CENTER);
@@ -52,7 +51,7 @@ public class LibrarianGUI extends JFrame {
         addNavButton(navPanel, "Add Book", e -> switchPage("Add Book"));
         addNavButton(navPanel, "Remove Book", e -> switchPage("Remove Book"));
         addNavButton(navPanel, "Search Book", e -> switchPage("Search Book"));
-        addNavButton(navPanel, "View Catalog", e -> switchPage("View Catalog"));
+        addNavButton(navPanel, "View Info", e -> switchPage("View Info"));
         addNavButton(navPanel, "Logout", e -> logout());
 
         return navPanel;
@@ -66,7 +65,16 @@ public class LibrarianGUI extends JFrame {
         styleNavButton(button);
         panel.add(button);
     }
+    private JPanel createCombinedViewPanel() {
+        JPanel combinedViewPanel = new JPanel(new BorderLayout());
 
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Catalog", createViewBooksPanel());
+        tabbedPane.addTab("Reports", createReportsPanel());
+
+        combinedViewPanel.add(tabbedPane, BorderLayout.CENTER);
+        return combinedViewPanel;
+    }
     private void styleNavButton(JButton button) {
         button.setFont(new Font("Arial", Font.PLAIN, 14));
         button.setBackground(new Color(121, 85, 72));
@@ -98,8 +106,6 @@ public class LibrarianGUI extends JFrame {
         reportArea.setEditable(false); // لضمان عدم تعديل النص
         JScrollPane scrollPane = new JScrollPane(reportArea);
         reportsPanel.add(scrollPane, BorderLayout.CENTER);
-
-        // زر عرض التقارير
         JButton viewReportsButton = new JButton("View Reports");
         viewReportsButton.addActionListener(e -> {
             // إنشاء كائن من Report
@@ -142,13 +148,13 @@ public class LibrarianGUI extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10); // المسافة بين المكونات
 
         // تحميل الفونت من المسار المحدد
-        try {
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("D:/clion/Project Data/LibraryMangmentSystem/src/GUI/Caveat.ttf")).deriveFont(16f); // حجم 16
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(customFont); // تسجيل الفونت مع البيئة الرسومية
-        } catch (FontFormatException | IOException e) {
-            e.printStackTrace();  // في حالة حدوث خطأ
-        }
+//        try {
+//            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("D:/clion/Project Data/LibraryMangmentSystem/src/GUI/Caveat.ttf")).deriveFont(16f); // حجم 16
+//            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//            ge.registerFont(customFont); // تسجيل الفونت مع البيئة الرسومية
+//        } catch (FontFormatException | IOException e) {
+//            e.printStackTrace();  // في حالة حدوث خطأ
+//        }
 
         JLabel titleLabel = new JLabel("Title:");
         titleLabel.setFont(new Font("Caveat", Font.BOLD, 24)); // تكبير الخط
@@ -196,8 +202,6 @@ public class LibrarianGUI extends JFrame {
         gbc.gridy = 0;
         gbc.gridheight = 3; // يكون الأيقونة تكمل الثلاث صفوف
         addBookPanel.add(iconLabel, gbc);
-
-
         JButton addButton = new JButton("Add");
         addButton.setPreferredSize(new Dimension(100, 40)); // Adjust button size
         addButton.setFont(new Font("Arial", Font.PLAIN, 16)); // Adjust font size
@@ -244,74 +248,87 @@ public class LibrarianGUI extends JFrame {
 
         return addBookPanel;
     }
-    private JPanel createRemoveBookPanel() {
-        JPanel removeBookPanel = new JPanel(new GridBagLayout());
-        removeBookPanel.setBackground(new Color(121, 85, 72)); // لون الخلفية بني
+    private JPanel createUpdateOrRemoveBookPanel() { // Renamed method
+        JPanel updateRemovePanel = new JPanel(new GridBagLayout());
+        updateRemovePanel.setBackground(new Color(121, 85, 72));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // مسافة بين المكونات
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Label for Book ID
         JLabel bookIdLabel = new JLabel("Enter Book ID:");
-        bookIdLabel.setFont(new Font("Caveat", Font.BOLD, 24)); // تكبير الخط
-        bookIdLabel.setForeground(Color.WHITE); // اللون الأبيض للنص
+        bookIdLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        bookIdLabel.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        removeBookPanel.add(bookIdLabel, gbc);
+        updateRemovePanel.add(bookIdLabel, gbc);
 
-        // TextField for Book ID
         JTextField bookIdField = new JTextField(20);
-        bookIdField.setFont(new Font("Caveat", Font.PLAIN, 16)); // تكبير الخط للـ TextField
+        bookIdField.setFont(new Font("Caveat", Font.PLAIN, 16));
         gbc.gridx = 1;
         gbc.gridy = 0;
-        removeBookPanel.add(bookIdField, gbc);
+        updateRemovePanel.add(bookIdField, gbc);
 
-        // Remove Button
+
         JButton removeButton = new JButton("Remove");
-        removeButton.setPreferredSize(new Dimension(100, 40)); // ضبط حجم الزر
-        removeButton.setFont(new Font("Arial", Font.PLAIN, 16)); // حجم الخط
-        removeButton.setBackground(new Color(141, 110, 99)); // لون الزر بني مناسب
-        removeButton.setForeground(Color.WHITE); // النص باللون الأبيض
+        removeButton.setPreferredSize(new Dimension(100, 40));
+        removeButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        removeButton.setBackground(new Color(141, 110, 99));
+        removeButton.setForeground(Color.WHITE);
         removeButton.addActionListener(e -> {
             String bookId = bookIdField.getText();
-
             if (bookId.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Book ID is required!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            boolean success = Catalog.removeBook(bookId); // Assuming Catalog.removeBook exists
-
-            if (success) {
-                refreshTable();
-                JOptionPane.showMessageDialog(this, "Book removed successfully!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Book not found!", "Error", JOptionPane.ERROR_MESSAGE);
+            int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to remove this book?", "Confirm Removal", JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                if(Catalog.removeBook(bookId)) {
+                    refreshTable();
+                    JOptionPane.showMessageDialog(this, "Book removed successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Book not found or could not be removed!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
-        // Clear Button
-        JButton clearButton = new JButton("Clear");
-        clearButton.setPreferredSize(new Dimension(100, 40)); // ضبط حجم الزر
-        clearButton.setFont(new Font("Arial", Font.PLAIN, 16)); // حجم الخط
-        clearButton.setBackground(new Color(141, 110, 99)); // نفس لون زر Remove
-        clearButton.setForeground(Color.WHITE); // النص باللون الأبيض
-        clearButton.addActionListener(e -> bookIdField.setText(""));
 
-        // Panel for buttons (Remove and Clear)
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10)); // مسافة بين الأزرار
-        buttonPanel.setBackground(new Color(121, 85, 72)); // لون الخلفية نفس الباكجراوند
+
+        JButton updateButton = new JButton("Update"); // Update button
+        updateButton.setPreferredSize(new Dimension(100, 40));
+        updateButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        updateButton.setBackground(new Color(141, 110, 99)); // Same style as remove
+        updateButton.setForeground(Color.WHITE);
+        updateButton.addActionListener(e -> {
+            String bookId = bookIdField.getText();
+            if (bookId.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Book ID is required to update!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            Catalog.updateBook(bookId,true);
+            JOptionPane.showMessageDialog(this, "Book Update is not yet fully implemented", "Info", JOptionPane.INFORMATION_MESSAGE);
+
+        });
+
+
+
+        JButton clearButton = new JButton("Clear");
+        // ... (clear button styling - same as before)
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(new Color(121, 85, 72));
         buttonPanel.add(removeButton);
+        buttonPanel.add(updateButton); // Add update button to panel
         buttonPanel.add(clearButton);
 
-        // Adding components to the main panel
+
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        removeBookPanel.add(buttonPanel, gbc);
+        updateRemovePanel.add(buttonPanel, gbc);
 
-        return removeBookPanel;
+        return updateRemovePanel;
     }
     private JPanel createSearchPanel() {
         JPanel searchPanel = new JPanel(new GridBagLayout());
@@ -350,7 +367,6 @@ public class LibrarianGUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "Search query cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             Node result = Catalog.FindBookByTitleOrAuthor(query, "Title"); // Assuming method exists
             if (result == null) {
                 JOptionPane.showMessageDialog(this, "No books found!", "Search Result", JOptionPane.INFORMATION_MESSAGE);
@@ -404,26 +420,23 @@ public class LibrarianGUI extends JFrame {
     private JPanel createViewBooksPanel() {
         JPanel viewBooksPanel = new JPanel(new BorderLayout());
 
-        // إنشاء زر "View Books"
+        // Create "View Books" button
         JButton viewBooksButton = new JButton("View Books");
 
-        // جدول لعرض الكتب
+        // Table for displaying books
         String[] columnNames = {"Book ID", "Title", "Author", "Availability"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable booksTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(booksTable);
 
-        // زر التحديث
+        // Action for "View Books" button
         viewBooksButton.addActionListener(e -> {
             try {
-                // تصفية الجدول قبل إضافة البيانات
+                // Clear the table before adding new data
                 tableModel.setRowCount(0);
 
-                // عرض الكتب من الكاتالوج
-                Catalog.displayCatalog(); // عرض الكتب باستخدام displayCatalog()
-
-                // إضافة الكتب إلى الجدول
-                Node temp = Catalog.bookList.getHead(); // استعراض الكتب من الكاتالوج
+                // Traverse through the catalog and populate the table
+                Node temp = Catalog.bookList.getHead(); // Access the linked list head
                 while (temp != null) {
                     Book book = temp.getBook();
                     Object[] row = {
@@ -432,8 +445,8 @@ public class LibrarianGUI extends JFrame {
                             book.getAuthor(),
                             book.getAvailablityStatus() ? "Available" : "Not Available"
                     };
-                    tableModel.addRow(row);
-                    temp = temp.getNext(); // الانتقال إلى الكتاب التالي
+                    tableModel.addRow(row); // Add book data to the table
+                    temp = temp.getNext(); // Move to the next node
                 }
 
             } catch (Exception ex) {
@@ -441,16 +454,12 @@ public class LibrarianGUI extends JFrame {
             }
         });
 
-        // إضافة الجدول والزر إلى اللوحة
+        // Add table and button to the panel
         viewBooksPanel.add(scrollPane, BorderLayout.CENTER);
         viewBooksPanel.add(viewBooksButton, BorderLayout.SOUTH);
 
         return viewBooksPanel;
     }
-
-
-
-
     private void logout() {
         dispose();
         new Login(); // Assuming Login class exists

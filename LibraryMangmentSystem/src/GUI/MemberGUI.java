@@ -1,4 +1,5 @@
 package GUI;
+
 import Classes.*;
 import javax.swing.*;
 import java.awt.*;
@@ -8,14 +9,16 @@ import java.io.IOException;
 
 public class MemberGUI extends JFrame {
     private Catalog catalog;
-    private dataBaseMembers member;
-    private JTextArea displayArea;
+    private Member member;
+    private JTextArea displayArea; // Declare displayArea
+    private final Color NAVIGATION_PANEL_COLOR = new Color(92, 64, 51);
+    private final Color MAIN_BACKGROUND_COLOR = new Color(121, 85, 72);
+    private final Color BUTTON_HOVER_COLOR = new Color(141, 110, 99);
+    private final Font BUTTON_FONT = new Font("Arial", Font.PLAIN, 16);
 
     public MemberGUI() {
-        catalog = new Catalog();
-        catalog.addBook(new Book("B001", "The Great Gatsby", "Fiction"));
-        catalog.addBook(new Book("B002", "1984", "Dystopian"));
-        catalog.addBook(new Book("B003", "To Kill a Mockingbird", "Dystopian"));
+        // ... (Existing code for initializing catalog and books)
+
         setTitle("Library Member Interface");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -24,25 +27,32 @@ public class MemberGUI extends JFrame {
         JPanel navPanel = new JPanel();
         navPanel.setLayout(new GridLayout(5, 1, 10, 10));
         navPanel.setPreferredSize(new Dimension(220, getHeight()));
-        navPanel.setBackground(new Color(45, 45, 45));
+        navPanel.setBackground(NAVIGATION_PANEL_COLOR); // Use the defined color
 
-        addNavButton(navPanel, "View Catalog", e -> displayCatalog());
-        addNavButton(navPanel, "Borrow Book", e -> borrowBook());
-        addNavButton(navPanel, "Return Book", e -> returnBook());
-        addNavButton(navPanel, "View Pending Requests", e -> PendingRequestsQueue.display());
-        addNavButton(navPanel, "Logout", e -> logout());
+        // ... add navigation buttons (same as before)
 
         add(navPanel, BorderLayout.WEST);
 
         displayArea = new JTextArea();
         displayArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(displayArea);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         displayArea.setFont(new Font("Arial", Font.PLAIN, 14));
+        JScrollPane scrollPane = new JScrollPane(displayArea);
         add(scrollPane, BorderLayout.CENTER);
-        RedirectSystemOut.redirectToTextArea(displayArea); //  IDK BUT IT IS WORKIIIIIINGGGGGGGG YAAAAAAYYYYY
-        getContentPane().setBackground(new Color(240, 240, 240));
+        addNavButton(navPanel, "Borrow Book", e -> borrowBook());
+        addNavButton(navPanel, "Return Book", e -> returnBook());
+        addNavButton(navPanel, "View Pending Requests", e -> PendingRequestsQueue.display()); //Make sure this method is correct
+        addNavButton(navPanel, "View Catalog", e -> displayCatalog());
+        addNavButton(navPanel, "Logout", e -> logout());
 
+
+        add(navPanel, BorderLayout.WEST);
+        displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        displayArea.setFont(new Font("Arial", Font.PLAIN, 14)); // Consistent font
+        JScrollPane scrollPane1 = new JScrollPane(displayArea);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(scrollPane1, BorderLayout.CENTER);
+        RedirectSystemOut.redirectToTextArea(displayArea);  // Correct method call
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -50,7 +60,22 @@ public class MemberGUI extends JFrame {
     private void addNavButton(JPanel panel, String text, ActionListener actionListener) {
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
-        styleNavButton(button);
+        button.setFont(BUTTON_FONT); //Directly use font
+        button.setBackground(MAIN_BACKGROUND_COLOR); //Directly use color
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(BUTTON_HOVER_COLOR); //Directly use color
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(MAIN_BACKGROUND_COLOR); //Directly use color
+
+            }
+        });
         panel.add(button);
     }
 
@@ -65,13 +90,12 @@ public class MemberGUI extends JFrame {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(100, 100, 100));
             }
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(68, 68, 68));
             }
         });
-    }
-
-    private void displayCatalog() {
+    }private void displayCatalog() {
         displayArea.setText("Library Catalog:\n");
         catalog.displayCatalog();
     }
