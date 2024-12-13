@@ -24,6 +24,7 @@ public class Main {
         Member member2 = new Member("ezz", "Mohamed1122@gmail.com");
         Member member3 = new Member("a7med", "Ezz@gmail.com");
         Loan.borrowBook("M200","B100",catalog);
+        Loan.returnBook("M200","B100",catalog);
         Member.display();
 
     }

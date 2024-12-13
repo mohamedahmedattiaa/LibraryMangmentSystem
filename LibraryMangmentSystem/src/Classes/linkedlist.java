@@ -219,4 +219,16 @@ public class linkedlist {
     public boolean isEmpty() {
         return head == null;
     }
+
+    public String toStringForMember() {
+        StringBuilder result = new StringBuilder();
+        Node current = this.getHead(); // Assuming `getHead` returns the head of the list
+        while (current != null) {
+            result.append(current.book.getBookID()).append(", "); // Replace with desired book details
+            current = current.next;
+        }
+        return result.length() > 0 ? result.substring(0, result.length() - 2) : "No books borrowed";
+    }
+
+
 }

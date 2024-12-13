@@ -20,15 +20,18 @@ public class Loan {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
         this.memberId = memberId;
-        LocalDate issueDate = LocalDate.now();
-        LocalDate returnDate = issueDate.plusDays(14);
+        this.issueDate = new Date(); // Initialize issueDate as the current date
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(issueDate);
+        calendar.add(Calendar.DAY_OF_MONTH, 14); // Add 14 days to create a return date
+        this.returnDate = calendar.getTime();
     }
     public Loan(){
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = getBookId();
         this.memberId = getMemberId();
         this.issueDate = new Date();
-        this.returnDate = null;
+
     }
 
     public String getLoanID() {
@@ -62,7 +65,6 @@ public class Loan {
             book.setAvailablityStatus(false);
             Loan loan = new Loan(bookId, member.getmemberId());
             activeLoans.add(loan);
-            member.add(book);
 
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
                     " by member " + member.getName() + "  your return date is: " + loan.getReturnDate() + ".");
@@ -89,7 +91,6 @@ public class Loan {
                 book.setAvailablityStatus(true);
                 activeLoans.remove(currentLoan);
                 returnedLoans.add(currentLoan);
-                member.remove(book);
                 System.out.println("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".");
                 System.out.println("Return Date: " + returnDate);
 
