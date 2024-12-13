@@ -605,7 +605,7 @@ public class LibrarianGUI extends JFrame {
                 JOptionPane.showMessageDialog(viewBooksPanel, "Error displaying books: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }); //
-
+//
         // Add table and button to the panel
         viewBooksPanel.add(scrollPane, BorderLayout.CENTER);
         viewBooksPanel.add(viewBooksButton, BorderLayout.SOUTH);
