@@ -65,7 +65,7 @@ public class  Report {
 
         displayPendingLoans(catalog);
 
-//        displayPopularGenre(catalog);
+        displayPopularGenre(catalog);
     }
 
     public void displayActiveLoans(Catalog catalog) {

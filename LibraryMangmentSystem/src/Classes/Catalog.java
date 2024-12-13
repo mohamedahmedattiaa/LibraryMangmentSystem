@@ -1,14 +1,12 @@
 package Classes;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class Catalog {
     public static linkedlist bookList =new linkedlist();
     public Catalog() {
     }
 
     public static void addBook(Book book) {
+        book.setAvailablityStatus(true);
         bookList.insertAtEnd(book);
         System.out.println("Added to catalog: " + book);
 
@@ -25,13 +23,36 @@ public class Catalog {
         bookList.display();
         return isRemoved;
     }
-    public static String updateBook(String bookId, boolean availabilityStatus) {
-        Book book = bookList.Searchbook(bookId);
-        if (book != null) {
-           book.setAvailablityStatus(false);
-            return "Book updated: " + book;
+    public static String checkBookAvailability(String bookId) {
+        for (Node current = bookList.getHead(); current != null; current = current.getNext()) {
+            Book book = current.getBook();
+            if (book.getBookID().equals(bookId)) {
+                if (book.getAvailablityStatus()) {
+                    return "Book exists and is available!";
+                } else {
+                    return "Book exists but is not available!";
+                }
+            }
         }
-        return "Book with ID " + bookId + " not found.";
+        return "Book not found!";
+    }
+
+    public static String updateBook(String bookId, boolean availabilityStatus, String title, String author, String genre) {
+        for (Node current = bookList.getHead(); current != null; current = current.getNext()) {
+            Book book = current.getBook();
+            if (book.getBookID().equals(bookId)) {
+                if (book.getAvailablityStatus()) {
+                    book.setAvailablityStatus(availabilityStatus);
+                    book.setBookTitle(title);
+                    book.setAuthor(author);
+                    book.setGenere(genre);
+                    return "Book details and availability status updated successfully!";
+                } else {
+                    return "Book is not available for update!";
+                }
+            }
+        }
+        return "Book not found!";
     }
 
     public static Book searchBook(String bookId) {
@@ -42,26 +63,29 @@ public class Catalog {
         bookList.display();
     }
 
-   public static String FindBookByTitle(String bookTitle) {
+    public static boolean searchBookByTitle(String bookTitle) {
         bookTitle = bookTitle.toLowerCase();
-        String bookid = bookList.Findbook(bookTitle);
-        if (bookid == null) {
-            return "Book not found: " + bookTitle;
+        String bookId = bookList.Findbook(bookTitle);
+        if (bookId == null) {
+            return false;
         }
-        Book book = Catalog.searchBook(bookid);
+        Book book = Catalog.searchBook(bookId);
         if (book == null) {
-            return "Book not found: " + bookTitle;
+            return false;
         }
         if (!book.getAvailablityStatus()) {
-            return "Book not available: " + bookTitle;
+            return false;
         }
         String bookID = book.getBookID();
-        return "Book found: " + bookTitle + " in section: " + bookID.charAt(0) +
+        System.out.println("Book found: " + bookTitle + " in section: " + bookID.charAt(0) +
                 " in roof number: " + bookID.charAt(1) +
-                " the number of the Book is: " + bookID.substring(2);
+                " the number of the Book is: " + bookID.substring(2));
+
+        return true;
     }
 
-   public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
+
+    public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
        Node foundBooks = null;
 
        // Traverse all the books and check if the title or author matches the query
