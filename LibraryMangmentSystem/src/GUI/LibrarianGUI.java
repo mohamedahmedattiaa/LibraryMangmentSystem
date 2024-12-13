@@ -3,6 +3,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
 import Classes.*;
 import GUI.Login;
 //
@@ -26,9 +28,9 @@ public class LibrarianGUI extends JFrame {
         mainPanel = new JPanel(card);
 
         mainPanel.add(createBookCatalogPanel(), "Book Catalog");
-        mainPanel.add(createCombinedManageBookTapped(), "Manage Book");
+        mainPanel.add(createCombinedManageBookTapped(), "Manage Books");
         mainPanel.add(createReportsTapedPanel(), "Reports");
-        mainPanel.add(createSearchBookTapped(), "Search Book");
+        mainPanel.add(createSearchBookTapped(), "Manage Members");
 
         add(mainPanel, BorderLayout.CENTER);
 
@@ -45,8 +47,8 @@ public class LibrarianGUI extends JFrame {
         NavPanel.setPreferredSize(new Dimension(200, getHeight()));
         NavPanel.setBackground(new Color(92, 64, 51));
 
-        addNavButton(NavPanel, "Manage Books", e -> switchPage("Manage Book"));
-        addNavButton(NavPanel, "Search Book", e -> switchPage("Search Book"));
+        addNavButton(NavPanel, "Manage Books", e -> switchPage("Manage Books"));
+        addNavButton(NavPanel,"Manage Members" , e -> switchPage("Manage Members"));
         addNavButton(NavPanel, "Book Catalog", e -> switchPage("Book Catalog"));
         addNavButton(NavPanel, "Reports", e -> switchPage("Reports"));
         addNavButton(NavPanel, "Logout", e -> logout());
@@ -84,6 +86,7 @@ public class LibrarianGUI extends JFrame {
         tabbedPane.addTab("Add Book", createAddBook());
         tabbedPane.addTab("Remove Book", createRemoveBookPanel());
         tabbedPane.addTab("Update book", createUpdateBook());
+        tabbedPane.addTab("Search book", createSearchPanel());
         MangeBook.add(tabbedPane, BorderLayout.CENTER);
         return MangeBook;
     }
@@ -493,7 +496,7 @@ public class LibrarianGUI extends JFrame {
         gbc.gridwidth = 2;
         searchPanel.add(searchLabel, gbc);
 
-// TextField for Search
+        // TextField for Search
         JTextField searchField = new JTextField(20);
         searchField.setFont(new Font("Caveat", Font.PLAIN, 16)); // تكبير الخط للـ TextField
         gbc.gridx = 0;
@@ -514,6 +517,8 @@ public class LibrarianGUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "Search query cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
+            // Here you can call the method to search for books by title or author
             Node result = Catalog.FindBookByTitleOrAuthor(query, "Title"); // Assuming method exists
             if (result == null) {
                 JOptionPane.showMessageDialog(this, "No books found!", "Search Result", JOptionPane.INFORMATION_MESSAGE);
@@ -537,7 +542,7 @@ public class LibrarianGUI extends JFrame {
         clearButton.setFont(new Font("Arial", Font.PLAIN, 16)); // حجم الخط
         clearButton.setBackground(new Color(141, 110, 99)); // نفس لون زر Search
         clearButton.setForeground(Color.WHITE); // النص باللون الأبيض
-        clearButton.addActionListener(e -> searchField.setText(""));
+        clearButton.addActionListener(e -> searchField.setText("")); // Clear the search field
 
         // Panel for buttons (Search and Clear)
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10)); // مسافة بين الأزرار
@@ -553,7 +558,8 @@ public class LibrarianGUI extends JFrame {
         searchPanel.add(buttonPanel, gbc);
 
         return searchPanel;
-    } //
+    }
+
 
     private void refreshCatalog() {
         tableModel.setRowCount(0);

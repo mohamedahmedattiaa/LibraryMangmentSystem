@@ -8,8 +8,6 @@ public class Login extends JFrame {
     private JPasswordField password;
     private JButton loginButton;
     private JButton signUpButton;
-    private JRadioButton memberRadioButton;
-    private JRadioButton librarianRadioButton;
 
     public Login() {
         JFrame frame = new JFrame("Library Management System - Login");
@@ -42,48 +40,19 @@ public class Login extends JFrame {
         signUpButton = new JButton("Sign Up");
         styleButton(signUpButton, 300, 500);
 
-
-        memberRadioButton = new JRadioButton("Member");
-        memberRadioButton.setBounds(300, 400, 90, 30);
-        memberRadioButton.setForeground(Color.WHITE); // Set text color
-        memberRadioButton.setOpaque(false);
-
-        librarianRadioButton = new JRadioButton("Librarian");
-        librarianRadioButton.setBounds(410, 400, 90, 30);
-        librarianRadioButton.setForeground(Color.WHITE);
-        librarianRadioButton.setOpaque(false);
-
-
-        ButtonGroup roleGroup = new ButtonGroup();
-        roleGroup.add(memberRadioButton);
-        roleGroup.add(librarianRadioButton);
-
         loginButton.addActionListener(e -> {
             String id = idText.getText();
             String pass = new String(password.getPassword());
 
-            if (!memberRadioButton.isSelected() && !librarianRadioButton.isSelected()) {
-                JOptionPane.showMessageDialog(frame, "Please select a role (Classes.Member or Librarian)", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (memberRadioButton.isSelected()) {
-                // تحقق الدخول كعضو
-                if (id.equals("user") && pass.equals("1234")) {
-                    JOptionPane.showMessageDialog(frame, "Welcome Classes.Member!");
-                    frame.dispose(); // غلق نافذة تسجيل الدخول
-                    new  MemberGUI();
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Invalid Classes.Member ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else if (librarianRadioButton.isSelected()) {
-                if (id.equals("librarian") && pass.equals("5678")) {
-                    JOptionPane.showMessageDialog(frame, "Welcome Librarian!");
-                    frame.dispose();
-                    new LibrarianGUI();
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Invalid Librarian ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+            if (id.equals("user") && pass.equals("1234")) {
+                JOptionPane.showMessageDialog(frame, "Welcome Member!");
+                frame.dispose(); // Close the login window
+            } else if (id.equals("librarian") && pass.equals("5678")) {
+                JOptionPane.showMessageDialog(frame, "Welcome Librarian!");
+                frame.dispose();
+                new LibrarianGUI(); // Open Librarian GUI
+            } else {
+                JOptionPane.showMessageDialog(frame, "Invalid ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -93,8 +62,6 @@ public class Login extends JFrame {
         frame.add(password);
         frame.add(loginButton);
         frame.add(signUpButton);
-        frame.add(memberRadioButton);
-        frame.add(librarianRadioButton);
         frame.add(backgroundLabel);
 
         frame.setLocationRelativeTo(null);

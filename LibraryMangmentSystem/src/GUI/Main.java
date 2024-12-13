@@ -8,6 +8,5 @@ public class Main {
             Login loginWindow = new Login();
             loginWindow.setVisible(true);
         });
-        new LibrarianGUI();
     }
 }
