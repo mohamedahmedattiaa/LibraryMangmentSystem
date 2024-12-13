@@ -54,12 +54,21 @@ public class Loan {
         return returnDate;
     }
 
-    public static void borrowBook(String memberID, String bookId, Catalog catalog) throws IOException {
+    public static void borrowBook(String memberID, String bookId) throws IOException {
         Member member = Member.SearchMember(memberID);
         if(member == null) {
             System.out.println("No member found with ID: " + memberID);
             return;
         }
+
+        for (Loan loan : activeLoans) {
+            if (loan.getMemberId().equals(memberID) && loan.getBookId().equals(bookId)) {
+                System.out.println("You already borrowed this book.");
+                return;
+            }
+        }
+        
+        
         Book book = Catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
@@ -78,7 +87,7 @@ public class Loan {
         }
     }
 
-    public static void returnBook(String memberId, String bookId, Catalog catalog) throws IOException {
+    public static void returnBook(String memberId, String bookId) throws IOException {
         Book book = Catalog.searchBook(bookId);
         Member member = Member.SearchMember(memberId);
         Date returnDate = new Date();
@@ -98,7 +107,7 @@ public class Loan {
                     Loan nextLoan = PendingRequestsQueue.dequeue();
                     Member nextMember = Member.SearchMember(nextLoan.memberId);
                     System.out.println("Processing next request for book: " + bookId + " for member: " + nextMember.getName() + " , memberId: " + nextMember.getmemberId());
-                    borrowBook(nextMember.getmemberId(), bookId, catalog); // edited
+                    borrowBook(nextMember.getmemberId(), bookId); // edited
                 }
             } else {
                 System.out.println("Book " + book.getBookTitle() + " is already available.");

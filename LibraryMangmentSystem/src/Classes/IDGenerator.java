@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Scanner;
 public class IDGenerator {
         private static int memberCounter = 200; // Start from 200
-        private static final String FILE_NAME = "text.txt";
+        private static final String Members = "Members.txt";
         public static String generateMemberID(String name, String email) {
             // Check if the member already exists in the file
             String existingID = findExistingMemberID(name, email);

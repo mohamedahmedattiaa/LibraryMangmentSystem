@@ -12,7 +12,7 @@ public class  Report {
 
 
         System.out.println("\nActive Loans for Member ID: " + memberId);
-        displayActiveLoansForMember(memberId, catalog);
+        displayActiveLoansForMember(memberId);
 
 
         System.out.println("\nPending Requests for Member ID: " + memberId);
@@ -21,11 +21,11 @@ public class  Report {
 
     }
 
-    private void displayActiveLoansForMember(String memberId, Catalog catalog) {
+    public static void displayActiveLoansForMember(String memberId) {
         boolean found = false;
         for (Loan loan : Loan.activeLoans) {
             if (loan.getMemberId().equals(memberId)) {
-                Book book = catalog.searchBook(loan.getBookId());
+                Book book = Catalog.searchBook(loan.getBookId());
 
                 if(book != null) {
                     System.out.println("Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
