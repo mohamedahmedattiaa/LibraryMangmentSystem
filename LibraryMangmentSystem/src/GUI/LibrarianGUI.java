@@ -1,13 +1,9 @@
+
 package GUI;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import Classes.Book;
-import Classes.Catalog;
-import Classes.Node;
 import Classes.*;
 
 public class LibrarianGUI extends JFrame {
@@ -28,10 +24,10 @@ public class LibrarianGUI extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        mainPanel.add(createCombinedViewPanel(), "View Info");
-        mainPanel.add(createAddBookPanel(), "Add Book");
-        mainPanel.add(createUpdateOrRemoveBookPanel(), "Remove Book");
-        mainPanel.add(createSearchPanel(), "Search Book");
+        mainPanel.add(createBookCatalogPanel(), "Book Catalog");
+        mainPanel.add(createCombinedManageBookTapped(), "Manage Book");
+        mainPanel.add(createReportsTapedPanel(), "Reports");
+        mainPanel.add(createSearchBookTapped(), "Search Book");
 
         add(mainPanel, BorderLayout.CENTER);
 
@@ -48,10 +44,10 @@ public class LibrarianGUI extends JFrame {
         navPanel.setPreferredSize(new Dimension(200, getHeight()));
         navPanel.setBackground(new Color(92, 64, 51));
 
-        addNavButton(navPanel, "Add Book", e -> switchPage("Add Book"));
-        addNavButton(navPanel, "Remove Book", e -> switchPage("Remove Book"));
+        addNavButton(navPanel, "Manage Books", e -> switchPage("Manage Book"));
         addNavButton(navPanel, "Search Book", e -> switchPage("Search Book"));
-        addNavButton(navPanel, "View Info", e -> switchPage("View Info"));
+        addNavButton(navPanel, "Book Catalog", e -> switchPage("Book Catalog"));
+        addNavButton(navPanel, "Reports", e -> switchPage("Reports"));
         addNavButton(navPanel, "Logout", e -> logout());
 
         return navPanel;
@@ -65,22 +61,50 @@ public class LibrarianGUI extends JFrame {
         styleNavButton(button);
         panel.add(button);
     }
-    private JPanel createCombinedViewPanel() {
-        JPanel combinedViewPanel = new JPanel(new BorderLayout());
+
+    private JPanel createBookCatalogPanel() {
+        JPanel BookCatalogPanel = new JPanel(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Catalog", createViewBooksPanel());
-        tabbedPane.addTab("Reports", createReportsPanel());
-
-        combinedViewPanel.add(tabbedPane, BorderLayout.CENTER);
-        return combinedViewPanel;
+        tabbedPane.addTab("Book Catalog", createViewBooksPanel());
+        BookCatalogPanel.add(tabbedPane, BorderLayout.CENTER);
+        return BookCatalogPanel;
     }
+
+    private JPanel createReportsTapedPanel() {
+        JPanel ReportsTapedPanel = new JPanel(new BorderLayout());
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Reports", createReportsPanel());
+        ReportsTapedPanel.add(tabbedPane, BorderLayout.CENTER);
+        return ReportsTapedPanel;
+    }
+
+
+    private JPanel createCombinedManageBookTapped(){
+        JPanel addBookPanel = new JPanel(new BorderLayout());
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Add Book", createAddBookPanel());
+        tabbedPane.addTab("Remove Book", createRemoveBookPanel());
+        tabbedPane.addTab("Update book", createUpdatePanel());
+        addBookPanel.add(tabbedPane, BorderLayout.CENTER);
+        return addBookPanel;
+    }
+
+    private JPanel createSearchBookTapped(){
+        JPanel searchBookPanel = new JPanel(new BorderLayout());
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Search Book", createSearchPanel());
+        searchBookPanel.add(tabbedPane, BorderLayout.CENTER);
+        return searchBookPanel;
+    }
+
     private void styleNavButton(JButton button) {
         button.setFont(new Font("Arial", Font.PLAIN, 14));
         button.setBackground(new Color(121, 85, 72));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10,  10));
 
         button.setPreferredSize(new Dimension(150, 50)); //مقاس الزر
 
@@ -95,76 +119,61 @@ public class LibrarianGUI extends JFrame {
         });
     }
 
-    ///
     private void switchPage(String pageName) {
         cardLayout.show(mainPanel, pageName);
     }
 
     private JPanel createReportsPanel() {
         JPanel reportsPanel = new JPanel(new BorderLayout());
-        JTextArea reportArea = new JTextArea();
-        reportArea.setEditable(false); // لضمان عدم تعديل النص
-        JScrollPane scrollPane = new JScrollPane(reportArea);
+
+        // Initialize JTable with an empty table model
+        String[] columns = {"Loan ID", "Book Title", "Return Date", "Status"};
+        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+        JTable reportTable = new JTable(tableModel);
+        reportTable.setFillsViewportHeight(true);
+
+        // Add the table to a JScrollPane
+        JScrollPane scrollPane = new JScrollPane(reportTable);
         reportsPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Button to view the general reports
         JButton viewReportsButton = new JButton("View Reports");
         viewReportsButton.addActionListener(e -> {
-            // إنشاء كائن من Report
+            // Create Report object
             Report report = new Report();
-            Catalog catalog = new Catalog(); // تأكد من تمرير الكتالوج الصحيح
+            Catalog catalog = new Catalog();
             try {
-                // توليد التقرير العام وعرضه في TextArea
-                StringBuilder reportContent = new StringBuilder();
-                reportContent.append("=== General Library Report ===\n\n");
-
-                // استدعاء الميثودز
-                reportContent.append("Active Loans:\n");
-                report.displayActiveLoans(catalog);
-
-                reportContent.append("\nOverdue Books:\n");
+                tableModel.setRowCount(0);
+                report.displayActiveLoans (catalog);
                 report.displayOverdueBooks(catalog);
-
-                reportContent.append("\nPending Loans:\n");
                 report.displayPendingLoans(catalog);
-
-                reportContent.append("\nPopular Genres:\n");
                 report.displayPopularGenre(catalog);
-
-                // تحديث النص في reportArea
-                reportArea.setText(reportContent.toString());
             } catch (Exception ex) {
-                reportArea.setText("Error generating report: " + ex.getMessage());
+                tableModel.setRowCount(0); // Clear table data on error
+                tableModel.addRow(new Object[]{"Error generating report: " + ex.getMessage()});
             }
         });
-
         reportsPanel.add(viewReportsButton, BorderLayout.SOUTH);
         return reportsPanel;
     }
 
+
     private JPanel createAddBookPanel() {
         JPanel addBookPanel = new JPanel(new GridBagLayout());
-        addBookPanel.setBackground(new Color(121, 85, 72)); // لون الباكجراوند بني
+        addBookPanel.setBackground(new Color(121, 85, 72)); // Color for background
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // المسافة بين المكونات
-
-        // تحميل الفونت من المسار المحدد
-//        try {
-//            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("D:/clion/Project Data/LibraryMangmentSystem/src/GUI/Caveat.ttf")).deriveFont(16f); // حجم 16
-//            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//            ge.registerFont(customFont); // تسجيل الفونت مع البيئة الرسومية
-//        } catch (FontFormatException | IOException e) {
-//            e.printStackTrace();  // في حالة حدوث خطأ
-//        }
+        gbc.insets = new Insets(10, 10, 10, 10); // Insets for spacing between components
 
         JLabel titleLabel = new JLabel("Title:");
-        titleLabel.setFont(new Font("Caveat", Font.BOLD, 24)); // تكبير الخط
-        titleLabel.setForeground(Color.WHITE); // اللون الأبيض للكتابة
+        titleLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 0;
         addBookPanel.add(titleLabel, gbc);
 
         JTextField titleField = new JTextField(20);
-        titleField.setFont(new Font("Caveat", Font.PLAIN, 16)); // تكبير الخط للـ TextField
+        titleField.setFont(new Font("Caveat", Font.PLAIN, 16));
         gbc.gridx = 1;
         gbc.gridy = 0;
         addBookPanel.add(titleField, gbc);
@@ -177,7 +186,7 @@ public class LibrarianGUI extends JFrame {
         addBookPanel.add(authorLabel, gbc);
 
         JTextField authorField = new JTextField(20);
-        authorField.setFont(new Font("Caveat", Font.PLAIN, 16)); // تطبيق الفونت
+        authorField.setFont(new Font("Caveat", Font.PLAIN, 16));
         gbc.gridx = 1;
         gbc.gridy = 1;
         addBookPanel.add(authorField, gbc);
@@ -190,67 +199,212 @@ public class LibrarianGUI extends JFrame {
         addBookPanel.add(genreLabel, gbc);
 
         JTextField genreField = new JTextField(20);
-        genreField.setFont(new Font("Caveat", Font.PLAIN, 16)); // تطبيق الفونت
+        genreField.setFont(new Font("Caveat", Font.PLAIN, 16));
         gbc.gridx = 1;
         gbc.gridy = 2;
         addBookPanel.add(genreField, gbc);
 
-        // إضافة أيقونة للكتاب
-        ImageIcon bookIcon = new ImageIcon("https://example.com/book_icon.png"); // استخدم URL مباشر
-        JLabel iconLabel = new JLabel(bookIcon);
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridheight = 3; // يكون الأيقونة تكمل الثلاث صفوف
-        addBookPanel.add(iconLabel, gbc);
+        JLabel successMessageLabel = new JLabel("");
+        successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        successMessageLabel.setForeground(Color.GREEN); // Green color for success message
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        addBookPanel.add(successMessageLabel, gbc);
+
+        // Add button to add book
         JButton addButton = new JButton("Add");
-        addButton.setPreferredSize(new Dimension(100, 40)); // Adjust button size
-        addButton.setFont(new Font("Arial", Font.PLAIN, 16)); // Adjust font size
-        addButton.setBackground(new Color(141, 110, 99)); // اللون البني المناسب
-        addButton.setForeground(Color.WHITE); // اللون الأبيض للنص
+        addButton.setPreferredSize(new Dimension(100, 40));
+        addButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        addButton.setBackground(new Color(141, 110, 99));
+        addButton.setForeground(Color.WHITE);
         addButton.addActionListener(e -> {
             String title = titleField.getText();
             String author = authorField.getText();
             String genre = genreField.getText();
 
-            if (title.isEmpty() || author.isEmpty() || genre.isEmpty()) {
+            if (title.isEmpty() ||  author.isEmpty() ||  genre.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }else if(Catalog.searchBookByTitle(title)) {
+                JOptionPane.showMessageDialog(this, "The Book is already exists!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             Book newBook = new Book(title, author, genre);
             Catalog.addBook(newBook); // Assuming Catalog.addBook exists
             refreshTable();
-            JOptionPane.showMessageDialog(this, "Book added successfully!");
+
+            // Update the success message label
+            successMessageLabel.setText("Book is added successfully!");
         });
 
-// Clear Button
+        // Clear button
         JButton clearButton = new JButton("Clear");
-        clearButton.setPreferredSize(new Dimension(100, 40)); // Adjust button size
-        clearButton.setFont(new Font("Arial", Font.PLAIN, 16)); // Adjust font size
-        clearButton.setBackground(new Color(141, 110, 99)); // نفس اللون الذي كان مستخدم في Add
-        clearButton.setForeground(Color.WHITE); // اللون الأبيض للنص
+        clearButton.setPreferredSize(new Dimension(100, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
         clearButton.addActionListener(e -> {
             titleField.setText("");
             authorField.setText("");
             genreField.setText("");
+            successMessageLabel.setText(""); // Clear the success message if any
         });
 
-// Add buttons to panel, place them in a new row, centered horizontally
+        // Add buttons to panel, place them in a new row, centered horizontally
         gbc.gridx = 1;
         gbc.gridy = 4;
-        gbc.gridwidth = 2; // جعل كل زر يأخذ عمود واحد فقط
+        gbc.gridwidth = 2; // Make buttons span two columns
         gbc.anchor = GridBagConstraints.CENTER;
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10)); // ضبط المسافة بين الأزرار
-        buttonPanel.setBackground(new Color(121, 85, 72)); // نفس اللون البني السابق للباكجراوند
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(new Color(121, 85, 72));
         buttonPanel.add(addButton);
         buttonPanel.add(clearButton);
         addBookPanel.add(buttonPanel, gbc);
 
         return addBookPanel;
     }
-    private JPanel createUpdateOrRemoveBookPanel() { // Renamed method
-        JPanel updateRemovePanel = new JPanel(new GridBagLayout());
-        updateRemovePanel.setBackground(new Color(121, 85, 72));
+
+
+    private JPanel createUpdatePanel() {
+        JPanel addBookPanel = new JPanel(new GridBagLayout());
+        addBookPanel.setBackground(new Color(121, 85, 72)); // Background color
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Padding between components
+
+        JLabel titleLabel = new JLabel("Title:");
+        titleLabel.setFont(new Font("Caveat", Font.BOLD, 24)); // Font size for title label
+        titleLabel.setForeground(Color.WHITE); // Text color
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        addBookPanel.add(titleLabel, gbc);
+
+        JTextField titleField = new JTextField(20);
+        titleField.setFont(new Font("Caveat", Font.PLAIN, 16)); // Font for title input field
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        addBookPanel.add(titleField, gbc);
+
+        JLabel authorLabel = new JLabel("Author:");
+        authorLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        authorLabel.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        addBookPanel.add(authorLabel, gbc);
+
+        JTextField authorField = new JTextField(20);
+        authorField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        addBookPanel.add(authorField, gbc);
+
+        JLabel genreLabel = new JLabel("Genre:");
+        genreLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        genreLabel.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        addBookPanel.add(genreLabel, gbc);
+
+        JTextField genreField = new JTextField(20);
+        genreField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        addBookPanel.add(genreField, gbc);
+
+        // Add book icon
+        JLabel successMessageLabel = new JLabel("");
+        successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        successMessageLabel.setForeground(Color.GREEN); // Green color for success message
+        gbc.gridx = 1;
+        gbc.gridy = 8;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.insets = new Insets(10, 10, 30, 10);
+        addBookPanel.add(successMessageLabel, gbc);
+
+        JButton updateButton = new JButton("Update");
+        updateButton.setPreferredSize(new Dimension(100, 40));
+        updateButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        updateButton.setBackground(new Color(141, 110, 99)); // Brown color for button
+        updateButton.setForeground(Color.WHITE); // White text for button
+        updateButton.addActionListener(e -> {
+            // Prompt the user to enter the book ID
+            String bookId = JOptionPane.showInputDialog(this, "Enter the Book ID to update:");
+
+            // If no ID is entered, exit the function
+            if (bookId == null && bookId.trim().isEmpty()) {
+                return; // No ID entered, do nothing
+            }
+
+            // Check if the book exists and is available
+            String checkAvailabilityMessage = Catalog.checkBookAvailability(bookId); // Call a method to check availability
+            if (!checkAvailabilityMessage.equals("Book exists and is available!")) {
+                JOptionPane.showMessageDialog(this, checkAvailabilityMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Prompt the user for availability status (true or false)
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Do you want to mark the book as available?", "Availability Status", JOptionPane.YES_NO_OPTION);
+            boolean availabilityStatus = (confirm == JOptionPane.YES_OPTION);
+
+            // Validate input for title, author, and genre
+            String title = titleField.getText().trim();
+            String author = authorField.getText().trim();
+            String genre = genreField.getText().trim();
+
+            if (title.isEmpty()  || author.isEmpty() || genre.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // If any field is empty, do not proceed
+            }
+
+            // Call the update method from Catalog class
+            String updateMessage = Catalog.updateBook(bookId, availabilityStatus, title, author, genre);
+
+            // Display appropriate message based on result
+            if (updateMessage.contains("not found")) {
+                JOptionPane.showMessageDialog(this, updateMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, updateMessage, "Success", JOptionPane.INFORMATION_MESSAGE);
+                successMessageLabel.setText("The Book is Updated successfully!");
+                refreshTable(); // Refresh the table to reflect the updated details
+            }
+        });
+
+        JButton clearButton = new JButton("Clear");
+        clearButton.setPreferredSize(new Dimension(100, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
+        clearButton.addActionListener(e -> {
+            titleField.setText("");
+            authorField.setText("");
+            genreField.setText("");
+            successMessageLabel.setText("");
+        });
+
+        // Add buttons to panel, centered horizontally
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(new Color(121, 85, 72)); // Background color
+        buttonPanel.add(updateButton);
+        buttonPanel.add(clearButton);
+        addBookPanel.add(buttonPanel, gbc);
+
+        return addBookPanel;
+    }
+
+
+    private JPanel createRemoveBookPanel() { // Renamed method
+        JPanel RemoveBookPanel = new JPanel(new GridBagLayout());
+        RemoveBookPanel.setBackground(new Color(121, 85, 72));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -260,14 +414,23 @@ public class LibrarianGUI extends JFrame {
         bookIdLabel.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        updateRemovePanel.add(bookIdLabel, gbc);
+        RemoveBookPanel.add(bookIdLabel, gbc);
 
         JTextField bookIdField = new JTextField(20);
         bookIdField.setFont(new Font("Caveat", Font.PLAIN, 16));
         gbc.gridx = 1;
         gbc.gridy = 0;
-        updateRemovePanel.add(bookIdField, gbc);
+        RemoveBookPanel.add(bookIdField, gbc);
 
+        JLabel successMessageLabel = new JLabel("");
+        successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        successMessageLabel.setForeground(Color.GREEN); // Green color for success message
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        RemoveBookPanel.add(successMessageLabel, gbc);
 
         JButton removeButton = new JButton("Remove");
         removeButton.setPreferredSize(new Dimension(100, 40));
@@ -283,53 +446,42 @@ public class LibrarianGUI extends JFrame {
 
             int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to remove this book?", "Confirm Removal", JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
-                if(Catalog.removeBook(bookId)) {
+                if (Catalog.removeBook(bookId)) {
                     refreshTable();
                     JOptionPane.showMessageDialog(this, "Book removed successfully!");
+                    successMessageLabel.setText("The Book is Removed successfully!");
                 } else {
                     JOptionPane.showMessageDialog(this, "Book not found or could not be removed!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-
-
-        JButton updateButton = new JButton("Update"); // Update button
-        updateButton.setPreferredSize(new Dimension(100, 40));
-        updateButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        updateButton.setBackground(new Color(141, 110, 99)); // Same style as remove
-        updateButton.setForeground(Color.WHITE);
-        updateButton.addActionListener(e -> {
-            String bookId = bookIdField.getText();
-            if (bookId.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Book ID is required to update!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            Catalog.updateBook(bookId,true);
-            JOptionPane.showMessageDialog(this, "Book Update is not yet fully implemented", "Info", JOptionPane.INFORMATION_MESSAGE);
-
-        });
-
-
-
         JButton clearButton = new JButton("Clear");
-        // ... (clear button styling - same as before)
+        clearButton.setPreferredSize(new Dimension(100, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
+        clearButton.addActionListener(e -> {
+            bookIdField.setText("");
+            successMessageLabel.setText("");
+        });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(121, 85, 72));
         buttonPanel.add(removeButton);
-        buttonPanel.add(updateButton); // Add update button to panel
         buttonPanel.add(clearButton);
-
 
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        updateRemovePanel.add(buttonPanel, gbc);
+        RemoveBookPanel.add(buttonPanel, gbc);
 
-        return updateRemovePanel;
+        return RemoveBookPanel;
     }
+
+
+
     private JPanel createSearchPanel() {
         JPanel searchPanel = new JPanel(new GridBagLayout());
         searchPanel.setBackground(new Color(121, 85, 72)); // لون الخلفية بني
@@ -421,7 +573,7 @@ public class LibrarianGUI extends JFrame {
         JPanel viewBooksPanel = new JPanel(new BorderLayout());
 
         // Create "View Books" button
-        JButton viewBooksButton = new JButton("View Books");
+        JButton viewBooksButton = new JButton("Refresh Books");
 
         // Table for displaying books
         String[] columnNames = {"Book ID", "Title", "Author", "Availability"};
