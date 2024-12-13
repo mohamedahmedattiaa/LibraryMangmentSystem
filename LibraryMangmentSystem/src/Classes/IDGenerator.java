@@ -18,7 +18,7 @@ public class IDGenerator {
 
         // Helper method to search for an existing member in the file
         private static String findExistingMemberID(String name, String email) {
-            try (Scanner scanner = new Scanner(new File(FILE_NAME))) {
+            try (Scanner scanner = new Scanner(new File("Members.txt"))) {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
                     String[] data = line.split(",");

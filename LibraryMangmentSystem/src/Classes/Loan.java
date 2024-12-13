@@ -52,7 +52,7 @@ public class Loan {
     }
 
     public static void borrowBook(String memberID, String bookId, Catalog catalog) throws IOException {
-        Member member = dataBaseMembers.SearchMember(memberID);
+        Member member = Member.SearchMember(memberID);
         if(member == null) {
             System.out.println("No member found with ID: " + memberID);
             return;
@@ -62,8 +62,10 @@ public class Loan {
             book.setAvailablityStatus(false);
             Loan loan = new Loan(bookId, member.getmemberId());
             activeLoans.add(loan);
+            member.add(book);
+
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
-                    " by member " + member.getName() + "your return date is: " + loan.getReturnDate() + ".");
+                    " by member " + member.getName() + "  your return date is: " + loan.getReturnDate() + ".");
 
         } else if (book != null && !book.getAvailablityStatus()) {
             System.out.println("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".");
@@ -76,7 +78,7 @@ public class Loan {
 
     public static void returnBook(String memberId, String bookId, Catalog catalog) throws IOException {
         Book book = Catalog.searchBook(bookId);
-        Member member = dataBaseMembers.SearchMember(memberId);
+        Member member = Member.SearchMember(memberId);
         Date returnDate = new Date();
         if (book != null) {
             if (!book.getAvailablityStatus()) {
@@ -87,12 +89,13 @@ public class Loan {
                 book.setAvailablityStatus(true);
                 activeLoans.remove(currentLoan);
                 returnedLoans.add(currentLoan);
+                member.remove(book);
                 System.out.println("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".");
                 System.out.println("Return Date: " + returnDate);
 
                 if (!PendingRequestsQueue.isEmpty()) {
                     Loan nextLoan = PendingRequestsQueue.dequeue();
-                    Member nextMember = dataBaseMembers.SearchMember(nextLoan.memberId);
+                    Member nextMember = Member.SearchMember(nextLoan.memberId);
                     System.out.println("Processing next request for book: " + bookId + " for member: " + nextMember.getName() + " , memberId: " + nextMember.getmemberId());
                     borrowBook(nextMember.getmemberId(), bookId, catalog); // edited
                 }

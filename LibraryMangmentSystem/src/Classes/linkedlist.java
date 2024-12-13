@@ -215,4 +215,8 @@ public class linkedlist {
                    return right;
                }
         }
+
+    public boolean isEmpty() {
+        return head == null;
     }
+}

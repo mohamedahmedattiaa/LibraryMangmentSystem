@@ -7,7 +7,7 @@ public class PendingRequestsQueue {
 
     public static void enqueue(Loan loan) {
         request.add(loan);
-        System.out.println("Loan request added for book " + loan.getBookId() + " by member '" + loan.getMemberId() + ".");
+        System.out.println("Pending Requests request added for book " + loan.getBookId() + " by member '" + loan.getMemberId() + ".");
     }
     public static Loan dequeue() {
         if(request.isEmpty()) {
@@ -21,7 +21,7 @@ public class PendingRequestsQueue {
     }
 
     public static void display() {
-        System.out.println("Loan Requests:");
+        System.out.println("Pending Requests Requests:");
         for (Loan loan : request) {
             System.out.println("Book ID: " + loan.getBookId() + ", Member: " + loan.getMemberId());
         }
