@@ -1,8 +1,8 @@
 package GUI;
+import Classes.*;
 
 import javax.swing.*;
 import java.awt.*;
-import Classes.*;
 
 public class BookIdDialog extends JDialog {
     private JTextField bookIdField;

@@ -86,21 +86,21 @@ public class Catalog {
 
 
     public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
-       Node foundBooks = null;
+        Node foundBooks = null;
 
-       // Traverse all the books and check if the title or author matches the query
-       Node temp = bookList.getHead(); // Traverse the linked list using the head of bookList
-       while (temp != null) {
-           Book book = temp.book;
-           if (book.getBookTitle().contains(searchQuery) || book.getAuthor().contains(searchQuery)) {
-               Node newNode = new Node(book);
-               foundBooks = bookList.merge(foundBooks, newNode, sortedBy); // Sort the books using the merge function
-           }
-           temp = temp.next; // Move to the next node
-       }
+        // Traverse all the books and check if the title or author matches the query
+        Node temp = bookList.getHead(); // Traverse the linked list using the head of bookList
+        while (temp != null) {
+            Book book = temp.book;
+            if (book.getBookTitle().contains(searchQuery) || book.getAuthor().contains(searchQuery)) {
+                Node newNode = new Node(book);
+                foundBooks = bookList.merge(foundBooks, newNode, sortedBy); // Sort the books using the merge function
+            }
+            temp = temp.next; // Move to the next node
+        }
 
-       return foundBooks;
-   }
+        return foundBooks;
+    }
 
     public static void Sorting(String SortedBy){
         bookList.sorting(SortedBy);

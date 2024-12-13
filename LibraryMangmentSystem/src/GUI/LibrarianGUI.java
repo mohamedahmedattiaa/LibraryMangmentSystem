@@ -1,11 +1,11 @@
-
 package GUI;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import Classes.*;
-
+import GUI.Login;
+//
 public class LibrarianGUI extends JFrame {
     private DefaultTableModel tableModel;
     private JTable bookTable;
@@ -17,7 +17,7 @@ public class LibrarianGUI extends JFrame {
         setSize(800, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
+//
         tableModel = new DefaultTableModel(new String[]{"Title", "Author", "Genre"}, 0);
         bookTable = new JTable(tableModel);
 
@@ -52,7 +52,7 @@ public class LibrarianGUI extends JFrame {
 
         return navPanel;
     }
-
+//
 
     //button
     private void addNavButton(JPanel panel, String text, ActionListener actionListener) {
@@ -61,7 +61,7 @@ public class LibrarianGUI extends JFrame {
         styleNavButton(button);
         panel.add(button);
     }
-
+//
     private JPanel createBookCatalogPanel() {
         JPanel BookCatalogPanel = new JPanel(new BorderLayout());
 
@@ -70,7 +70,7 @@ public class LibrarianGUI extends JFrame {
         BookCatalogPanel.add(tabbedPane, BorderLayout.CENTER);
         return BookCatalogPanel;
     }
-
+//
     private JPanel createReportsTapedPanel() {
         JPanel ReportsTapedPanel = new JPanel(new BorderLayout());
 
@@ -79,7 +79,7 @@ public class LibrarianGUI extends JFrame {
         ReportsTapedPanel.add(tabbedPane, BorderLayout.CENTER);
         return ReportsTapedPanel;
     }
-
+//
 
     private JPanel createCombinedManageBookTapped(){
         JPanel addBookPanel = new JPanel(new BorderLayout());
@@ -90,7 +90,7 @@ public class LibrarianGUI extends JFrame {
         addBookPanel.add(tabbedPane, BorderLayout.CENTER);
         return addBookPanel;
     }
-
+//
     private JPanel createSearchBookTapped(){
         JPanel searchBookPanel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -118,11 +118,11 @@ public class LibrarianGUI extends JFrame {
             }
         });
     }
-
+//
     private void switchPage(String pageName) {
         cardLayout.show(mainPanel, pageName);
     }
-
+//
     private JPanel createReportsPanel() {
         JPanel reportsPanel = new JPanel(new BorderLayout());
 
@@ -157,7 +157,7 @@ public class LibrarianGUI extends JFrame {
         return reportsPanel;
     }
 
-
+//
     private JPanel createAddBookPanel() {
         JPanel addBookPanel = new JPanel(new GridBagLayout());
         addBookPanel.setBackground(new Color(121, 85, 72)); // Color for background
@@ -214,7 +214,7 @@ public class LibrarianGUI extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         addBookPanel.add(successMessageLabel, gbc);
 
-        // Add button to add book
+// Add button to add book
         JButton addButton = new JButton("Add");
         addButton.setPreferredSize(new Dimension(100, 40));
         addButton.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -225,7 +225,7 @@ public class LibrarianGUI extends JFrame {
             String author = authorField.getText();
             String genre = genreField.getText();
 
-            if (title.isEmpty() ||  author.isEmpty() ||  genre.isEmpty()) {
+            if (title.isEmpty()  || author.isEmpty()  ||  genre.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }else if(Catalog.searchBookByTitle(title)) {
@@ -266,7 +266,7 @@ public class LibrarianGUI extends JFrame {
         addBookPanel.add(buttonPanel, gbc);
 
         return addBookPanel;
-    }
+    } ///
 
 
     private JPanel createUpdatePanel() {
@@ -315,7 +315,7 @@ public class LibrarianGUI extends JFrame {
         gbc.gridy = 2;
         addBookPanel.add(genreField, gbc);
 
-        // Add book icon
+// Add book icon
         JLabel successMessageLabel = new JLabel("");
         successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
         successMessageLabel.setForeground(Color.GREEN); // Green color for success message
@@ -357,7 +357,7 @@ public class LibrarianGUI extends JFrame {
             String author = authorField.getText().trim();
             String genre = genreField.getText().trim();
 
-            if (title.isEmpty()  || author.isEmpty() || genre.isEmpty()) {
+            if (title.isEmpty() ||  author.isEmpty()  || genre.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
                 return; // If any field is empty, do not proceed
             }
@@ -399,7 +399,7 @@ public class LibrarianGUI extends JFrame {
         addBookPanel.add(buttonPanel, gbc);
 
         return addBookPanel;
-    }
+    } //
 
 
     private JPanel createRemoveBookPanel() { // Renamed method
@@ -478,7 +478,7 @@ public class LibrarianGUI extends JFrame {
         RemoveBookPanel.add(buttonPanel, gbc);
 
         return RemoveBookPanel;
-    }
+    }  //
 
 
 
@@ -498,7 +498,7 @@ public class LibrarianGUI extends JFrame {
         gbc.gridwidth = 2;
         searchPanel.add(searchLabel, gbc);
 
-        // TextField for Search
+// TextField for Search
         JTextField searchField = new JTextField(20);
         searchField.setFont(new Font("Caveat", Font.PLAIN, 16)); // تكبير الخط للـ TextField
         gbc.gridx = 0;
@@ -558,7 +558,7 @@ public class LibrarianGUI extends JFrame {
         searchPanel.add(buttonPanel, gbc);
 
         return searchPanel;
-    }
+    } //
 
     private void refreshTable() {
         tableModel.setRowCount(0);
@@ -568,7 +568,7 @@ public class LibrarianGUI extends JFrame {
             tableModel.addRow(new Object[]{book.getBookTitle(), book.getAuthor(), book.getGenere()});
             current = current.getNext();
         }
-    }
+    } //
     private JPanel createViewBooksPanel() {
         JPanel viewBooksPanel = new JPanel(new BorderLayout());
 
@@ -587,7 +587,7 @@ public class LibrarianGUI extends JFrame {
                 // Clear the table before adding new data
                 tableModel.setRowCount(0);
 
-                // Traverse through the catalog and populate the table
+// Traverse through the catalog and populate the table
                 Node temp = Catalog.bookList.getHead(); // Access the linked list head
                 while (temp != null) {
                     Book book = temp.getBook();
@@ -604,7 +604,7 @@ public class LibrarianGUI extends JFrame {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(viewBooksPanel, "Error displaying books: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-        });
+        }); //
 
         // Add table and button to the panel
         viewBooksPanel.add(scrollPane, BorderLayout.CENTER);
@@ -615,9 +615,9 @@ public class LibrarianGUI extends JFrame {
     private void logout() {
         dispose();
         new Login(); // Assuming Login class exists
-    }
+    } //
 
     public static void main(String[] args) {
         new LibrarianGUI();
     }
-}
+} //

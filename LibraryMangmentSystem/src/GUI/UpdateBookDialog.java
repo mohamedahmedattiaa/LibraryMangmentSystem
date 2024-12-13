@@ -1,9 +1,9 @@
 package GUI;
+import Classes.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import Classes.*;
+
 public class UpdateBookDialog extends JDialog {
     private Book bookToUpdate;
     private JTextField titleField, authorField, genreField;
