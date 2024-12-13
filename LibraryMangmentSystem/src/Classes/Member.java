@@ -77,24 +77,28 @@ public class Member {
 
     // Display all members' details
     public static String display() throws IOException {
-        String line = "";
-        System.out.println("Member Details: ");
+        String line;
+        System.out.println("Member Details:");
 
         // Initialize a BufferedReader to read from the file
         try (BufferedReader reader = new BufferedReader(new FileReader("Members.txt"))) {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length >= 4) { // Ensure the array has all necessary parts
-                    String memberId = data[0].trim();
+                if (data.length >= 4) {
+                    String memberID = data[0].trim();
                     String name = data[1].trim();
                     String email = data[2].trim();
                     String password = data[3].trim();
 
-                    System.out.println("Member ID: " + memberId);
-                    System.out.println("Name: " + name);
-                    System.out.println("Email: " + email);
-                    System.out.println("Password: " + password);
-                    System.out.println("----------");
+                    if (SearchMember(memberID) == null) {
+                        System.out.println("Member ID: " + memberID);
+                        System.out.println("Name: " + name);
+                        System.out.println("Email: " + email);
+                        System.out.println("Password: " + password);
+                        System.out.println("----------");
+                    } else {
+                        System.out.println("Member with ID " + memberID + " already exists. Skipping.");
+                    }
                 } else {
                     System.out.println("Error: Invalid data format in the file.");
                 }
@@ -138,7 +142,6 @@ public class Member {
 
     // Display books borrowed by the member using catalog data
     public static void displayBooksBorrowed(String memberID) throws IOException {
-
         System.out.println("Books Borrowed by Member ID: " + memberID);
         Report.displayActiveLoansForMember(memberID);
     }
