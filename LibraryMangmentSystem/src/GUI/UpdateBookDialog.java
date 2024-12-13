@@ -72,7 +72,7 @@ public class UpdateBookDialog extends JDialog {
         String genre = genreField.getText();
         boolean availabilityStatus = availabilityCheckBox.isSelected();
 
-        if (title.isEmpty() || author.isEmpty()  || genre.isEmpty()) {
+        if (title.isEmpty() || author.isEmpty()  ||  genre.isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
