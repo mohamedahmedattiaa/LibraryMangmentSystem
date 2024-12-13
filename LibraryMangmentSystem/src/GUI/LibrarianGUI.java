@@ -13,6 +13,8 @@ public class LibrarianGUI extends JFrame {
     private JTable bookTable;
     private CardLayout card;
     private JPanel mainPanel;
+    private AbstractButton booksTable;
+    private Component sortBooksPanel;
 
     public LibrarianGUI() {
         setTitle("Librarian Panel");
@@ -582,13 +584,35 @@ public class LibrarianGUI extends JFrame {
         JTable booksTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(booksTable);
 
+        // Create the combo box with sorting options
+        String[] sortOptions = {"Sort by Author", "Sort by Title"};
+        JComboBox<String> sortComboBox = new JComboBox<>(sortOptions);
+
+        // Create the sorting button
+        JButton sortButton = new JButton("Sort");
+
+        // Action for the "Sort" button
+        sortButton.addActionListener(e -> {
+            String selectedOption = (String) sortComboBox.getSelectedItem();
+
+            // Call the sorting method based on the selected option
+            if ("Sort by Author".equals(selectedOption)) {
+                Catalog.bookList.sorting("Author");  // Sort books by Author
+            } else if ("Sort by Title".equals(selectedOption)) {
+                Catalog.bookList.sorting("Title");   // Sort books by Title
+            }
+
+            // Refresh the books table after sorting
+            refreshBooksTable(tableModel, booksTable);
+        });
+
         // Action for "View Books" button
         viewBooksButton.addActionListener(e -> {
             try {
                 // Clear the table before adding new data
                 tableModel.setRowCount(0);
 
-// Traverse through the catalog and populate the table
+                // Traverse through the catalog and populate the table
                 Node temp = Catalog.bookList.getHead(); // Access the linked list head
                 while (temp != null) {
                     Book book = temp.getBook();
@@ -605,14 +629,69 @@ public class LibrarianGUI extends JFrame {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(viewBooksPanel, "Error displaying books: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-        }); //
-//
-        // Add table and button to the panel
+        });
+
+        // Add table, combo box, and buttons to the panel
+        JPanel topPanel = new JPanel();
+        topPanel.add(sortComboBox);
+        topPanel.add(sortButton);
+
+        viewBooksPanel.add(topPanel, BorderLayout.NORTH);
         viewBooksPanel.add(scrollPane, BorderLayout.CENTER);
         viewBooksPanel.add(viewBooksButton, BorderLayout.SOUTH);
 
         return viewBooksPanel;
     }
+
+
+
+    // Method to refresh the books table (after sorting)
+    private void refreshBooksTable(DefaultTableModel tableModel, JTable booksTable) {
+        try {
+            tableModel.setRowCount(0); // Clear the existing table data
+
+            Node temp = Catalog.bookList.getHead(); // Access the linked list head
+            while (temp != null) {
+                Book book = temp.getBook();
+                Object[] row = {
+                        book.getBookID(),
+                        book.getBookTitle(),
+                        book.getAuthor(),
+                        book.getAvailablityStatus() ? "Available" : "Not Available"
+                };
+                tableModel.addRow(row); // Add book data to the table
+                temp = temp.getNext(); // Move to the next node
+            }
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(booksTable, "Error displaying books: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Method to refresh the books table (after sorting)
+    private void refreshBooksTable() {
+        try {
+            DefaultTableModel tableModel = (DefaultTableModel) booksTable.getModel();
+            tableModel.setRowCount(0); // Clear the existing table data
+
+            Node temp = Catalog.bookList.getHead(); // Access the linked list head
+            while (temp != null) {
+                Book book = temp.getBook();
+                Object[] row = {
+                        book.getBookID(),
+                        book.getBookTitle(),
+                        book.getAuthor(),
+                        book.getAvailablityStatus() ? "Available" : "Not Available"
+                };
+                tableModel.addRow(row); // Add book data to the table
+                temp = temp.getNext(); // Move to the next node
+            }
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(sortBooksPanel, "Error displaying books: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void logout() {
         dispose();
         new Login(); // Assuming Login class exists

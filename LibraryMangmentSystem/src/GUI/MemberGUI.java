@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Date;
 import Classes.*;
-//
 import static Classes.Loan.activeLoans;
 import static Classes.Loan.returnedLoans;
 
