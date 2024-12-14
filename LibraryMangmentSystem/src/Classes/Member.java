@@ -1,5 +1,6 @@
 package Classes;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,6 +14,7 @@ public class Member {
     static BufferedWriter writer;
     static BufferedReader reader;
     private List<Loan> loans;
+    private static Node membersList;
 
     public Member(String name, String Email, String password) throws IOException {
         if (Email.contains("@") && Email.contains(".")) {
@@ -68,7 +70,7 @@ public class Member {
 
     static {
         try {
-            writer = new BufferedWriter(new FileWriter("Members.txt", false)); // Use true to append data
+            writer = new BufferedWriter(new FileWriter("Members.txt", true)); // Use true to append data
             reader = new BufferedReader(new FileReader("Members.txt"));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -111,7 +113,23 @@ public class Member {
 
         return "End of Member List";
     }
-
+    public static List<Member> readMembersFromFile(String filePath) throws IOException {
+        List<Member> members = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 4) {
+                    String memberID = parts[0].trim();
+                    String name = parts[1].trim();
+                    String email = parts[2].trim();
+                    String password = parts[3].trim();
+                    members.add(new Member(name, email, password));
+                }
+            }
+        }
+        return members;
+    }
     // Search for a member by memberID
     public static Member SearchMember(String memberID) throws IOException {
         if (memberID == null || memberID.isEmpty()) {
@@ -133,6 +151,88 @@ public class Member {
         }
 
         return null;
+    }
+    public static boolean removeMember(String memberID) throws IOException {
+        File inputFile = new File("Members.txt");
+        File tempFile = new File("TempMembers.txt");
+
+        boolean isRemoved = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (!data[0].trim().equals(memberID)) {
+                    writer.write(line);
+                    writer.newLine();
+                } else {
+                    isRemoved = true; // Member found and skipped
+                }
+            }
+        }
+
+        // Replace the old file with the new one
+        if (isRemoved && inputFile.delete() && tempFile.renameTo(inputFile)) {
+            System.out.println("Member with ID " + memberID + " removed successfully.");
+        } else if (!isRemoved) {
+            System.out.println("Member with ID " + memberID + " not found.");
+        }
+
+        return isRemoved;
+    }
+
+    public static boolean updateMember(String memberID, String newName, String newEmail, String newPassword) throws IOException {
+        File inputFile = new File("Members.txt");
+        File tempFile = new File("TempMembers.txt");
+
+        boolean isUpdated = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data[0].trim().equals(memberID)) {
+                    // Update member details
+                    data[1] = newName;
+                    data[2] = newEmail;
+                    data[3] = newPassword;
+                    isUpdated = true;
+                }
+                writer.write(String.join(",", data));
+                writer.newLine();
+            }
+        }
+
+// Replace the old file with the updated one
+        if (isUpdated && inputFile.delete() && tempFile.renameTo(inputFile)) {
+            System.out.println("Member with ID " + memberID + " updated successfully.");
+        } else if (!isUpdated) {
+            System.out.println("Member with ID " + memberID + " not found.");
+        }
+
+        return isUpdated;
+    }
+    public static void addMember(String name, String email, String password) throws IOException {
+        try {
+            Member newMember = new Member(name, email, password); // Constructor handles validations and writing.
+            System.out.println("Member added successfully: " + newMember);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error adding member: " + e.getMessage());
+        }
+    }
+    public static Member getMemberByIdAndName(String memberId, String name) throws IOException {
+        // Example: Retrieve from a file or database
+        List<Member> members = readMembersFromFile(String.valueOf(new File("Members.txt"))); // Implement this to read members
+        for (Member member : members) {
+            if (member.getmemberId().equals(memberId) && member.getName().equalsIgnoreCase(name)) {
+                return member;
+            }
+        }
+        return null; // Return null if no match is found
     }
 
     public void addLoan(Loan loan) {
@@ -165,4 +265,6 @@ public class Member {
         }
         return null; // Return null if not found
     }
+
+
 }

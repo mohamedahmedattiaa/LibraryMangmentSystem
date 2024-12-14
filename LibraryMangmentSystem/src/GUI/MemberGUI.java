@@ -7,14 +7,19 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Date;
 import Classes.*;
-import static Classes.Loan.activeLoans;
-import static Classes.Loan.returnedLoans;
+import GUI.Login;
+
+import static Classes.Loan.*;
 
 public class MemberGUI extends JFrame {
     private DefaultTableModel tableModel;
     private JTable bookTable;
     private CardLayout card;
     private JPanel mainPanel;
+    private static final Color BROWN_COLOR = new Color(121, 85, 72); // Define your desired brown color
+    private static final Color LIGHT_BROWN_COLOR = new Color(141, 110, 99); // Lighter brown for buttons on hover
+    private static final Color WHITE_COLOR = Color.WHITE; // White for text
+
 
     public MemberGUI() {
         setTitle("Member Panel");
@@ -59,9 +64,26 @@ public class MemberGUI extends JFrame {
     private void addNavButton(JPanel panel, String text, ActionListener actionListener) {
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
-        styleNavButton(button);
+        button.setFont(new Font("Arial", Font.PLAIN, 14));
+        button.setBackground(LIGHT_BROWN_COLOR); // Using the defined color
+        button.setForeground(WHITE_COLOR); // White text color
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        button.setPreferredSize(new Dimension(150, 50));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(141, 110, 99)); // Light brown on hover
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(LIGHT_BROWN_COLOR); // Default light brown
+            }
+        });
+
         panel.add(button);
     }
+
 
     private JPanel createMembersActionPanel() {
         JPanel membersActionPanel = new JPanel(new BorderLayout());
@@ -118,16 +140,11 @@ public class MemberGUI extends JFrame {
 
     private JPanel createBorrowPanel() {
         JPanel borrowPanel = new JPanel(new BorderLayout());
-
-        // Create a JTextArea to display borrow messages
-        JTextArea borrowMessageArea = new JTextArea(5, 20);
-        borrowMessageArea.setEditable(false); // Make it read-only
-        borrowPanel.add(new JScrollPane(borrowMessageArea), BorderLayout.SOUTH);
+        borrowPanel.setBackground(new Color(121, 85, 72)); // Matching brown background
 
         // Add components to borrow book
         JPanel borrowInputPanel = new JPanel(new GridBagLayout());
-        borrowInputPanel.setBackground(new Color(121, 85, 72)); // Matching background color
-
+        borrowInputPanel.setBackground(new Color(121, 85, 72)); // Matching brown background
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); // Insets for spacing between components
 
@@ -140,6 +157,8 @@ public class MemberGUI extends JFrame {
 
         JTextField memberIDField = new JTextField(20);
         memberIDField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        memberIDField.setBackground(new Color(141, 110, 99)); // Light brown background
+        memberIDField.setForeground(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 0;
         borrowInputPanel.add(memberIDField, gbc);
@@ -153,6 +172,8 @@ public class MemberGUI extends JFrame {
 
         JTextField bookIDField = new JTextField(20);
         bookIDField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        bookIDField.setBackground(new Color(141, 110, 99)); // Light brown background
+        bookIDField.setForeground(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 1;
         borrowInputPanel.add(bookIDField, gbc);
@@ -166,19 +187,34 @@ public class MemberGUI extends JFrame {
         gbc.gridy = 2;
         borrowInputPanel.add(borrowButton, gbc);
 
+        // Clear Button
+        JButton clearButton = new JButton("Clear");
+        clearButton.setPreferredSize(new Dimension(150, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        borrowInputPanel.add(clearButton, gbc);
+
         borrowPanel.add(borrowInputPanel, BorderLayout.CENTER);
 
-        // Handle borrow button click
+// Handle borrow button click
         borrowButton.addActionListener(e -> {
             String memberID = memberIDField.getText();
             String bookID = bookIDField.getText();
-            Catalog catalog = new Catalog();  // Initialize catalog, or pass it if needed
 
             try {
-                borrowBook(memberID, bookID, catalog, borrowMessageArea);
+                borrowBook(memberID, bookID);
             } catch (IOException ex) {
-                borrowMessageArea.append("Error occurred while borrowing the book.\n");
+                JOptionPane.showMessageDialog(this, "Error occurred while borrowing the book.", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        });
+
+        // Handle clear button click
+        clearButton.addActionListener(e -> {
+            memberIDField.setText("");
+            bookIDField.setText("");
         });
 
         return borrowPanel;
@@ -186,15 +222,11 @@ public class MemberGUI extends JFrame {
 
     private JPanel createReturnPanel() {
         JPanel returnPanel = new JPanel(new BorderLayout());
-
-        // Create a JTextArea to display return messages
-        JTextArea returnMessageArea = new JTextArea(5, 20);
-        returnMessageArea.setEditable(false); // Make it read-only
-        returnPanel.add(new JScrollPane(returnMessageArea), BorderLayout.SOUTH);
+        returnPanel.setBackground(new Color(121, 85, 72)); // Matching brown background
 
         // Add components to return book
         JPanel returnInputPanel = new JPanel(new GridBagLayout());
-        returnInputPanel.setBackground(new Color(121, 85, 72)); // Matching background color
+        returnInputPanel.setBackground(new Color(121, 85, 72)); // Matching brown background
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); // Insets for spacing between components
@@ -208,6 +240,8 @@ public class MemberGUI extends JFrame {
 
         JTextField memberIDField = new JTextField(20);
         memberIDField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        memberIDField.setBackground(new Color(141, 110, 99)); // Light brown background
+        memberIDField.setForeground(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 0;
         returnInputPanel.add(memberIDField, gbc);
@@ -221,6 +255,8 @@ public class MemberGUI extends JFrame {
 
         JTextField bookIDField = new JTextField(20);
         bookIDField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        bookIDField.setBackground(new Color(141, 110, 99)); // Light brown background
+        bookIDField.setForeground(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 1;
         returnInputPanel.add(bookIDField, gbc);
@@ -234,98 +270,49 @@ public class MemberGUI extends JFrame {
         gbc.gridy = 2;
         returnInputPanel.add(returnButton, gbc);
 
+        // Clear Button
+        JButton clearButton = new JButton("Clear");
+        clearButton.setPreferredSize(new Dimension(150, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        returnInputPanel.add(clearButton, gbc);
+
         returnPanel.add(returnInputPanel, BorderLayout.CENTER);
 
         // Handle return button click
         returnButton.addActionListener(e -> {
             String memberID = memberIDField.getText();
             String bookID = bookIDField.getText();
-            Catalog catalog = new Catalog();  // Initialize catalog, or pass it if needed
-
             try {
-                returnBook(memberID, bookID, catalog, returnMessageArea);
+                Loan.returnBook(memberID, bookID);
             } catch (IOException ex) {
-                returnMessageArea.append("Error occurred while returning the book.\n");
+                JOptionPane.showMessageDialog(this, "Error occurred while returning the book.", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        });
+
+// Handle clear button click
+        clearButton.addActionListener(e -> {
+            memberIDField.setText("");
+            bookIDField.setText("");
         });
 
         return returnPanel;
     }
 
-
-    public static void borrowBook(String memberID, String bookId, Catalog catalog, JTextArea messageArea) throws IOException {
-        // Search for the member in the catalog
-        Member member = Member.SearchMember(memberID);
-        if (member == null) {
-            messageArea.append("No member found with ID: " + memberID + "\n");
-            return;
-        }
-
-        // Search for the book in the catalog
-        Book book = Catalog.searchBook(bookId);
-        if (book != null && book.getAvailablityStatus()) {
-            // If the book is available, set it to unavailable and create a loan
-            book.setAvailablityStatus(false);
-            Loan loan = new Loan(bookId, member.getmemberId());
-            activeLoans.add(loan);
-
-            // Update the JTextArea with the success message
-            messageArea.append("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
-                    " by member " + member.getName() + ". Your return date is: " + loan.getReturnDate() + ".\n");
-        } else if (book != null && !book.getAvailablityStatus()) {
-            // If the book is not available, add the loan request to the queue
-            messageArea.append("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".\n");
-            Loan loan = new Loan(bookId, member.getmemberId());
-            PendingRequestsQueue.enqueue(loan); // Add the loan request to the queue
-        } else {
-            // If the book is not found in the catalog
-            messageArea.append("Book with ID " + bookId + " not found in catalog.\n");
-        }
-    }
-
-
-    public static void returnBook(String memberId, String bookId, Catalog catalog, JTextArea messageArea) throws IOException, IOException {
-        Book book = Catalog.searchBook(bookId);
-        Member member = Member.SearchMember(memberId);
-        Date returnDate = new Date();
-
-        if (book != null) {
-            if (!book.getAvailablityStatus()) {
-                Loan currentLoan = new Loan(bookId, member.getmemberId());
-                if (returnDate.after(currentLoan.getReturnDate())) {  // checking if the return date has passed
-                    messageArea.append("You passed the return date.\n");
-                }
-                book.setAvailablityStatus(true);
-                activeLoans.remove(currentLoan);
-                returnedLoans.add(currentLoan);
-                messageArea.append("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".\n");
-                messageArea.append("Return Date: " + returnDate + "\n");
-
-                if (!PendingRequestsQueue.isEmpty()) {
-                    Loan nextLoan = PendingRequestsQueue.dequeue();
-                    Member nextMember = Member.SearchMember(nextLoan.getMemberId());
-                    messageArea.append("Processing next request for book: " + bookId + " for member: " + nextMember.getName() + "\n");
-                    borrowBook(nextMember.getmemberId(), bookId, catalog, messageArea); // edited
-                }
-            } else {
-                messageArea.append("Book " + book.getBookTitle() + " is already available.\n");
-            }
-        } else {
-            messageArea.append("Book with ID " + bookId + " not found in catalog.\n");
-        }
-    }
-
     private JPanel createSearchPanel() {
         JPanel searchPanel = new JPanel(new GridBagLayout());
-        searchPanel.setBackground(new Color(121, 85, 72)); // لون الخلفية بني
+        searchPanel.setBackground(new Color(121, 85, 72)); // Brown color background
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // مسافة بين المكونات
+        gbc.insets = new Insets(10, 10, 10, 10); // Spacing between components
 
         // Label for Search
         JLabel searchLabel = new JLabel("Search by Title or Author:");
-        searchLabel.setFont(new Font("Caveat", Font.BOLD, 24)); // تكبير الخط
-        searchLabel.setForeground(Color.WHITE); // اللون الأبيض للنص
+        searchLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        searchLabel.setForeground(Color.WHITE); // White text color
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -333,7 +320,7 @@ public class MemberGUI extends JFrame {
 
         // TextField for Search
         JTextField searchField = new JTextField(20);
-        searchField.setFont(new Font("Caveat", Font.PLAIN, 16)); // تكبير الخط للـ TextField
+        searchField.setFont(new Font("Caveat", Font.PLAIN, 16)); // Font size for text field
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -341,10 +328,10 @@ public class MemberGUI extends JFrame {
 
         // Search Button
         JButton searchButton = new JButton("Search");
-        searchButton.setPreferredSize(new Dimension(100, 40)); // ضبط حجم الزر
-        searchButton.setFont(new Font("Arial", Font.PLAIN, 16)); // حجم الخط
-        searchButton.setBackground(new Color(141, 110, 99)); // لون الزر بني مناسب
-        searchButton.setForeground(Color.WHITE); // النص باللون الأبيض
+        searchButton.setPreferredSize(new Dimension(100, 40));
+        searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        searchButton.setBackground(new Color(141, 110, 99)); // Brown color for the button
+        searchButton.setForeground(Color.WHITE);
         searchButton.addActionListener(e -> {
             String query = searchField.getText();
 
@@ -353,114 +340,40 @@ public class MemberGUI extends JFrame {
                 return;
             }
 
-            // هنا هتكون الميثود للبحث عن الكتب (على سبيل المثال اسم الكتاب أو المؤلف)
-            Catalog.searchBookByTitle(query);       });
-
-        // Clear Button
-        JButton clearButton = new JButton("Clear");
-        clearButton.setPreferredSize(new Dimension(100, 40)); // ضبط حجم الزر
-        clearButton.setFont(new Font("Arial", Font.PLAIN, 16)); // حجم الخط
-        clearButton.setBackground(new Color(141, 110, 99)); // نفس لون زر Search
-        clearButton.setForeground(Color.WHITE); // النص باللون الأبيض
-        clearButton.addActionListener(e -> searchField.setText("")); // مسح النص داخل مربع البحث
-
-        // Panel for buttons (Search and Clear)
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10)); // مسافة بين الأزرار
-        buttonPanel.setBackground(new Color(121, 85, 72)); // لون الخلفية نفس الباكجراوند
-        buttonPanel.add(searchButton);
-        buttonPanel.add(clearButton);
-
-        // Adding components to the main panel
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        searchPanel.add(buttonPanel, gbc);
-
-        return searchPanel;
-    }
-
-    private JPanel createSearchBookPanel() {
-        JPanel searchBookPanel = new JPanel(new GridBagLayout());
-        searchBookPanel.setBackground(new Color(121, 85, 72)); // Color for background
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Insets for spacing between components
-
-        JLabel searchLabel = new JLabel("Search by Title or Author:");
-        searchLabel.setFont(new Font("Caveat", Font.BOLD, 24));
-        searchLabel.setForeground(Color.WHITE);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        searchBookPanel.add(searchLabel, gbc);
-
-        JTextField searchField = new JTextField(20);
-        searchField.setFont(new Font("Caveat", Font.PLAIN, 16));
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        searchBookPanel.add(searchField, gbc);
-
-        JLabel resultLabel = new JLabel("");
-        resultLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        resultLabel.setForeground(Color.GREEN); // Green color for success message
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.SOUTH;
-        gbc.insets = new Insets(10, 10, 10, 10);
-        searchBookPanel.add(resultLabel, gbc);
-
-        JButton searchButton = new JButton("Search");
-        searchButton.setPreferredSize(new Dimension(100, 40));
-        searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        searchButton.setBackground(new Color(141, 110, 99));
-        searchButton.setForeground(Color.WHITE);
-        searchButton.addActionListener(e -> {
-            String query = searchField.getText();
-
-            if (query.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a search term!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            Node result = Catalog.FindBookByTitleOrAuthor(query, "title"); // Search by title or author
-            if (result == null) {
-                JOptionPane.showMessageDialog(this, "No books found!", "Search Result", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            StringBuilder resultText = new StringBuilder();
-            Node current = result;
-            while (current != null) {
-                resultText.append(current.getBook().getBookTitle())
-                        .append(" by ")
-                        .append(current.getBook().getAuthor())
-                        .append("\n");
-                current = current.getNext();
-            }
-            resultLabel.setText("Search Results:");
-            JOptionPane.showMessageDialog(this, resultText.toString(), "Search Results", JOptionPane.INFORMATION_MESSAGE);
+            // Call the method to search books by title or author
+            Catalog.searchBookByTitle(query);
         });
 
+        // Clear Button
         JButton clearButton = new JButton("Clear");
         clearButton.setPreferredSize(new Dimension(100, 40));
         clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
         clearButton.setBackground(new Color(141, 110, 99));
         clearButton.setForeground(Color.WHITE);
-        clearButton.addActionListener(e -> {
-            searchField.setText("");
-            resultLabel.setText("");
-        });
+        clearButton.addActionListener(e -> searchField.setText(""));
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        searchPanel.add(searchButton, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        buttonPanel.setBackground(new Color(121, 85, 72));
-        buttonPanel.add(searchButton);
-        buttonPanel.add(clearButton);
-        searchBookPanel.add(buttonPanel, gbc);
+        gbc.gridy = 2;
+        searchPanel.add(clearButton, gbc);
+
+        return searchPanel;
+    }
+
+    private JPanel createSearchBookPanel() {
+        // Similar layout for search book panel
+        JPanel searchBookPanel = new JPanel(new BorderLayout());
+        searchBookPanel.setBackground(new Color(121, 85, 72));
+
+        JTextArea searchResultsArea = new JTextArea(10, 30);
+        searchResultsArea.setEditable(false);
+        searchResultsArea.setBackground(new Color(121, 85, 72));
+        searchResultsArea.setForeground(Color.WHITE);
+        searchBookPanel.add(new JScrollPane(searchResultsArea), BorderLayout.CENTER);
 
         return searchBookPanel;
     }

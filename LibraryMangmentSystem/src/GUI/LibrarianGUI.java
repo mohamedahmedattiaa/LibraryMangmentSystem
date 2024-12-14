@@ -3,11 +3,14 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 import Classes.*;
 import GUI.Login;
-// //
+import com.sun.net.httpserver.Authenticator;
+
 public class LibrarianGUI extends JFrame {
     private DefaultTableModel tableModel;
     private JTable bookTable;
@@ -31,8 +34,8 @@ public class LibrarianGUI extends JFrame {
 
         mainPanel.add(createBookCatalogPanel(), "Book Catalog");
         mainPanel.add(createCombinedManageBookTapped(), "Manage Books");
-        mainPanel.add(createReportsTapedPanel(), "Reports");
-        mainPanel.add(createSearchBookTapped(), "Manage Members");
+        mainPanel.add(createReportsPanel(), "Reports");
+        mainPanel.add(createCombinedManageMemberTabbed(), "Manage Members");
 
         add(mainPanel, BorderLayout.CENTER);
 
@@ -92,13 +95,371 @@ public class LibrarianGUI extends JFrame {
         MangeBook.add(tabbedPane, BorderLayout.CENTER);
         return MangeBook;
     }
-    //
+
     private JPanel createSearchBookTapped(){
         JPanel searchPanel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Search Book", createSearchPanel());
         searchPanel.add(tabbedPane, BorderLayout.CENTER);
         return searchPanel;
+    }
+    private JPanel createCombinedManageMemberTabbed() {
+        JPanel manageMember = new JPanel(new BorderLayout());
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Add Member", createAddMemberPanel());
+        tabbedPane.addTab("Remove Member", createRemoveMemberPanel());
+        tabbedPane.addTab("Update Member", createUpdateMemberPanel());
+        tabbedPane.addTab("Search Member", createSearchMemberPanel());
+        tabbedPane.addTab("Display Members", createDisplayMembersPanel());
+        manageMember.add(tabbedPane, BorderLayout.CENTER);
+        return manageMember;
+    }
+    private JPanel createAddMemberPanel() {
+        JPanel addMemberPanel = new JPanel(new GridBagLayout());
+        addMemberPanel.setBackground(new Color(121, 85, 72));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel idLabel = new JLabel("Name:");
+        idLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        idLabel.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        addMemberPanel.add(idLabel, gbc);
+
+        JTextField idField = new JTextField(20);
+        idField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        addMemberPanel.add(idField, gbc);
+
+        JLabel nameLabel = new JLabel("MemberID:");
+        nameLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        nameLabel.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        addMemberPanel.add(nameLabel, gbc);
+
+        JTextField nameField = new JTextField(20);
+        nameField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        addMemberPanel.add(nameField, gbc);
+
+        JLabel successMessageLabel = new JLabel("");
+        successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        successMessageLabel.setForeground(Color.GREEN);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        addMemberPanel.add(successMessageLabel, gbc);
+
+        JButton addButton = new JButton("Add");
+        addButton.setPreferredSize(new Dimension(100, 40));
+        addButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        addButton.setBackground(new Color(141, 110, 99));
+        addButton.setForeground(Color.WHITE);
+
+        // Add button action
+        addButton.addActionListener(e -> {
+            String memberId = idField.getText().trim();
+            String name = nameField.getText().trim();
+
+            if (memberId.isEmpty() || name.isEmpty()) {
+                JOptionPane.showMessageDialog(addMemberPanel, "Both MemberID and Name are required!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Retrieve member data from the source (file, database, or collection)
+            Member member = null;
+            try {
+                member = Member.getMemberByIdAndName(memberId, name);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            if (member == null) {
+                JOptionPane.showMessageDialog(addMemberPanel, "No member found with the provided ID and Name.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Add the member's data to the table
+            tableModel.addRow(new Object[] { member.getmemberId(), member.getName(), member.getEmail(), member.getPassword() });
+            successMessageLabel.setText("Member added successfully!");
+
+            // Clear fields after successful addition
+            idField.setText("");
+            nameField.setText("");
+        });
+
+        JButton clearButton = new JButton("Clear");
+        clearButton.setPreferredSize(new Dimension(100, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
+
+        // Clear button action
+        clearButton.addActionListener(e -> {
+            idField.setText("");
+            nameField.setText("");
+            successMessageLabel.setText("");
+        });
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(new Color(121, 85, 72));
+        buttonPanel.add(addButton);
+        buttonPanel.add(clearButton);
+        addMemberPanel.add(buttonPanel, gbc);
+
+        return addMemberPanel;
+    }
+
+
+
+    private JPanel createRemoveMemberPanel() {
+        JPanel removeMemberPanel = new JPanel(new GridBagLayout());
+        removeMemberPanel.setBackground(new Color(121, 85, 72));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel memberIdLabel = new JLabel("Member ID:");
+        memberIdLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        memberIdLabel.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        removeMemberPanel.add(memberIdLabel, gbc);
+
+        JTextField memberIdField = new JTextField(20);
+        memberIdField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        removeMemberPanel.add(memberIdField, gbc);
+
+        JLabel successMessageLabel = new JLabel("");
+        successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        successMessageLabel.setForeground(Color.GREEN);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        removeMemberPanel.add(successMessageLabel, gbc);
+
+        JButton removeButton = new JButton("Remove");
+        removeButton.setPreferredSize(new Dimension(100, 40));
+        removeButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        removeButton.setBackground(new Color(141, 110, 99));
+        removeButton.setForeground(Color.WHITE);
+        removeButton.addActionListener(e -> {
+                    String memberId = memberIdField.getText();
+
+                    if (memberId.isEmpty()) {
+                        JOptionPane.showMessageDialog(removeMemberPanel, "Member ID is required!", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    boolean removed = false;
+                    try {
+                        removed = Member.removeMember(memberId);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    if (removed) {
+
+                        successMessageLabel.setText("Member removed successfully!");
+                    } else {
+                        JOptionPane.showMessageDialog(removeMemberPanel, "Member not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+        );
+
+        JButton clearButton = new JButton("Clear");
+        clearButton.setPreferredSize(new Dimension(100, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
+        clearButton.addActionListener(e -> {
+            memberIdField.setText("");
+            successMessageLabel.setText("");
+        });
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(new Color(121, 85, 72));
+        buttonPanel.add(removeButton);
+        buttonPanel.add(clearButton);
+        removeMemberPanel.add(buttonPanel, gbc);
+
+        return removeMemberPanel;
+    }
+
+
+    private JPanel createUpdateMemberPanel() {
+        JPanel updateMemberPanel = new JPanel();
+        updateMemberPanel.add(new JLabel("Update Member functionality."));
+        return updateMemberPanel;
+    }
+
+    private JPanel createSearchMemberPanel() {
+        JPanel searchMemberPanel = new JPanel(new GridBagLayout());
+        searchMemberPanel.setBackground(new Color(121, 85, 72)); // Background color
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Spacing between components
+
+        // Label for input field
+        JLabel searchLabel = new JLabel("Enter Member Name or ID:");
+        searchLabel.setFont(new Font("Caveat", Font.BOLD, 24));
+        searchLabel.setForeground(Color.WHITE);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        searchMemberPanel.add(searchLabel, gbc);
+
+        // Input text field
+        JTextField searchField = new JTextField(20);
+        searchField.setFont(new Font("Caveat", Font.PLAIN, 16));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        searchMemberPanel.add(searchField, gbc);
+
+
+        // Search button
+        JButton searchButton = new JButton("Search");
+        searchButton.setPreferredSize(new Dimension(100, 40));
+        searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        searchButton.setBackground(new Color(141, 110, 99));
+        searchButton.setForeground(Color.WHITE);
+        searchButton.addActionListener(e -> {
+            String query = searchField.getText().trim();
+            if (query.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Search query cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Call the method to search for members by name or ID
+            Member result = null; // You can use "ID" or "Name" depending on the search type
+            try {
+                result = Member.SearchMember(query);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "An error occurred while searching!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Handle search result
+            if (result == null) {
+                JOptionPane.showMessageDialog(this, "No member found!", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                StringBuilder resultText = new StringBuilder();
+
+// No need for a loop, we only have one result
+                resultText.append("Member ID: ").append(result.getmemberId())  // Assuming Member class has getMemberId()
+                        .append("\nName: ").append(result.getName())  // Assuming Member class has getName()
+                        .append("\nEmail: ").append(result.getEmail())  // Assuming Member class has getEmail()
+                        .append("\nPassword: ").append(result.getPassword())  // Assuming Member class has getPassword()
+                        .append("\n");
+
+                // Display the result in a message dialog
+                JOptionPane.showMessageDialog(this, resultText.toString(), "Search Results", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+
+
+
+        // Clear button
+        JButton clearButton = new JButton("Clear");
+        clearButton.setPreferredSize(new Dimension(100, 40));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        clearButton.setBackground(new Color(141, 110, 99));
+        clearButton.setForeground(Color.WHITE);
+        clearButton.addActionListener(e -> {
+            searchField.setText(""); // Clear the search field
+            // Clear the result text area
+        });
+
+        // Button panel
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(new Color(121, 85, 72));
+        buttonPanel.add(searchButton);
+        buttonPanel.add(clearButton);
+        searchMemberPanel.add(buttonPanel, gbc);
+
+        return searchMemberPanel;
+    }
+
+
+
+
+    private JPanel createDisplayMembersPanel() {
+        JPanel displayMembersPanel = new JPanel();
+        displayMembersPanel.setLayout(new BorderLayout());  // Use BorderLayout for proper table display
+
+        // Create column names for the table
+        String[] columnNames = {"Member ID", "Name", "Email", "Password"};
+
+        // Get the member data from the file
+        Object[][] data = readMemberData();
+
+        // Create the table using DefaultTableModel
+        DefaultTableModel model = new DefaultTableModel(data, columnNames);
+        JTable memberTable = new JTable(model);
+
+        // Add table to JScrollPane for scroll functionality
+        JScrollPane scrollPane = new JScrollPane(memberTable);
+        displayMembersPanel.add(scrollPane, BorderLayout.CENTER);
+
+        return displayMembersPanel;
+    }
+
+    // This method reads member data from the file and returns it as an Object[][] array
+    private Object[][] readMemberData() {
+        String line;
+        Object[][] data = new Object[100][4];  // Adjust size if needed
+        int rowIndex = 0;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("Members.txt"))) {
+            while ((line = reader.readLine()) != null) {
+                String[] memberData = line.split(",");
+                if (memberData.length >= 4) {
+                    String memberID = memberData[0].trim();
+                    String name = memberData[1].trim();
+                    String email = memberData[2].trim();
+                    String password = memberData[3].trim();
+
+                    // Add data to the table
+                    data[rowIndex][0] = memberID;
+                    data[rowIndex][1] = name;
+                    data[rowIndex][2] = email;
+                    data[rowIndex][3] = password;
+                    rowIndex++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Resize array to fit actual number of rows
+        Object[][] resizedData = new Object[rowIndex][4];
+        System.arraycopy(data, 0, resizedData, 0, rowIndex);
+        return resizedData;
     }
 
     private void styleNavButton(JButton button) {
@@ -120,43 +481,130 @@ public class LibrarianGUI extends JFrame {
             }
         });
     }
-    //
     private void switchPage(String pageName) {
         card.show(mainPanel, pageName);
     }
-    //
-    private JPanel createReportsPanel() {
+    public JPanel createReportsPanel() {
         JPanel reportsPanel = new JPanel(new BorderLayout());
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Active Loans", createActiveLoansPanel());
+        tabbedPane.addTab("Overdue Books", createOverdueBooksPanel());
+        tabbedPane.addTab("Pending Loans", createPendingLoansPanel());
+        tabbedPane.addTab("Popular Genre", createPopularGenrePanel());
+        reportsPanel.add(tabbedPane, BorderLayout.CENTER);
+        return reportsPanel;
+    }
 
-        // Initialize JTable with an empty table model
+    // Create the Active Loans Panel
+    private JPanel createActiveLoansPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
         String[] columns = {"Loan ID", "Book Title", "Return Date", "Status"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
         JTable reportTable = new JTable(tableModel);
         reportTable.setFillsViewportHeight(true);
 
-        // Add the table to a JScrollPane
         JScrollPane scrollPane = new JScrollPane(reportTable);
-        reportsPanel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(scrollPane, BorderLayout.CENTER);
 
-        // Button to view the general reports
-        JButton viewReportsButton = new JButton("View Reports");
+        // Button to load active loans data
+        JButton viewReportsButton = new JButton("View Active Loans");
         viewReportsButton.addActionListener(e -> {
-            // Create Report object
-            Report report = new Report();
-            Catalog catalog = new Catalog();
             try {
                 tableModel.setRowCount(0);
-                report.displayActiveLoans (catalog);
-                report.displayOverdueBooks(catalog);
-                report.displayPendingLoans(catalog);
-                report.displayPopularGenre(catalog);
+                Report report = new Report();
+                Catalog catalog = new Catalog();
+                report.displayActiveLoans(catalog);  // Update table with active loans data
             } catch (Exception ex) {
-                tableModel.setRowCount(0); // Clear table data on error
+                tableModel.setRowCount(0);
                 tableModel.addRow(new Object[]{"Error generating report: " + ex.getMessage()});
             }
         });
-        reportsPanel.add(viewReportsButton, BorderLayout.SOUTH);
-        return reportsPanel;
+        panel.add(viewReportsButton, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    // Create the Overdue Books Panel
+    private JPanel createOverdueBooksPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        String[] columns = {"Loan ID", "Book Title", "Due Date", "Status"};
+        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+        JTable reportTable = new JTable(tableModel);
+        reportTable.setFillsViewportHeight(true);
+
+        JScrollPane scrollPane = new JScrollPane(reportTable);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Button to load overdue books data
+        JButton viewReportsButton = new JButton("View Overdue Books");
+        viewReportsButton.addActionListener(e -> {
+            try {
+                tableModel.setRowCount(0);
+                Report report = new Report();
+                Catalog catalog = new Catalog();
+                report.displayOverdueBooks(catalog);  // Update table with overdue books data
+            } catch (Exception ex) {
+                tableModel.setRowCount(0);
+                tableModel.addRow(new Object[]{"Error generating report: " + ex.getMessage()});
+            }
+        });
+        panel.add(viewReportsButton, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    // Create the Pending Loans Panel
+    private JPanel createPendingLoansPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        String[] columns = {"Loan ID", "Book Title", "Loan Date", "Status"};
+        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+        JTable reportTable = new JTable(tableModel);
+        reportTable.setFillsViewportHeight(true);
+
+        JScrollPane scrollPane = new JScrollPane(reportTable);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Button to load pending loans data
+        JButton viewReportsButton = new JButton("View Pending Loans");
+        viewReportsButton.addActionListener(e -> {
+            try {
+                tableModel.setRowCount(0);
+                Report report = new Report();
+                Catalog catalog = new Catalog();
+                report.displayPendingLoans(catalog);  // Update table with pending loans data
+            } catch (Exception ex) {
+                tableModel.setRowCount(0);
+                tableModel.addRow(new Object[]{"Error generating report: " + ex.getMessage()});
+            }
+        });
+        panel.add(viewReportsButton, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    // Create the Popular Genre Panel
+    private JPanel createPopularGenrePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        String[] columns = {"Genre", "Count"};
+        DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+        JTable reportTable = new JTable(tableModel);
+        reportTable.setFillsViewportHeight(true);
+
+        JScrollPane scrollPane = new JScrollPane(reportTable);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Button to load popular genre data
+        JButton viewReportsButton = new JButton("View Popular Genre");
+        viewReportsButton.addActionListener(e -> {
+            try {
+                tableModel.setRowCount(0);
+                Report report = new Report();
+                Catalog catalog = new Catalog();
+                report.displayPopularGenre(catalog);  // Update table with popular genre data
+            } catch (Exception ex) {
+                tableModel.setRowCount(0);
+                tableModel.addRow(new Object[]{"Error generating report: " + ex.getMessage()});
+            }
+        });
+        panel.add(viewReportsButton, BorderLayout.SOUTH);
+        return panel;
     }
 
     //
@@ -387,7 +835,7 @@ public class LibrarianGUI extends JFrame {
             successMessageLabel.setText("");
         });
 
-        // Add buttons to panel, centered horizontally
+// Add buttons to panel, centered horizontally
         gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
@@ -571,14 +1019,14 @@ public class LibrarianGUI extends JFrame {
             tableModel.addRow(new Object[]{book.getBookTitle(), book.getAuthor(), book.getGenere()});
             current = current.getNext();
         }
-    } //
+    }
     private JPanel createViewBooksPanel() {
         JPanel viewBooksPanel = new JPanel(new BorderLayout());
 
         // Create "View Books" button
         JButton viewBooksButton = new JButton("Refresh Books");
 
-        // Table for displaying books
+// Table for displaying books
         String[] columnNames = {"Book ID", "Title", "Author", "Availability"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable booksTable = new JTable(tableModel);
