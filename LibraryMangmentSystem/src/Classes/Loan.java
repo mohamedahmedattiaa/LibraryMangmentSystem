@@ -31,7 +31,8 @@ public class Loan {
         calendar.add(Calendar.DAY_OF_MONTH, 14); // Add 14 days to create a return date
         this.returnDate = calendar.getTime();
     }
-    public Loan(){
+
+    public Loan() {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = getBookId();
         this.memberId = getMemberId();
@@ -43,7 +44,7 @@ public class Loan {
         return loanID;
     }
 
-    public  String getBookId() {
+    public String getBookId() {
         return bookId;
     }
 
@@ -61,7 +62,7 @@ public class Loan {
 
     public static void borrowBook(String memberID, String bookId) throws IOException {
         Member member = Member.SearchMember(memberID);
-        if(member == null) {
+        if (member == null) {
             System.out.println("No member found with ID: " + memberID);
             return;
         }
@@ -72,8 +73,6 @@ public class Loan {
                 return;
             }
         }
-        
-        
         Book book = Catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
@@ -101,6 +100,12 @@ public class Loan {
                 Loan currentLoan = new Loan(bookId, member.getmemberId());
                 if (returnDate.after(currentLoan.getReturnDate())) {  //checking if he passed the return date
                     System.out.println("yous passed the return date");
+                }
+                for (Loan loan : activeLoans) {
+                    if (loan.getMemberId().equals(memberId) && loan.getBookId().equals(bookId)) {
+                        System.out.println("You already returned this book.");
+                        return;
+                    }
                 }
                 book.setAvailablityStatus(true);
                 activeLoans.remove(currentLoan);
@@ -152,25 +157,43 @@ public class Loan {
                 "Issue Date   : " + issueDate + "\n" +
                 "Return Date  : " + (returnDate != null ? returnDate : "Not returned yet");
     }
+
     public void setReturnDate() {               // setting the date to overdue ( ONLY FOR TESTING DON`T DELETE)
         Calendar returnDate1 = Calendar.getInstance();
-        returnDate1.set(2023,1,1);
+        returnDate1.set(2023, 1, 1);
         this.returnDate = returnDate1.getTime();
     }
 
-    public static void saveLoansToFile() {
+    public static void saveLoansToFile() throws IOException {
+        Set<String> existingLoanIds = new HashSet<>();
+        File file = new File(FILE_NAME);
+
+        // Load existing loan IDs to avoid duplicates
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] data = line.split(",");
+                    if (data.length > 0) {
+                        existingLoanIds.add(data[0]); // Assuming the first field is the loan ID
+                    }
+                }
+            }
+        }
+
+        // Append new loans that are not already in the file
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, true))) {
             for (Loan loan : Loan.activeLoans) {
-                Member member = Member.SearchMember(loan.getMemberId());
-                writer.println(loan.getLoanID() + "," + loan.getBookId() + "," + loan.getMemberId() +
-                        "," + loan.getIssueDate() + "," + loan.getReturnDate());
+                if (!existingLoanIds.contains(loan.getLoanID())) {
+                    writer.println(loan.getLoanID() + "," + loan.getBookId() + "," + loan.getMemberId() +
+                            "," + loan.getIssueDate() + "," + loan.getReturnDate());
+                }
             }
             writer.flush();
             System.out.println("Loans saved to file.");
-        } catch (IOException e) {
-            System.out.println("Error saving loans to file: " + e.getMessage());
         }
     }
+
 
     public static void loadLoansFromFile() {
         File file = new File(FILE_NAME);
