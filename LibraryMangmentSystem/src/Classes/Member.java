@@ -214,6 +214,7 @@ public class Member {
 
         return isUpdated;
     }
+
     public static void addMember(String name, String email, String password) throws IOException {
         try {
             Member newMember = new Member(name, email, password); // Constructor handles validations and writing.
