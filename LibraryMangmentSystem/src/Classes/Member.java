@@ -158,7 +158,7 @@ public class Member {
 
     public static boolean removeMember(String memberID) throws IOException {
         File inputFile = new File("TempMembers.txt");
-        File tempFile = new File("UpdatedMembers.txt");
+        File tempFile = new File("TempMembers.txt");
 
         boolean isRemoved = false;
 
@@ -189,13 +189,12 @@ public class Member {
 
     public static boolean updateMember(String memberID, String newName, String newEmail, String newPassword) throws IOException {
         File inputFile = new File("TempMembers.txt");
-        File tempFile = new File("UpdatedMembers.txt");
+        File tempFile = new File("TempMembers.txt");
 
         boolean isUpdated = false;
+        List<String> fileContent = new ArrayList<>(); // To store the file contents temporarily
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
@@ -205,18 +204,26 @@ public class Member {
                     data[3] = newPassword;
                     isUpdated = true;
                 }
-                writer.write(String.join(",", data));
-                writer.newLine();
+                fileContent.add(String.join(",", data)); // Store the updated or original line
             }
         }
-        if (isUpdated && inputFile.delete() && tempFile.renameTo(inputFile)) {
+
+        // Rewrite the file with updated content
+        if (isUpdated) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(inputFile))) {
+                for (String line : fileContent) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
             System.out.println("Member with ID " + memberID + " updated successfully.");
-        } else if (!isUpdated) {
+        } else {
             System.out.println("Member with ID " + memberID + " not found.");
         }
 
         return isUpdated;
     }
+
 
     public static void addMember(String name, String email, String password) throws IOException {
         try {
