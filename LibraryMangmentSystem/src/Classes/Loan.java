@@ -13,6 +13,8 @@ public class Loan {
     private Date issueDate;
     private Date returnDate;
     private static final String FILE_NAME = "loans.txt";
+    static BufferedWriter writer;
+    static BufferedReader reader;
 
 
     public static Queue<Loan> activeLoans = new LinkedList<>();
@@ -37,6 +39,15 @@ public class Loan {
         this.memberId = getMemberId();
         this.issueDate = new Date();
 
+    }
+
+    public Loan(String loanID, String bookId, String memberId, Date issueDate, Date returnDate) throws IOException {
+        this.loanID = loanID;
+        this.bookId = bookId;
+        this.memberId = memberId;
+        Member member = Member.SearchMember(memberId);
+        this.issueDate = issueDate;
+        this.returnDate = returnDate;
     }
 
     public String getLoanID() {
@@ -78,11 +89,11 @@ public class Loan {
             book.setAvailablityStatus(false);
 
             // Create a new Loan and set issueDate and returnDate
-            Loan loan = new Loan(bookId, member.getmemberId()); // Loan constructor sets dates
-            activeLoans.add(loan);
+            Loan loan = new Loan(bookId, member.getmemberId());
+            saveLoansToFile(loan);
+            addloanA(loan.getLoanID());
 
-            // Save the loan details to file
-            saveLoansToFile();
+
 
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
                     " by member " + member.getName() + "  your return date is: " + loan.getReturnDate() + ".");
@@ -94,6 +105,24 @@ public class Loan {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
     }
+    public static void addloanA(String loanID){
+        Loan loan = searchLoan(loanID);
+        if (loan != null) {
+            activeLoans.add(loan);
+        } else {
+            System.out.println("Loan ID not found.");
+        }
+
+    }
+    public static void addloanR(String loanID){
+        Loan loan = searchLoanR(loanID , new Date());
+        if (loan != null) {
+            returnedLoans.add(loan);
+        } else {
+            System.out.println("Loan ID not found.");
+        }
+
+    }
 
 
 
@@ -104,8 +133,8 @@ public class Loan {
 
         if (book != null) {
             if (!book.getAvailablityStatus()) {
+                book.setAvailablityStatus(true);
                 Loan currentLoan = null;
-
                 // Find the active loan for this member and book
                 for (Loan loan : activeLoans) {
                     if (loan.getMemberId().equals(memberId) && loan.getBookId().equals(bookId)) {
@@ -114,26 +143,19 @@ public class Loan {
                     }
                 }
 
-                if (currentLoan == null) {
-                    System.out.println("No active loan found for this book and member.");
-                    return;
-                }
+
+
 
                 // Check if the return date is overdue
                 if (returnDate.after(currentLoan.getReturnDate())) {
                     System.out.println("You have returned the book past the due date!");
                 }
 
-                // Update the return date in memory
-                currentLoan.setReturnDate(returnDate); // Only update the return date
 
-                // Update the loan in the file
-                updateLoanInFile(currentLoan.getLoanID(), returnDate);
 
-                // Update book availability and queues
-                book.setAvailablityStatus(true);
+
                 activeLoans.remove(currentLoan);
-                returnedLoans.add(currentLoan);
+                addloanR(currentLoan.getLoanID());
 
                 System.out.println("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".");
                 System.out.println("Return Date: " + returnDate);
@@ -225,7 +247,7 @@ public class Loan {
         this.returnDate = returnDate;
    }
 
-    public static void saveLoansToFile() throws IOException {
+    public static void saveLoansToFile(Loan loan) throws IOException {
         Set<String> existingLoanIds = new HashSet<>();
         File file = new File(FILE_NAME);
 
@@ -244,14 +266,13 @@ public class Loan {
 
         // Append new loans that are not already in the file
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, true))) {
-            for (Loan loan : activeLoans) {
+           {
                 if (!existingLoanIds.contains(loan.getLoanID())) {
                     writer.println(loan.getLoanID() + "," + loan.getBookId() + "," + loan.getMemberId() +
                             "," + loan.getIssueDate() + "," + loan.getReturnDate());
                 }
             }
             writer.flush();
-            System.out.println("Loans saved to file.");
         }
     }
 
@@ -291,20 +312,52 @@ public class Loan {
         }
     }
 
-    public static String searchLoan(String loanID) {
+    public static Loan searchLoan(String loanID) {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length > 0 && data[0].equals(loanID)) { // Check if loan ID matches
-                    return line;
+                if (data.length > 0 && data[0].equals(loanID)) {
+                    String loanId =data[0];
+                    String BookID = data[1];
+                    String memberID = data[2];
+                    Date issuedate = parseDate(data[3]);
+                    Date returndate = parseDate(data[4]);
+                     Loan loan = new Loan(loanId,BookID,memberID,issuedate,returndate);
+                   return loan;
                 }
             }
-            return "Loan ID not found.";
+            return null;
         } catch (FileNotFoundException e) {
-            return "Loan file not found.";
+            return null;
         } catch (IOException e) {
-            return "Error reading the loan file: " + e.getMessage();
+           return null;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static Loan searchLoanR(String loanID , Date ReturnDate) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length > 0 && data[0].equals(loanID)) {
+                    String loanId =data[0];
+                    String BookID = data[1];
+                    String memberID = data[2];
+                    Date issuedate = parseDate(data[3]);
+                    Date returndate = ReturnDate;
+                    Loan loan = new Loan(loanId,BookID,memberID,issuedate,returndate);
+                    return loan;
+                }
+            }
+            return null;
+        } catch (FileNotFoundException e) {
+            return null;
+        } catch (IOException e) {
+            return null;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -348,7 +401,6 @@ public class Loan {
     public int hashCode() {
         return Objects.hash(loanID); // Hash based on loan ID
     }
-    
     
     
     
