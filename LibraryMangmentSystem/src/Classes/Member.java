@@ -1,6 +1,7 @@
 package Classes;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -70,8 +71,8 @@ public class Member {
 
     static {
         try {
-            writer = new BufferedWriter(new FileWriter("Members.txt", true)); // Use true to append data
-            reader = new BufferedReader(new FileReader("Members.txt"));
+            writer = new BufferedWriter(new FileWriter("TempMembers.txt", true)); // Use true to append data
+            reader = new BufferedReader(new FileReader("TempMembers.txt"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -83,7 +84,7 @@ public class Member {
         System.out.println("Member Details:");
 
         // Initialize a BufferedReader to read from the file
-        try (BufferedReader reader = new BufferedReader(new FileReader("Members.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("TempMembers.txt"))) {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data.length >= 4) {
@@ -113,6 +114,7 @@ public class Member {
 
         return "End of Member List";
     }
+
     public static List<Member> readMembersFromFile(String filePath) throws IOException {
         List<Member> members = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -130,12 +132,13 @@ public class Member {
         }
         return members;
     }
+
     // Search for a member by memberID
     public static Member SearchMember(String memberID) throws IOException {
         if (memberID == null || memberID.isEmpty()) {
             return null;
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader("Members.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("TempMembers.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
@@ -152,9 +155,10 @@ public class Member {
 
         return null;
     }
+
     public static boolean removeMember(String memberID) throws IOException {
-        File inputFile = new File("Members.txt");
-        File tempFile = new File("TempMembers.txt");
+        File inputFile = new File("TempMembers.txt");
+        File tempFile = new File("UpdatedMembers.txt");
 
         boolean isRemoved = false;
 
@@ -184,8 +188,8 @@ public class Member {
     }
 
     public static boolean updateMember(String memberID, String newName, String newEmail, String newPassword) throws IOException {
-        File inputFile = new File("Members.txt");
-        File tempFile = new File("TempMembers.txt");
+        File inputFile = new File("TempMembers.txt");
+        File tempFile = new File("UpdatedMembers.txt");
 
         boolean isUpdated = false;
 
@@ -196,7 +200,6 @@ public class Member {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data[0].trim().equals(memberID)) {
-                    // Update member details
                     data[1] = newName;
                     data[2] = newEmail;
                     data[3] = newPassword;
@@ -223,31 +226,28 @@ public class Member {
             System.out.println("Error adding member: " + e.getMessage());
         }
     }
+
     public static Member getMemberByIdAndName(String memberId, String name) throws IOException {
-        // Example: Retrieve from a file or database
-        List<Member> members = readMembersFromFile(String.valueOf(new File("Members.txt"))); // Implement this to read members
+        List<Member> members = readMembersFromFile(String.valueOf(new File("TempMembers.txt")));
         for (Member member : members) {
             if (member.getmemberId().equals(memberId) && member.getName().equalsIgnoreCase(name)) {
                 return member;
             }
         }
-        return null; // Return null if no match is found
+        return null;
     }
 
     public void addLoan(Loan loan) {
         loans.add(loan);
     }
 
-
-    // Display books borrowed by the member using catalog data
     public static void displayBooksBorrowed(String memberID) throws IOException {
         System.out.println("Books Borrowed by Member ID: " + memberID);
         Report.displayActiveLoansForMember(memberID);
     }
 
-    // Check if the member already exists using name, email, and password
     private static String findExistingMemberID(String name, String email, String password) {
-        try (Scanner scanner = new Scanner(new File("Members.txt"))) {
+        try (Scanner scanner = new Scanner(new File("TempMembers.txt"))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] data = line.split(",");
@@ -255,15 +255,50 @@ public class Member {
                     String existingName = data[1].trim();
                     String existingEmail = data[2].trim();
                     if (existingName.equalsIgnoreCase(name) && existingEmail.equalsIgnoreCase(email)) {
-                        return data[0].trim(); // Return the existing ID
+                        return data[0].trim();
                     }
                 }
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + e.getMessage());
         }
-        return null; // Return null if not found
+        return null;
     }
 
+    public static void sortMembers(String sortBy) throws IOException {
+        File inputFile = new File("TempMembers.txt");
+        List<String> memberLines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                memberLines.add(line);
+            }
+        }
+        switch (sortBy.toLowerCase().trim()) {
+            case "memberid":
+                memberLines.sort(Comparator.comparing(line -> line.split(",")[0].trim()));
+                break;
+            case "name":
+                memberLines.sort(Comparator.comparing(line -> line.split(",")[1].trim()));
+                break;
+            case "email":
+                memberLines.sort(Comparator.comparing(line -> line.split(",")[2].trim()));
+                break;
+            default:
+                System.out.println("Invalid sorting criteria. Please choose 'memberID', 'name', or 'email'.");
+                return;
+        }
+        System.out.println("Sorted Members by " + sortBy + ":");
+        for (String line : memberLines) {
+            String[] data = line.split(",");
+            if (data.length >= 4) {
+                System.out.println("Member ID: " + data[0].trim());
+                System.out.println("Name: " + data[1].trim());
+                System.out.println("Email: " + data[2].trim());
+                System.out.println("Password: " + data[3].trim());
+                System.out.println("----------");
+            }
+        }
+    }
 
 }
