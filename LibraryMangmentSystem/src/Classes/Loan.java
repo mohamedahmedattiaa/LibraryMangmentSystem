@@ -207,14 +207,14 @@ public class Loan {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
 
-                // Ensure we have at least 4 fields: memberId, name, email, loan status
+                // Ensure we have at least 4 fields: LoanId, BookID, MemberID, loan status
                 if (data.length >= 4) {
-                    String memberId = data[0];
-                    String memberName = data[1];
-                    String memberEmail = data[2];
+                    String LoanId = data[0];
+                    String BookID = data[1];
+                    String MemberID = data[2];
                     String loanStatus = data[3];
 
-                    Member member = new Member(memberId, memberName, memberEmail);
+                    Member member = Member.SearchMember(MemberID);
 
 
                     if (!loanStatus.equals("No books borrowed") && data.length > 4) {
@@ -224,16 +224,16 @@ public class Loan {
                             Book book = Catalog.searchBook(bookId);  // Assuming you have a Catalog class to search for books
 
                             if (book != null) {
-                                Loan loan = new Loan(bookId, memberId);
+                                Loan loan = new Loan(bookId, MemberID);
                                 activeLoans.add(loan);  // Add to active loans
                                 member.addLoan(loan);  // Add loan to member's loan list
-                                System.out.println("Loan added: Member " + memberName + " borrowed book " + bookId);
+                                System.out.println("Loan added: Member " + member.getName() + " borrowed book " + bookId);
                             } else {
                                 System.out.println("Book with ID " + bookId + " not found.");
                             }
                         }
                     } else {
-                        System.out.println("No books borrowed for member: " + memberName);
+                        System.out.println("No books borrowed for member: " + member.getName());
                     }
                 } else {
                     System.out.println("Invalid data format in line: " + line);

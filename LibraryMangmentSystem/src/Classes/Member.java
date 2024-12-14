@@ -206,8 +206,6 @@ public class Member {
                 writer.newLine();
             }
         }
-
-// Replace the old file with the updated one
         if (isUpdated && inputFile.delete() && tempFile.renameTo(inputFile)) {
             System.out.println("Member with ID " + memberID + " updated successfully.");
         } else if (!isUpdated) {

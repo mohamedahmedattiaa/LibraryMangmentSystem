@@ -20,12 +20,14 @@ public class Main {
         catalog.addBook(book4);
         System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
 // Borrow and return books
-Member member1 = new Member("ezz","doc@gmail.com","123");
-Member member2 = new Member("atta","doc@gmail.com","123");
-Member member3 = new Member("ezaz","doc@gmail.com","123");
+Member member1 = new Member("ezz","@.","123");
+Member member2 = new Member("atta","@.","123");
+Member member3 = new Member("ezaz","@.","123");
 Loan.borrowBook("M200","B100");
 Loan.borrowBook("M201","B101");
 Loan.borrowBook("M202","B102");
+Loan.sortloanBydate();
+Loan.loadLoansFromFile();
 
     }
 
