@@ -148,9 +148,6 @@ public class  Report {
             System.out.println("No genres found.");
         }
     }
-
-
-
 }
 
 

@@ -1,8 +1,5 @@
 package Classes;
-
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.io.*;
 import java.text.ParseException;
@@ -75,15 +72,20 @@ public class Loan {
                 return;
             }
         }
+
         Book book = Catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
             book.setAvailablityStatus(false);
-            Loan loan = new Loan(bookId, member.getmemberId());
+
+            // Create a new Loan and set issueDate and returnDate
+            Loan loan = new Loan(bookId, member.getmemberId()); // Loan constructor sets dates
             activeLoans.add(loan);
+
+            // Save the loan details to file
+            saveLoansToFile();
 
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
                     " by member " + member.getName() + "  your return date is: " + loan.getReturnDate() + ".");
-            saveLoansToFile();
         } else if (book != null && !book.getAvailablityStatus()) {
             System.out.println("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".");
             Loan loan = new Loan(bookId, member.getmemberId());
@@ -93,33 +95,55 @@ public class Loan {
         }
     }
 
+
+
     public static void returnBook(String memberId, String bookId) throws IOException {
         Book book = Catalog.searchBook(bookId);
         Member member = Member.SearchMember(memberId);
-        Date returnDate = new Date();
+        Date returnDate = new Date(); // Current return date
+
         if (book != null) {
             if (!book.getAvailablityStatus()) {
-                Loan currentLoan = new Loan(bookId, member.getmemberId());
-                if (returnDate.after(currentLoan.getReturnDate())) {  //checking if he passed the return date
-                    System.out.println("yous passed the return date");
-                }
+                Loan currentLoan = null;
+
+                // Find the active loan for this member and book
                 for (Loan loan : activeLoans) {
                     if (loan.getMemberId().equals(memberId) && loan.getBookId().equals(bookId)) {
-                        System.out.println("You already returned this book.");
-                        return;
+                        currentLoan = loan;
+                        break;
                     }
                 }
+
+                if (currentLoan == null) {
+                    System.out.println("No active loan found for this book and member.");
+                    return;
+                }
+
+                // Check if the return date is overdue
+                if (returnDate.after(currentLoan.getReturnDate())) {
+                    System.out.println("You have returned the book past the due date!");
+                }
+
+                // Update the return date in memory
+                currentLoan.setReturnDate(returnDate); // Only update the return date
+
+                // Update the loan in the file
+                updateLoanInFile(currentLoan.getLoanID(), returnDate);
+
+                // Update book availability and queues
                 book.setAvailablityStatus(true);
                 activeLoans.remove(currentLoan);
                 returnedLoans.add(currentLoan);
-                removeLoanById(currentLoan.getLoanID());
+
                 System.out.println("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".");
                 System.out.println("Return Date: " + returnDate);
+
+                // Process the next pending request for the book, if any
                 if (!PendingRequestsQueue.isEmpty()) {
                     Loan nextLoan = PendingRequestsQueue.dequeue();
                     Member nextMember = Member.SearchMember(nextLoan.memberId);
-                    System.out.println("Processing next request for book: " + bookId + " for member: " + nextMember.getName() + " , memberId: " + nextMember.getmemberId());
-                    borrowBook(nextMember.getmemberId(), bookId); // edited
+                    System.out.println("Processing next request for book: " + bookId + " for member: " + nextMember.getName());
+                    borrowBook(nextMember.getmemberId(), bookId);
                 }
             } else {
                 System.out.println("Book " + book.getBookTitle() + " is already available.");
@@ -128,6 +152,43 @@ public class Loan {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
     }
+
+
+
+    private static void updateLoanInFile(String loanID, Date newReturnDate) throws IOException {
+        List<String> updatedLines = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy"); // Match the date format in the file
+        boolean returnDateUpdated = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("loans.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length >= 5 && data[0].equals(loanID)) {
+                    // Only update the return date, do not modify the issue date
+                    data[4] = dateFormat.format(newReturnDate);
+                    returnDateUpdated = true;
+                }
+                updatedLines.add(String.join(",", data)); // Add the updated line or unchanged line
+            }
+        }
+
+        // Only write to the file if the return date was updated
+        if (returnDateUpdated) {
+            try (PrintWriter writer = new PrintWriter(new FileWriter("loans.txt"))) {
+                for (String updatedLine : updatedLines) {
+                    writer.println(updatedLine);
+                }
+            }
+            System.out.println("Return date updated for loan ID " + loanID);
+        } else {
+            System.out.println("No update needed for return date. It was already the same.");
+        }
+    }
+
+
+
+
 
     public static void sortloanBydate() {
         List<Loan> loanList = new ArrayList<>(activeLoans);
@@ -160,11 +221,9 @@ public class Loan {
                 "Return Date  : " + (returnDate != null ? returnDate : "Not returned yet");
     }
 
-    public void setReturnDate() {               // setting the date to overdue ( ONLY FOR TESTING DON`T DELETE)
-        Calendar returnDate1 = Calendar.getInstance();
-        returnDate1.set(2023, 1, 1);
-        this.returnDate = returnDate1.getTime();
-    }
+   public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+   }
 
     public static void saveLoansToFile() throws IOException {
         Set<String> existingLoanIds = new HashSet<>();
@@ -185,7 +244,7 @@ public class Loan {
 
         // Append new loans that are not already in the file
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, true))) {
-            for (Loan loan : Loan.activeLoans) {
+            for (Loan loan : activeLoans) {
                 if (!existingLoanIds.contains(loan.getLoanID())) {
                     writer.println(loan.getLoanID() + "," + loan.getBookId() + "," + loan.getMemberId() +
                             "," + loan.getIssueDate() + "," + loan.getReturnDate());
@@ -197,7 +256,7 @@ public class Loan {
     }
 
 
-    
+
     private static Date parseDate(String dateString) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
         return formatter.parse(dateString);
