@@ -6,6 +6,9 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 import Classes.*;
 import GUI.Login;
@@ -1139,6 +1142,7 @@ public class LibrarianGUI extends JFrame {
             JOptionPane.showMessageDialog(sortBooksPanel, "Error displaying books: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     private void logout() {
         dispose();
