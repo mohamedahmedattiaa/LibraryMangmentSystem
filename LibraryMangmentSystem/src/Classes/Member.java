@@ -1,5 +1,7 @@
 package Classes;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -38,6 +40,13 @@ public class Member {
             }
             writer.flush();
         }
+    }
+
+    public Member(String memberId, String name, String email, String password) {
+        this.memberId = memberId;
+        this.name = name;
+        this.Email = email;
+        this.password = password;
     }
 
     public Member() throws IOException {
@@ -115,23 +124,7 @@ public class Member {
         return "End of Member List";
     }
 
-    public static List<Member> readMembersFromFile(String filePath) throws IOException {
-        List<Member> members = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 4) {
-                    String memberID = parts[0].trim();
-                    String name = parts[1].trim();
-                    String email = parts[2].trim();
-                    String password = parts[3].trim();
-                    members.add(new Member(name, email, password));
-                }
-            }
-        }
-        return members;
-    }
+
 
     // Search for a member by memberID
     public static Member SearchMember(String memberID) throws IOException {
@@ -156,36 +149,62 @@ public class Member {
         return null;
     }
 
-    public static boolean removeMember(String memberID) throws IOException {
-        File inputFile = new File("TempMembers.txt");
-        File tempFile = new File("TempMembers.txt");
+    public static boolean removeMemberByID(String memberId) {
+        String filePath = "TempMembers.txt";  // Ensure this is the correct path
+        File file = new File(filePath);
 
-        boolean isRemoved = false;
+        if (!file.exists()) {
+            System.out.println("File not found: " + filePath);
+            return false;  // File doesn't exist
+        }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+        try {
+            // Read all lines from the file
+            List<String> lines = new ArrayList<>(Files.readAllLines(file.toPath(), StandardCharsets.UTF_8));
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (!data[0].trim().equals(memberID)) {
-                    writer.write(line);
-                    writer.newLine();
-                } else {
-                    isRemoved = true; // Member found and skipped
+            // Skip the header (first line)
+            if (!lines.isEmpty()) {
+                String header = lines.get(0);  // Keep the header
+                List<String> updatedLines = new ArrayList<>();
+                updatedLines.add(header);  // Add header to new list
+
+                // Process the lines and skip the one to remove
+                boolean memberRemoved = false;
+                for (String line : lines.subList(1, lines.size())) {
+                    String[] data = line.split(",");
+
+                    // Debugging: Print each member's ID and the comparison result
+                    System.out.println("Checking ID: '" + data[0].trim() + "' against '" + memberId.trim() + "'");
+
+                    // Compare and trim both sides to avoid issues with extra spaces
+                    if (data[0].trim().equals(memberId.trim())) {
+                        memberRemoved = true;  // Skip this line
+                        System.out.println("Removed member: " + line);
+                        continue;
+                    }
+                    updatedLines.add(line);  // Keep other lines
                 }
+
+                if (!memberRemoved) {
+                    System.out.println("No member found with ID: " + memberId);
+                    return false;  // No matching member found
+                }
+
+                // Write the updated lines back to the file
+                Files.write(file.toPath(), updatedLines, StandardCharsets.UTF_8);
+                System.out.println("Member with ID " + memberId + " has been removed.");
+                return true;
             }
+
+        } catch (IOException e) {
+            System.out.println("Error reading or writing file: " + e.getMessage());
         }
 
-        // Replace the old file with the new one
-        if (isRemoved && inputFile.delete() && tempFile.renameTo(inputFile)) {
-            System.out.println("Member with ID " + memberID + " removed successfully.");
-        } else if (!isRemoved) {
-            System.out.println("Member with ID " + memberID + " not found.");
-        }
-
-        return isRemoved;
+        return false;  // Something went wrong
     }
+
+
+
 
     public static boolean updateMember(String memberID, String newName, String newEmail, String newPassword) throws IOException {
         File inputFile = new File("TempMembers.txt");
@@ -234,15 +253,48 @@ public class Member {
         }
     }
 
-    public static Member getMemberByIdAndName(String memberId, String name) throws IOException {
-        List<Member> members = readMembersFromFile(String.valueOf(new File("TempMembers.txt")));
-        for (Member member : members) {
-            if (member.getmemberId().equals(memberId) && member.getName().equalsIgnoreCase(name)) {
-                return member;
-            }
+    public static Member getMemberByIDandName(String name, String memberId) {
+        String filePath = "TempMembers.txt";  // Ensure this is the correct path
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("File not found: " + filePath);
+            return null;
         }
-        return null;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+
+            // Skip the header line if it exists
+            reader.readLine();  // Remove this line if there's no header
+
+            // Read through the file line by line
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 4) {  // Ensure there are 4 values (ID, Name, Email, Password)
+                    String id = data[0].trim();
+                    String memberName = data[1].trim();
+                    String email = data[2].trim();
+                    String password = data[3].trim();
+
+                    // Debugging output to check the read data
+                    System.out.println("Checking: ID=" + id + ", Name=" + memberName);
+                    System.out.println("Looking for: ID=" + memberId + ", Name=" + name);
+
+                    if (id.equals(memberId) && memberName.equals(name)) {
+                        return new Member(id, memberName, email, password);
+                    }
+                } else {
+                    System.out.println("Invalid line format: " + line);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+
+        return null;  // No member found
     }
+
 
     public void addLoan(Loan loan) {
         loans.add(loan);
