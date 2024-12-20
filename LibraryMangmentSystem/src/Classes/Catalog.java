@@ -17,7 +17,6 @@ public class Catalog {
             System.out.println("Book with ID " + book.getBookID() + " already exists in the catalog.");
             return; // Exit the method without adding the book
         }
-
         // If the book does not exist, add it to the file
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
             writer.write(book.getBookID() + "," +
