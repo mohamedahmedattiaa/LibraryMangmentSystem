@@ -7,7 +7,7 @@ import java.util.*;
 public class  Report {
     PendingRequestsQueue pendingRequestsQueue =new PendingRequestsQueue();
     Loan loan = new Loan();
-    public void generateReportForMember(String memberId, Catalog catalog) throws IOException {
+    public static void generateReportForMember(String memberId, Catalog catalog) throws IOException {
         System.out.println("\nGenerating report for Member ID: " + memberId);
 
 
@@ -41,7 +41,7 @@ public class  Report {
         }
     }
 
-    private void displayPendingLoansForMember(String memberId) {
+    public static void displayPendingLoansForMember(String memberId) {
         boolean found = false;
         for (Loan loan : PendingRequestsQueue.request) {
             if (loan.getMemberId().equals(memberId)) {
@@ -55,9 +55,8 @@ public class  Report {
         }
     }
 
-    public void generateGeneralReport(Catalog catalog) {
+    public static void generateGeneralReport(Catalog catalog) {
         System.out.println("\nGeneral Library Report:");
-
 
         displayActiveLoans(catalog);
 
@@ -68,7 +67,7 @@ public class  Report {
         displayPopularGenre(catalog);
     }
 
-    public void displayActiveLoans(Catalog catalog) {
+    public static void displayActiveLoans(Catalog catalog) {
         System.out.println("\nActive Loans in the Library:"); // multiple borrow
         for (Loan loan : Loan.activeLoans) {
             Book book = catalog.searchBook(loan.getBookId());
@@ -98,7 +97,7 @@ public class  Report {
         System.out.println("No overdue books found.");
         }
 
-    public void displayPendingLoans(Catalog catalog) {
+    public static void displayPendingLoans(Catalog catalog) {
         System.out.println("\nPending Loans in the Library:");
         for (Loan loan : PendingRequestsQueue.request) {
             Book book = catalog.searchBook(loan.getBookId());
@@ -110,7 +109,7 @@ public class  Report {
     }
     //
 
-    public void displayPopularGenre(Catalog catalog) {
+    public static void displayPopularGenre(Catalog catalog) {
         if (Loan.activeLoans.isEmpty()) {
             System.out.println("No active loans to calculate popular genres.");
             return;

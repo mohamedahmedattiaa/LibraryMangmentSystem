@@ -2,6 +2,7 @@ package GUI;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -11,14 +12,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
-//
+//////
 import Classes.*;
 import GUI.LibrarianInterface.ManageBook;
 import GUI.LibrarianInterface.ManageMember;
+import GUI.LibrarianInterface.ReportGUI;
 import GUI.Login;
 import com.sun.net.httpserver.Authenticator;
 
 public class LibrarianGUI extends JFrame {
+    private JFrame frame;
+    private JButton reportButton;
     private DefaultTableModel tableModel;
     private CardLayout card;
     private JPanel mainPanel;;
@@ -45,6 +49,23 @@ public class LibrarianGUI extends JFrame {
 
         setLocationRelativeTo(null);
         setVisible(true);
+        frame = new JFrame("Librarian Dashboard");
+        frame.setSize(400, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(null);
+
+        // Report Button
+        reportButton = new JButton("Open Reports");
+        reportButton.setBounds(50, 50, 300, 30);
+        frame.add(reportButton);
+
+        // Action Listener for Report Button
+        reportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ReportGUI(); // Open the Report GUI
+            }
+        });
     }
 
     private JPanel createNavPanel() {
@@ -80,6 +101,7 @@ public class LibrarianGUI extends JFrame {
     }
 
     private JPanel createReportsTapedPanel() {
+        ReportGUI reportGUI = new ReportGUI();
         JPanel ReportTaped = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Reports", createReportsPanel());

@@ -301,7 +301,7 @@ import java.io.IOException;
             gbc.gridx = 1;
             gbc.gridy = 3;
             updateMemberPanel.add(newPasswordField, gbc);
-
+//
 // Initialize the success message label here
             JLabel successMessageLabel = new JLabel("");
             successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
