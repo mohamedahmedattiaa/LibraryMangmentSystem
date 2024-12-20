@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Catalog {
     public static linkedlist bookList = new linkedlist();
-    private static final String FILE_PATH = "catalog.txt"; // File to store the catalog data
+    private static final String FILE_PATH = "catalog.txt"; // File o store the catalog data
 
     public Catalog() {
         loadCatalogFromFile(); // Load catalog data when the program starts
