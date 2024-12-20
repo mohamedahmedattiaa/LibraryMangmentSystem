@@ -28,7 +28,7 @@ public class LibrarianGUI extends JFrame {
     private JPanel mainPanel;;
     ManageBook manageBook =new ManageBook();
     ManageMember manage = new ManageMember();
-
+    ReportGUI report = new ReportGUI();
     public LibrarianGUI() {
         setTitle("Librarian Panel");
         setSize(800, 700);
@@ -100,15 +100,6 @@ public class LibrarianGUI extends JFrame {
         return BookCatalogPanel;
     }
 
-    private JPanel createReportsTapedPanel() {
-        ReportGUI reportGUI = new ReportGUI();
-        JPanel ReportTaped = new JPanel(new BorderLayout());
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Reports", createReportsPanel());
-        ReportTaped.add(tabbedPane, BorderLayout.CENTER);
-        return ReportTaped;
-    }
-
     private JPanel createCombinedManageBookTapped(){
         JPanel MangeBook = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -155,10 +146,7 @@ public class LibrarianGUI extends JFrame {
     public JPanel createReportsPanel() {
         JPanel reportsPanel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Active Loans", createActiveLoansPanel());
-        tabbedPane.addTab("Overdue Books", createOverdueBooksPanel());
-        tabbedPane.addTab("Pending Loans", createPendingLoansPanel());
-        tabbedPane.addTab("Popular Genre", createPopularGenrePanel());
+        tabbedPane.addTab("Reports", report.createReportPanel());
         reportsPanel.add(tabbedPane, BorderLayout.CENTER);
         return reportsPanel;
     }
@@ -202,7 +190,7 @@ public class LibrarianGUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(reportTable);
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // Button to load overdue books data
+// Button to load overdue books data
         JButton viewReportsButton = new JButton("View Overdue Books");
         viewReportsButton.addActionListener(e -> {
             try {
