@@ -23,10 +23,10 @@ public class Main {
 Member member1 = new Member("ezz","@.","123");
 Member member2 = new Member("atta","@.","123");
 Member member3 = new Member("ezaz","@.","123");
-Loan.borrowBook("M200","B100");
+Loan.borrowBook("M202","B100");
 Loan.borrowBook("M200","B101");
-Loan.borrowBook("M200","B102");
-Loan.returnBook("M200","B100");
+Loan.borrowBook("M201","B102");
+Loan.sortloanBydate();
 
 
 

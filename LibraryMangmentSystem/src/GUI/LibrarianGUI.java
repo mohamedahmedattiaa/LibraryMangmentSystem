@@ -178,7 +178,7 @@ public class LibrarianGUI extends JFrame {
             // Retrieve member data from the source (file, database, or collection)
             Member member = null;
             try {
-                member = Member.getMemberByIdAndName(memberId, name);
+                member = Member.SearchMember(memberId);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -268,12 +268,8 @@ public class LibrarianGUI extends JFrame {
                         return;
                     }
                     boolean removed = false;
-                    try {
-                        removed = Member.removeMember(memberId);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    if (removed) {
+            removed = Member.removeMemberByID(memberId);
+            if (removed) {
 
                         successMessageLabel.setText("Member removed successfully!");
                     } else {
