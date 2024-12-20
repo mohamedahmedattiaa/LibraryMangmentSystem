@@ -1,0 +1,2 @@
+Book{bookID='B100', bookTitle='1', author='1', genere='1', availablityStatus=true}
+Book{bookID='B101', bookTitle='2', author='2', genere='12', availablityStatus=true}
