@@ -12,11 +12,26 @@ public class Catalog {
     }
 
     public static void addBook(Book book) {
-        book.setAvailablityStatus(true);
-        bookList.insertAtEnd(book);
-        saveCatalogToFile();
-        System.out.println("Added to catalog: " + book);
+        // Check if the book already exists in the file
+        if (searchBook(book.getBookID()) != null) {
+            System.out.println("Book with ID " + book.getBookID() + " already exists in the catalog.");
+            return; // Exit the method without adding the book
+        }
+
+        // If the book does not exist, add it to the file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
+            writer.write(book.getBookID() + "," +
+                    book.getBookTitle() + "," +
+                    book.getAuthor() + "," +
+                    book.getGenere() + "," +
+                    book.getAvailablityStatus());
+            writer.newLine();
+            System.out.println("Added to catalog: " + book);
+        } catch (IOException e) {
+            System.err.println("Error adding book to catalog: " + e.getMessage());
+        }
     }
+
 
     public static boolean removeBook(String bookId) {
         boolean isRemoved = bookList.deleteById(bookId);
@@ -65,8 +80,30 @@ public class Catalog {
     }
 
     public static Book searchBook(String bookId) {
-        return bookList.Searchbook(bookId);
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Parse the line to create a Book object
+                String[] parts = line.split(",");
+                if (parts.length == 5) {
+                    String fileBookId = parts[0];
+                    String title = parts[1];
+                    String author = parts[2];
+                    String genre = parts[3];
+                    boolean availabilityStatus = Boolean.parseBoolean(parts[4]);
+
+                    // If the book ID matches, return the Book object
+                    if (fileBookId.equals(bookId)) {
+                        return new Book(fileBookId, title, author, genre, availabilityStatus);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error searching for book in file: " + e.getMessage());
+        }
+        return null; // Return null if the book is not found
     }
+
 
     public static void displayCatalog() {
         bookList.display();

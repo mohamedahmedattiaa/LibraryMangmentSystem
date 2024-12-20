@@ -20,7 +20,7 @@ public class Book {
     }
 
     public Book(String bookId, String title, String author, String genre, boolean availabilityStatus) {
-            this.bookID = idGenerator.generateBookID();
+            this.bookID = bookId;
             this.bookTitle = title;
             this.author = author;
             this.genere = genre;
