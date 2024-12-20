@@ -1,15 +1,21 @@
 package Classes;
 
+import java.io.*;
+import java.util.Scanner;
+
 public class Catalog {
-    public static linkedlist bookList =new linkedlist();
+    public static linkedlist bookList = new linkedlist();
+    private static final String FILE_PATH = "catalog.txt"; // File to store the catalog data
+
     public Catalog() {
+        loadCatalogFromFile(); // Load catalog data when the program starts
     }
 
     public static void addBook(Book book) {
         book.setAvailablityStatus(true);
         bookList.insertAtEnd(book);
+        saveCatalogToFile();
         System.out.println("Added to catalog: " + book);
-
     }
 
     public static boolean removeBook(String bookId) {
@@ -19,10 +25,12 @@ public class Catalog {
         } else {
             System.out.println("Book with ID " + bookId + " not found.");
         }
+        saveCatalogToFile(); // Save updated catalog to file
         System.out.println("After removing:");
         bookList.display();
         return isRemoved;
     }
+
     public static String checkBookAvailability(String bookId) {
         for (Node current = bookList.getHead(); current != null; current = current.getNext()) {
             Book book = current.getBook();
@@ -46,6 +54,7 @@ public class Catalog {
                     book.setBookTitle(title);
                     book.setAuthor(author);
                     book.setGenere(genre);
+                    saveCatalogToFile();
                     return "Book details and availability status updated successfully!";
                 } else {
                     return "Book is not available for update!";
@@ -84,7 +93,6 @@ public class Catalog {
         return true;
     }
 
-
     public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
         Node foundBooks = null;
 
@@ -102,7 +110,43 @@ public class Catalog {
         return foundBooks;
     }
 
-    public static void Sorting(String SortedBy){
+    public static void Sorting(String SortedBy) {
         bookList.sorting(SortedBy);
+    }
+
+    private static void saveCatalogToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+            for (Node current = bookList.getHead(); current != null; current = current.getNext()) {
+                Book book = current.getBook();
+                writer.write(book.toString()); // Customize toString for saving data
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error saving catalog to file: " + e.getMessage());
+        }
+    }
+
+    private static void loadCatalogFromFile() {
+        try (Scanner scanner = new Scanner(new File(FILE_PATH))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                // Parse the line to create a Book object
+                String[] parts = line.split(",");
+                if (parts.length == 5) {
+                    String bookId = parts[0];
+                    String title = parts[1];
+                    String author = parts[2];
+                    String genre = parts[3];
+                    boolean availabilityStatus = Boolean.parseBoolean(parts[4]);
+
+                    Book book = new Book(bookId, title, author, genre, availabilityStatus);
+                    bookList.insertAtEnd(book);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Catalog file not found. Starting with an empty catalog.");
+        } catch (Exception e) {
+            System.err.println("Error loading catalog from file: " + e.getMessage());
+        }
     }
 }

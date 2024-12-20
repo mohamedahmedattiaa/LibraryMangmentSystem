@@ -19,6 +19,15 @@ public class Book {
     public Book() {
     }
 
+    public Book(String bookId, String title, String author, String genre, boolean availabilityStatus) {
+            this.bookID = idGenerator.generateBookID();
+            this.bookTitle = title;
+            this.author = author;
+            this.genere = genre;
+            this.availablityStatus = availabilityStatus;
+
+    }
+
     public boolean getAvailablityStatus() {
         return availablityStatus;
     }
