@@ -1,0 +1,13 @@
+B101,b101,b101,b100,true
+B104,b104,b103,c,true
+B107,b107,b104,d,true
+B110,b110,b105,a,true
+B113,b113,b106,e,true
+B116,b115,c,George washonton,true
+B119,b116,d,Ibraham lincolin,true
+B122,b117,a,Wealm sheckspear,true
+B125,b118,e,Albert fred,true
+B127,c,George washonton,Fiction,true
+B128,d,Ibraham lincolin,Dystopian,true
+B129,a,Wealm sheckspear,Dystopian,true
+B130,e,Albert fred,Fiction,true
