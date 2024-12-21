@@ -1,15 +1,14 @@
 package Classes;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
 
 public class  Report {
     PendingRequestsQueue pendingRequestsQueue = new PendingRequestsQueue();
     Loan loan = new Loan();
-    public static ActiveLoansDatabase activeLoansDatabase = new ActiveLoansDatabase();
-    public static void generateReportForMember(String memberId, Catalog catalog) throws IOException, ParseException, ClassNotFoundException {
+
+    public static void generateReportForMember(String memberId, Catalog catalog) throws IOException {
         System.out.println("\nGenerating report for Member ID: " + memberId);
 
 
@@ -23,12 +22,9 @@ public class  Report {
 
     }
 
-    public static void displayActiveLoansForMember(String memberId) throws IOException, ClassNotFoundException, ParseException {
-        // Load active loans from the file
-        Queue<Loan> activeLoans = activeLoansDatabase.loadActiveLoansFromFile();
-
+    public static void displayActiveLoansForMember(String memberId) {
         boolean found = false;
-        for (Loan loan : activeLoans) {
+        for (Loan loan : Loan.activeLoans) {
             if (loan.getMemberId().equals(memberId)) {
                 Book book = Catalog.searchBook(loan.getBookId());
 
@@ -41,12 +37,10 @@ public class  Report {
                 found = true;
             }
         }
-
         if (!found) {
             System.out.println("No active loans for this member.");
         }
     }
-
 
     public static void displayPendingLoansForMember(String memberId) {
         boolean found = false;
@@ -72,7 +66,8 @@ public class  Report {
         displayPendingLoans(catalog);
 
         displayPopularGenre(catalog);
-    }  //report
+    }
+
     public static void displayActiveLoans(Catalog catalog) {
         System.out.println("\nActive Loans in the Library:"); // multiple borrow
         for (Loan loan : Loan.activeLoans) {
