@@ -1,15 +1,11 @@
 package GUI;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import Classes.*;
-public class UserSignup {
+
+public class UserSignup extends JFrame {
+
     public static void main(String[] args) {
+
         JFrame frame = new JFrame("Martian Login");
         frame.setSize(1600, 900);
         frame.setLayout(null);
@@ -24,15 +20,7 @@ public class UserSignup {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                // Try to load the image
                 ImageIcon backgroundImage = new ImageIcon(getClass().getResource("test.jpg"));
-
-                // Check if the image is loaded successfully
-                if (backgroundImage.getImageLoadStatus() != MediaTracker.COMPLETE) {
-                    System.out.println("Image not found!");
-                    return; // Return if the image is not found
-                }
-
                 Image img = backgroundImage.getImage();
                 g.drawImage(img, 0, 0, getWidth(), getHeight(), this);
             }
@@ -78,11 +66,11 @@ public class UserSignup {
         rightPanel.add(signInLabel);
 
 
-        JLabel firstNameLabel = new JLabel("First Name:");
-        firstNameLabel.setBounds(50, 250, 100, 25);
-        firstNameLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        firstNameLabel.setForeground(Color.WHITE);
-        rightPanel.add(firstNameLabel);
+        JLabel firstName = new JLabel("First Name:");
+        firstName.setBounds(50, 250, 100, 25);
+        firstName.setFont(new Font("Arial", Font.BOLD, 12));
+        firstName.setForeground(Color.WHITE);
+        rightPanel.add(firstName);
 
         JTextField firstNameField = new JTextField(20);
         firstNameField.setBounds(50, 280, 150, 25);
@@ -104,46 +92,47 @@ public class UserSignup {
         emailLabel.setBounds(50, 330, 100, 25);
         emailLabel.setForeground(Color.WHITE);
         rightPanel.add(emailLabel);
-    JTextField emailField = new JTextField(20);
+
+        JTextField emailField = new JTextField(20);
         emailField.setBounds(50, 360, 200, 25);
         rightPanel.add(emailField);
 
-    JLabel passwordLabel = new JLabel("Password:");
+        JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setFont(new Font("Arial", Font.BOLD, 12));
         passwordLabel.setBounds(50, 410, 100, 25);
         passwordLabel.setForeground(Color.WHITE);
         rightPanel.add(passwordLabel);
 
-    JPasswordField passwordField = new JPasswordField(20);
+        JPasswordField passwordField = new JPasswordField(20);
         passwordField.setBounds(50, 440, 200, 25);
         rightPanel.add(passwordField);
 
-    JLabel conpasswordLabel = new JLabel("Confirm Password:");
+        JLabel conpasswordLabel = new JLabel("Confirm Password:");
         conpasswordLabel.setFont(new Font("Arial", Font.BOLD, 12));
         conpasswordLabel.setForeground(Color.WHITE);
         conpasswordLabel.setBounds(50, 490, 200, 25);
         rightPanel.add(conpasswordLabel);
 
-    JPasswordField conpasswordField = new JPasswordField(20);
+        JPasswordField conpasswordField = new JPasswordField(20);
         conpasswordField.setBounds(50, 520, 200, 25);
         rightPanel.add(conpasswordField);
 
 
 
-    JButton signUp = new JButton("Sign Up");
+        JButton signUp = new JButton("Sign Up");
         signUp.setBounds(250, 600, 100, 25);
         signUp.setForeground(Color.WHITE);
         signUp.setBackground(new Color(62, 2, 2, 255));
         rightPanel.add(signUp);
 
 
-    JLabel loginLabel = new JLabel("Already have an account?");
+        JLabel loginLabel = new JLabel("Already have an account?");
         loginLabel.setFont(new Font("Arial", Font.BOLD, 15));
         loginLabel.setForeground(Color.WHITE);
         loginLabel.setBounds(225, 690, 400, 30);
         rightPanel.add(loginLabel);
 
-    JButton loginButton = new JButton("Login");
+        JButton loginButton = new JButton("Login");
         loginButton.setForeground(Color.WHITE);
         loginButton.setBounds(250, 730, 100, 25);
         loginButton.setBackground(new Color(62, 2, 2, 255));
@@ -151,37 +140,59 @@ public class UserSignup {
 
 
 
-    JLabel socialLabel = new JLabel("Follow us on:");
+        JLabel socialLabel = new JLabel("Follow us on:");
         socialLabel.setForeground(Color.WHITE);
         socialLabel.setBounds(50, 680, 100, 20);
         layeredPane.add(socialLabel, JLayeredPane.PALETTE_LAYER);
 
-    ImageIcon backgroundImage = new ImageIcon(UserSignup.class.getResource("test.jpg"));
-    JLabel fbLabel = new JLabel(backgroundImage);
-        fbLabel.setBounds(55, 600, 200, 200);
-        layeredPane.add(fbLabel, JLayeredPane.PALETTE_LAYER);
 
 
-        signUp.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
+
+        signUp.addActionListener(e -> {
             String name = firstNameField.getText();
             String lastName = lastNameField.getText();
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
             String confirmPassword = new String(conpasswordField.getPassword());
 
-            if (name.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+
+
+
+
+
+
+
+
+            System.out.println( name);
+            System.out.println( lastName);
+            System.out.println( email);
+            System.out.println( password);
+
+
+
+
+            if (name.isEmpty() ||   lastName.isEmpty() || email.isEmpty() ||  password.isEmpty() || confirmPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
             } else if (!password.equals(confirmPassword)) {
                 JOptionPane.showMessageDialog(frame, "Passwords do not match.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
+
+                UserDatabase.addUser(name, lastName, email, password, "User");
+
+                // Show success message
                 JOptionPane.showMessageDialog(frame, "Sign-Up Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                frame.setVisible(false);
+                frame.dispose();
+                JFrame loginFrame = new Login();
+                loginFrame.setVisible(true);
             }
-        }
-    });
+        });
+
+
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-}
+    }
+
+
 }

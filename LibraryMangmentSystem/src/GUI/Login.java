@@ -1,7 +1,6 @@
 package GUI;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 
 public class Login extends JFrame {
     private JTextField idText;
@@ -20,7 +19,7 @@ public class Login extends JFrame {
         JLabel backgroundLabel = new JLabel(backgroundIcon);
         backgroundLabel.setBounds(0, 0, 735, 956);
 
-        JLabel idLabel = new JLabel("ID:");
+        JLabel idLabel = new JLabel("Email/ID:");
         idLabel.setForeground(Color.WHITE);
         idLabel.setBounds(200, 300, 100, 30);
 
@@ -43,18 +42,21 @@ public class Login extends JFrame {
         loginButton.addActionListener(e -> {
             String id = idText.getText();
             String pass = new String(password.getPassword());
-
-            if (id.equals("user") && pass.equals("1234")) {
-                JOptionPane.showMessageDialog(frame, "Welcome Member!");
-                frame.dispose(); // Close the login window
-            } else if (id.equals("librarian") && pass.equals("5678")) {
-                JOptionPane.showMessageDialog(frame, "Welcome Librarian!");
+            if (id.equals("ADMIN3060") && pass.equals("U@Admin36798")) {
+                JOptionPane.showMessageDialog(frame, "Welcome Admin!");
                 frame.dispose();
-                new LibrarianGUI(); // Open Librarian GUI
-            } else {
+                new LibrarianGUI();
+            }
+            else if (UserDatabase.validateUser(id, pass)) {
+                JOptionPane.showMessageDialog(frame, "Welcome Member!");
+                frame.dispose();
+                new MemberGUI();
+            }
+            else {
                 JOptionPane.showMessageDialog(frame, "Invalid ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+
 
         frame.add(idLabel);
         frame.add(idText);
