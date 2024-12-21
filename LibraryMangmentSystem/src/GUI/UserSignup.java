@@ -4,16 +4,14 @@ import java.awt.*;
 
 public class UserSignup extends JFrame {
 
-    public static void main(String[] args) {
-
-        JFrame frame = new JFrame("Martian Login");
-        frame.setSize(1600, 900);
-        frame.setLayout(null);
+    public UserSignup() {
+        setTitle("User Signup");
+        setSize(1600, 900);
+        setLayout(null);
 
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setBounds(0, 0, 1600, 900);
-        frame.add(layeredPane);
-
+        add(layeredPane);
 
         JPanel backgroundPanel = new JPanel() {
             @Override
@@ -28,28 +26,23 @@ public class UserSignup extends JFrame {
         backgroundPanel.setBounds(0, 0, 1600, 900);
         layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
 
-
-        JLabel welcomeLabel = new JLabel("Dont have an account?");
+        JLabel welcomeLabel = new JLabel("Don't have an account?");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 50));
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setBounds(25, 500, 700, 50);
         layeredPane.add(welcomeLabel, JLayeredPane.PALETTE_LAYER);
 
-
-        JLabel infoLabel = new JLabel("<html>Register to access all the features of our service.</html>"
-        );
+        JLabel infoLabel = new JLabel("Register to access all the features of our service.");
         infoLabel.setFont(new Font("Arial", Font.BOLD, 25));
         infoLabel.setForeground(Color.LIGHT_GRAY);
         infoLabel.setBounds(50, 90, 1000, 1000);
         layeredPane.add(infoLabel, JLayeredPane.PALETTE_LAYER);
 
-
-        JLabel info2Label = new JLabel("<html>Discover a new world of knowledge with every book you read.</html>");
+        JLabel info2Label = new JLabel("Discover a new world of knowledge with every book you read.");
         info2Label.setFont(new Font("Arial", Font.BOLD, 25));
         info2Label.setForeground(Color.LIGHT_GRAY);
         info2Label.setBounds(50, 120, 1020, 1000);
         layeredPane.add(info2Label, JLayeredPane.PALETTE_LAYER);
-
 
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(null);
@@ -57,14 +50,11 @@ public class UserSignup extends JFrame {
         rightPanel.setBounds(900, 0, 700, 900);
         layeredPane.add(rightPanel, JLayeredPane.PALETTE_LAYER);
 
-
         JLabel signInLabel = new JLabel("Sign Up");
         signInLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        signInLabel.setForeground(new Color(255, 255, 255, 255));
+        signInLabel.setForeground(Color.WHITE);
         signInLabel.setBounds(50, 180, 600, 30);
-
         rightPanel.add(signInLabel);
-
 
         JLabel firstName = new JLabel("First Name:");
         firstName.setBounds(50, 250, 100, 25);
@@ -74,7 +64,6 @@ public class UserSignup extends JFrame {
 
         JTextField firstNameField = new JTextField(20);
         firstNameField.setBounds(50, 280, 150, 25);
-        firstNameField.setBackground(new Color(255, 255, 255, 255));
         rightPanel.add(firstNameField);
 
         JLabel lastNameLabel = new JLabel("Last Name:");
@@ -117,20 +106,11 @@ public class UserSignup extends JFrame {
         conpasswordField.setBounds(50, 520, 200, 25);
         rightPanel.add(conpasswordField);
 
-
-
         JButton signUp = new JButton("Sign Up");
         signUp.setBounds(250, 600, 100, 25);
         signUp.setForeground(Color.WHITE);
         signUp.setBackground(new Color(62, 2, 2, 255));
         rightPanel.add(signUp);
-
-
-        JLabel loginLabel = new JLabel("Already have an account?");
-        loginLabel.setFont(new Font("Arial", Font.BOLD, 15));
-        loginLabel.setForeground(Color.WHITE);
-        loginLabel.setBounds(225, 690, 400, 30);
-        rightPanel.add(loginLabel);
 
         JButton loginButton = new JButton("Login");
         loginButton.setForeground(Color.WHITE);
@@ -138,61 +118,36 @@ public class UserSignup extends JFrame {
         loginButton.setBackground(new Color(62, 2, 2, 255));
         rightPanel.add(loginButton);
 
-
-
-        JLabel socialLabel = new JLabel("Follow us on:");
-        socialLabel.setForeground(Color.WHITE);
-        socialLabel.setBounds(50, 680, 100, 20);
-        layeredPane.add(socialLabel, JLayeredPane.PALETTE_LAYER);
-
-
-
-
         signUp.addActionListener(e -> {
             String name = firstNameField.getText();
             String lastName = lastNameField.getText();
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
             String confirmPassword = new String(conpasswordField.getPassword());
-
-
-
-
-
-
-
-
-
-            System.out.println( name);
-            System.out.println( lastName);
-            System.out.println( email);
-            System.out.println( password);
-
-
-
-
-            if (name.isEmpty() ||   lastName.isEmpty() || email.isEmpty() ||  password.isEmpty() || confirmPassword.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-            } else if (!password.equals(confirmPassword)) {
-                JOptionPane.showMessageDialog(frame, "Passwords do not match.", "Error", JOptionPane.ERROR_MESSAGE);
+            if (name.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() ||  confirmPassword.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if(UserDatabase.isEmailTaken(email)){
+                JOptionPane.showMessageDialog(this, "Email is already in taken.", "Error", JOptionPane.ERROR_MESSAGE);
+            }else if (!password.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(this, "Passwords do not match.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-
                 UserDatabase.addUser(name, lastName, email, password, "User");
-
-                // Show success message
-                JOptionPane.showMessageDialog(frame, "Sign-Up Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                frame.setVisible(false);
-                frame.dispose();
-                JFrame loginFrame = new Login();
-                loginFrame.setVisible(true);
+                JOptionPane.showMessageDialog(this, "Sign-Up Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+                new Login();
             }
         });
 
+        loginButton.addActionListener(e -> {
+            dispose();
+            new Login();
+        });
 
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
     }
 
-
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(UserSignup::new);
+    }
 }
