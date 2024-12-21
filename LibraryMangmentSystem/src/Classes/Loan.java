@@ -116,7 +116,7 @@ public class Loan {
         } else if (book != null && !book.getAvailablityStatus()) {
             System.out.println("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".");
             Loan loan = new Loan(bookId, member.getmemberId());
-            PendingRequestsQueue.enqueue(loan); // Add the loan request to the queue
+            PendingRequestsQueue.enqueue(loan);
         } else {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
@@ -125,52 +125,52 @@ public class Loan {
     public static void returnBook(String memberId, String bookId) throws IOException, ParseException {
         Book book = Catalog.searchBook(bookId);
         Member member = Member.SearchMember(memberId);
-        Date returnDate = new Date(); // Current return date
+        Date returnDate = new Date();
 
         if (book != null) {
             if (!book.getAvailablityStatus()) {
                 book.setAvailablityStatus(true);
                 Loan currentLoan = null;
-                // Find the active loan for this member and book
+
+
                 for (Loan loan : activeLoans) {
                     if (loan.getMemberId().equals(memberId) && loan.getBookId().equals(bookId)) {
                         currentLoan = loan;
                         break;
                     }
                 }
+                if (currentLoan == null) {
+                    System.out.println("No active loan found for this book and member.");
+                    return;
+                }
 
-
-
-
-                // Check if the return date is overdue
                 if (returnDate.after(currentLoan.getReturnDate())) {
                     System.out.println("You have returned the book past the due date!");
                 }
-
-
-                Catalog.updateBookAvailabilityInFile(bookId,true);
-                Catalog.bookList.ReAdd();
-
-                activeLoans.remove(currentLoan);
-
-
+                Catalog.updateBookAvailabilityInFile(bookId, true);
+                updateReturned(currentLoan.getLoanID(),false);
+                saveLoansToFile(currentLoan);
+                add();
                 System.out.println("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".");
                 System.out.println("Return Date: " + returnDate);
 
-                // Process the next pending request for the book, if any
+                // Process the next pending request, if available
                 if (!PendingRequestsQueue.isEmpty()) {
                     Loan nextLoan = PendingRequestsQueue.dequeue();
-                    Member nextMember = Member.SearchMember(nextLoan.memberId);
+                    Member nextMember = Member.SearchMember(nextLoan.getMemberId());
                     System.out.println("Processing next request for book: " + bookId + " for member: " + nextMember.getName());
                     borrowBook(nextMember.getmemberId(), bookId);
                 }
             } else {
-                System.out.println("Book " + book.getBookTitle() + " is already available.");
+                System.out.println("You already returned this book.");
+                System.out.println("Now the Book " + book.getBookTitle() + " is already available!");
             }
         } else {
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
     }
+
+
 
 
 
@@ -247,6 +247,7 @@ public class Loan {
 
     public static void saveLoansToFile(Loan loan) throws IOException {
         Set<String> existingLoanIds = new HashSet<>();
+        Set<String> existingbook = new HashSet<>();
         File file = new File(FILE_NAME);
 
         // Load existing loan IDs to avoid duplicates
@@ -255,8 +256,9 @@ public class Loan {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] data = line.split(",");
-                    if (data.length > 0) {
-                        existingLoanIds.add(data[0]); // Assuming the first field is the loan ID
+                    if (data.length > 1) {
+                        existingLoanIds.add(data[0]);// Assuming the first field is the loan ID
+                        existingbook.add(data[1]);
                     }
                 }
             }
@@ -265,7 +267,7 @@ public class Loan {
         // Append new loans that are not already in the file
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, true))) {
            {
-                if (!existingLoanIds.contains(loan.getLoanID())) {
+                if (!(existingLoanIds.contains(loan.getLoanID())&& existingbook.contains(loan.getBookId()))) {
                     writer.println(loan.getLoanID() + "," + loan.getBookId() + "," + loan.getMemberId() +
                             "," + loan.getIssueDate() + "," + loan.getReturnDate()+","+loan.Isactive());
                 }
@@ -380,9 +382,6 @@ public class Loan {
         return null; // Return null if the book is not found
     }
     public static void add() throws IOException, ParseException {
-        // Clear the existing activeLoans queue to avoid duplicates when adding loans
-
-
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -416,6 +415,49 @@ public class Loan {
         System.out.println("All active loans have been added to the activeLoans queue.");
     }
 
+    public static void updateReturned(String loanID, boolean isActive) throws IOException {
+        File inputFile = new File(FILE_NAME);
+        File tempFile = new File("temp_loans.txt");
+
+        boolean loanFound = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             PrintWriter writer = new PrintWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length > 0 && data[0].equals(loanID)) {
+                    loanFound = true;
+                    // Update the IsActive status in the line
+                    if (data.length >= 6) {    // Assuming IsActive is at the 6th position
+                        data[4] = new Date().toString();
+                        data[5] = String.valueOf(isActive);
+                    }
+                    // Join updated data back into a line
+                    line = String.join(",", data);
+                }
+                writer.println(line); // Write the (updated or original) line to the temp file
+            }
+        }
+
+        if (loanFound) {
+            if (!inputFile.delete()) {
+                System.out.println("Failed to delete the original file.");
+                return;
+            }
+            if (!tempFile.renameTo(inputFile)) {
+                System.out.println("Failed to rename the temporary file.");
+                return;
+            }
+            System.out.println("Loan ID " + loanID + " activation status updated to " + isActive + ".");
+        } else {
+            System.out.println("Loan ID " + loanID + " does not exist in the file.");
+            if (!tempFile.delete()) {
+                System.out.println("Failed to delete the temporary file.");
+            }
+        }
+    }
 
 
 
