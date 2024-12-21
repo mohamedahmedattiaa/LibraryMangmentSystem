@@ -1,193 +1,347 @@
 package GUI.LibrarianInterface;
-
+import Classes.Catalog;
+import Classes.Report;
+import Classes.Loan;
+import Classes.PendingRequestsQueue;
+import Classes.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Date;
 
-public class ReportGUI {
-    private JPanel mainPanel;
-    private JPanel dashboardPanel;
-    private JButton generalReportButton;
-    private JButton memberReportButton;
-    private JLabel titleLabel;
-    private CardLayout cardLayout;
-    private JTabbedPane tabbedPane;
+public class ReportGUI extends JFrame {
+    private JTextField memberIdField;
+    private JButton generateMemberReportButton;
+    private JTable memberReportTable, generalReportTable;
+    private DefaultTableModel memberTableModel, generalTableModel;
+    private JLabel statusLabel;
 
-    // إنشاء جدول للـ General Report و Member Report
-    private JTable generalReportTable;
-    private JTable memberReportTable;
+    public ReportGUI(Catalog catalog) {
+        // Set up main frame
+        setTitle("Library Management System - Reports");
+        setSize(1000, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-    public ReportGUI() {
-        mainPanel = new JPanel(new GridBagLayout());
-        dashboardPanel = new JPanel(new GridBagLayout());
+        // Tabbed Pane
+        JTabbedPane tabbedPane = new JTabbedPane();
 
-        generalReportButton = new JButton("Generate General Report");
-        memberReportButton = new JButton("Generate Member Report");
-        titleLabel = new JLabel("Generate Reports");
+        // Member Report Tab
+        JPanel memberReportPanel = createMemberReportPanel(catalog);
+        tabbedPane.addTab("Member Report", memberReportPanel);
 
-        dashboardPanel.setBackground(new Color(92, 64, 51));
-        mainPanel.setBackground(new Color(92, 64, 51));
+        // General Report Tab
+        JPanel generalReportPanel = createGeneralReportPanel(catalog);
+        tabbedPane.addTab("General Report", generalReportPanel);
 
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Add Tabbed Pane to Frame
+        add(tabbedPane);
+    }
 
-        tabbedPane = new JTabbedPane();
-        tabbedPane.setBackground(new Color(139, 69, 19));
-        tabbedPane.setForeground(Color.WHITE);
-
+    public JPanel createMemberReportPanel(Catalog catalog) {
+        JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Title Label
+        JLabel titleLabel = new JLabel("Generate Member Report", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(0, 51, 102)); // Navy Blue
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        mainPanel.add(titleLabel, gbc);
+        panel.add(titleLabel, gbc);
 
-        generalReportButton.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        generalReportButton.setBackground(new Color(139, 69, 19));
-        generalReportButton.setForeground(Color.WHITE);
-        generalReportButton.setFocusPainted(false);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        // Member ID Field
         gbc.gridwidth = 1;
-        mainPanel.add(generalReportButton, gbc);
-
-        memberReportButton.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        memberReportButton.setBackground(new Color(139, 69, 19));
-        memberReportButton.setForeground(Color.WHITE);
-        memberReportButton.setFocusPainted(false);
-        gbc.gridx = 1;
         gbc.gridy = 1;
-        mainPanel.add(memberReportButton, gbc);
+        gbc.gridx = 0;
+        JLabel memberIdLabel = new JLabel("Enter Member ID:");
+        memberIdLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        panel.add(memberIdLabel, gbc);
 
-        JPanel generalReportPanel = createGeneralReportPanel();
-        JPanel memberReportPanel = createMemberReportPanel();
+        gbc.gridx = 1;
+        memberIdField = new JTextField(20);
+        panel.add(memberIdField, gbc);
 
-        tabbedPane.addTab("General Report Dashboard", generalReportPanel);
-        tabbedPane.addTab("Member Report Dashboard", memberReportPanel);
+        // Report Type ComboBox
+        gbc.gridy = 2;
+        gbc.gridx = 0;
+        JLabel reportTypeLabel = new JLabel("Select Report Type:");
+        reportTypeLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        panel.add(reportTypeLabel, gbc);
 
-        addActionListeners();
-    }
+        gbc.gridx = 1;
+        JComboBox<String> reportTypeComboBox = new JComboBox<>(new String[]{"Active Loans", "Pending Loans", "Overdue Books"});
+        reportTypeComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
+        panel.add(reportTypeComboBox, gbc);
 
-    // إنشاء الـ General Report Panel مع جدول
-    public JPanel createGeneralReportPanel() {
-        JPanel generalReportPanel = new JPanel(new BorderLayout());
-        generalReportPanel.setBackground(new Color(92, 64, 51));
+        // Generate Report Button
+        gbc.gridy = 3;
+        gbc.gridx = 0;
+        generateMemberReportButton = new JButton("Generate Report");
+        generateMemberReportButton.setFont(new Font("Arial", Font.BOLD, 14));
+        generateMemberReportButton.setBackground(new Color(102, 178, 255)); // Light Blue
+        generateMemberReportButton.setForeground(Color.WHITE);
+        panel.add(generateMemberReportButton, gbc);
 
-        JLabel titleLabel = new JLabel("General Report Dashboard");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Status Label
+        gbc.gridx = 1;
+        statusLabel = new JLabel("");
+        statusLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        statusLabel.setForeground(Color.RED);
+        panel.add(statusLabel, gbc);
 
-        // إنشاء الجدول للـ General Report
-        String[] columnNames = {"Book ID", "Book Title", "Genre", "Available Copies"};
-        generalReportTable = new JTable();
-        JScrollPane scrollPane = new JScrollPane(generalReportTable);
+        // Member Report Table
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
 
-        // إضافة الجدول داخل الـ Panel
-        generalReportPanel.add(titleLabel, BorderLayout.NORTH);
-        generalReportPanel.add(scrollPane, BorderLayout.CENTER);
+        memberTableModel = new DefaultTableModel();
+        memberTableModel.addColumn("Report Type");
+        memberTableModel.addColumn("Details");
 
-        return generalReportPanel;
-    }
+        memberReportTable = new JTable(memberTableModel);
+        JScrollPane memberTableScroll = new JScrollPane(memberReportTable);
+        panel.add(memberTableScroll, gbc);
 
-    // إنشاء الـ Member Report Panel مع جدول
-    public JPanel createMemberReportPanel() {
-        JPanel memberReportPanel = new JPanel(new BorderLayout());
-        memberReportPanel.setBackground(new Color(92, 64, 51));
+// Add Action Listener for Button
+        generateMemberReportButton.addActionListener(e -> {
+            String memberId = memberIdField.getText().trim();
+            String reportType = (String) reportTypeComboBox.getSelectedItem();
 
-        JLabel titleLabel = new JLabel("Member Report Dashboard");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // إنشاء الجدول للـ Member Report
-        String[] columnNames = {"Loan ID", "Book ID", "Book Title", "Issue Date", "Return Date"};
-        memberReportTable = new JTable();
-        JScrollPane scrollPane = new JScrollPane(memberReportTable);
-
-        // إضافة الجدول داخل الـ Panel
-        memberReportPanel.add(titleLabel, BorderLayout.NORTH);
-        memberReportPanel.add(scrollPane, BorderLayout.CENTER);
-
-        return memberReportPanel;
-    }
-
-    private void addActionListeners() {
-        generalReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(mainPanel, "Switching to General Report Dashboard.");
-                tabbedPane.setSelectedIndex(0);
-                loadGeneralReportData(); // تحميل البيانات للـ General Report من الملف
+            if (memberId.isEmpty()) {
+                statusLabel.setText("Please enter a valid Member ID.");
+                return;
             }
+
+            if (reportType == null) {
+                statusLabel.setText("Please select a valid report type.");
+                return;
+            }
+            statusLabel.setText("");
+            memberTableModel.setRowCount(0);
+            JTable memberReport = createMemberReportTable(catalog, memberId, reportType);
+            memberTableModel = (DefaultTableModel) memberReport.getModel();
+            memberReportTable.setModel(memberTableModel);
         });
 
-        memberReportButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String memberID = JOptionPane.showInputDialog(mainPanel, "Enter Member ID:");
-                if (memberID != null && !memberID.trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(mainPanel, "Switching to Member Report Dashboard for ID: " + memberID);
-                    tabbedPane.setSelectedIndex(1);
-                    loadMemberReportData(memberID); // تحميل البيانات للـ Member Report من الملف بناءً على ID العضو
-                } else {
-                    JOptionPane.showMessageDialog(mainPanel, "Member ID cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+        return panel;
+    }
+
+
+//    public void displayMemberReport(String memberId, Catalog catalog) {
+//        // Add data to the table for Active Loans, Pending Loans, Overdue Books
+//        // For Active Loans
+//        Report.displayActiveLoansForMember(memberId);
+//
+//        // For Pending Loans
+//        Report.displayPendingLoansForMember(memberId);
+//
+//        // Add rows to the table with respective results
+//        memberTableModel.addRow(new Object[]{"Active Loans", "Details here"});
+//        memberTableModel.addRow(new Object[]{"Pending Loans", "Details here"});
+//    }
+
+    public JPanel createGeneralReportPanel(Catalog catalog) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Title Label
+        JLabel titleLabel = new JLabel("General Library Report", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(0, 51, 102)); // Navy Blue
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        panel.add(titleLabel, gbc);
+
+        // Tabbed Pane for General Reports
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        // Active Loans Tab
+        JPanel activeLoansPanel = new JPanel(new BorderLayout());
+        JTable activeLoansTable = createReportTable(catalog, "Active Loans");
+        activeLoansPanel.add(new JScrollPane(activeLoansTable), BorderLayout.CENTER);
+        tabbedPane.addTab("Active Loans", activeLoansPanel);
+
+        // Overdue Books Tab
+        JPanel overdueBooksPanel = new JPanel(new BorderLayout());
+        JTable overdueBooksTable = createReportTable(catalog, "Overdue Books");
+        overdueBooksPanel.add(new JScrollPane(overdueBooksTable), BorderLayout.CENTER);
+        tabbedPane.addTab("Overdue Books", overdueBooksPanel);
+
+        // Pending Loans Tab
+        JPanel pendingLoansPanel = new JPanel(new BorderLayout());
+        JTable pendingLoansTable = createReportTable(catalog, "Pending Loans");
+        pendingLoansPanel.add(new JScrollPane(pendingLoansTable), BorderLayout.CENTER);
+        tabbedPane.addTab("Pending Loans", pendingLoansPanel);
+
+        // Popular Genre Tab
+        JPanel popularGenrePanel = new JPanel(new BorderLayout());
+        JTable popularGenreTable = createReportTable(catalog, "Popular Genre");
+        popularGenrePanel.add(new JScrollPane(popularGenreTable), BorderLayout.CENTER);
+        tabbedPane.addTab("Popular Genre", popularGenrePanel);
+
+        // Add Tabbed Pane to the Panel
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        panel.add(tabbedPane, gbc);
+
+        return panel;
+    }
+
+    private JTable createReportTable(Catalog catalog, String reportType) {
+        // Create the table model
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel.addColumn("Report Type");
+        tableModel.addColumn("Details");
+
+        switch (reportType) {
+            case "Active Loans":
+                for (Loan loan : Loan.activeLoans) {
+                    Book book = catalog.searchBook(loan.getBookId());
+                    if (book != null) {
+                        tableModel.addRow(new Object[]{
+                                reportType,
+                                "Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
+                                        " | Member: " + loan.getMemberId() + " | Return Date: " + loan.getReturnDate()
+                        });
+                    }
                 }
-            }
-        });
-    }
-
-    // تحميل البيانات من ملف الـ General Report
-    private void loadGeneralReportData() {
-        // تحديد مسار الملف
-        String filePath = "general_report.txt";
-        ArrayList<String[]> data = readDataFromFile(filePath);
-
-        // تحديث الجدول بالبيانات
-        String[] columnNames = {"Book ID", "Book Title", "Genre", "Available Copies"};
-        DefaultTableModel model = new DefaultTableModel(data.toArray(new Object[0][]), columnNames);
-        generalReportTable.setModel(model);
-    }
-
-    // تحميل البيانات من ملف الـ Member Report بناءً على Member ID
-    private void loadMemberReportData(String memberID) {
-        // تحديد مسار الملف
-        String filePath = "member_report_" + memberID + ".txt"; // افترض أن اسم الملف يحتوي على ID العضو
-        ArrayList<String[]> data = readDataFromFile(filePath);
-
-        // تحديث الجدول بالبيانات
-        String[] columnNames = {"Loan ID", "Book ID", "Book Title", "Issue Date", "Return Date"};
-        DefaultTableModel model = new DefaultTableModel(data.toArray(new Object[0][]), columnNames);
-        memberReportTable.setModel(model);
-    }
-
-    // دالة لقراءة البيانات من الملف
-    private ArrayList<String[]> readDataFromFile(String filePath) {
-        ArrayList<String[]> data = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] row = line.split(",");
-                data.add(row);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+                break;
+            case "Overdue Books":
+                Date currentDate = new Date();
+                for (Loan loan : Loan.activeLoans) {
+                    if (loan.getReturnDate().before(currentDate)) {
+                        Book book = catalog.searchBook(loan.getBookId());
+                        if (book != null) {
+                            tableModel.addRow(new Object[]{
+                                    reportType,
+                                    "Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
+                                            " | Member: " + loan.getMemberId() + " | Return Date: " + loan.getReturnDate()
+                            });
+                        }
+                    }
+                }
+                break;
+            case "Pending Loans":
+                for (Loan loan : PendingRequestsQueue.request) {
+                    Book book = catalog.searchBook(loan.getBookId());
+                    if (book != null) {
+                        tableModel.addRow(new Object[]{
+                                reportType,
+                                "Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
+                                        " | Requested on: " + loan.getIssueDate()
+                        });
+                    }
+                }
+                break;
+            case "Popular Genre":
+                String popularGenreOutput = Report.displayPopularGenre(catalog);
+                tableModel.addRow(new Object[]{
+                        reportType,
+                        popularGenreOutput
+                });
+                break;
         }
-        return data;
+        return new JTable(tableModel);
     }
 
-    public JPanel createReportPanel() {
-        JPanel containerPanel = new JPanel(new BorderLayout());
-        containerPanel.add(mainPanel, BorderLayout.NORTH);
-        containerPanel.add(tabbedPane, BorderLayout.CENTER);
-        return containerPanel;
+    private JTable createMemberReportTable(Catalog catalog, String memberId, String reportType) {
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel.addColumn("Report Type");
+        tableModel.addColumn("Details");
+
+        switch (reportType) {
+            case "Active Loans":
+                boolean foundActiveLoans = false;
+                for (Loan loan : Loan.activeLoans) {
+                    if (loan.getMemberId().equals(memberId)) {
+                        Book book = catalog.searchBook(loan.getBookId());
+                        if (book != null) {
+                            tableModel.addRow(new Object[]{
+                                    reportType,
+                                    "Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
+                                            " | Return Date: " + loan.getReturnDate()
+                            });
+                            foundActiveLoans = true;
+                        }
+                    }
+                }
+                if (!foundActiveLoans) {
+                    tableModel.addRow(new Object[]{
+                            reportType,
+                            "No active loans for this member."
+                    });
+                }
+                break;
+
+            case "Pending Loans":
+                boolean foundPendingLoans = false;
+                for (Loan loan : PendingRequestsQueue.request) {
+                    if (loan.getMemberId().equals(memberId)) {
+                        tableModel.addRow(new Object[]{
+                                reportType,
+                                "Loan ID: " + loan.getLoanID() + " | Book ID: " + loan.getBookId() +
+                                        " | Requested on: " + loan.getIssueDate()
+                        });
+                        foundPendingLoans = true;
+                    }
+                }
+                if (!foundPendingLoans) {
+                    tableModel.addRow(new Object[]{
+                            reportType,
+                            "No pending requests for this member."
+                    });
+                }
+                break;
+
+            case "Overdue Books":
+                boolean foundOverdueBooks = false;
+                Date currentDate = new Date();
+                for (Loan loan : Loan.activeLoans) {
+                    if (loan.getReturnDate().before(currentDate) && loan.getMemberId().equals(memberId)) {
+                        Book book = catalog.searchBook(loan.getBookId());
+                        if (book != null) {
+                            tableModel.addRow(new Object[]{
+                                    reportType,
+                                    "Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
+                                            " | Return Date: " + loan.getReturnDate()
+                            });
+                            foundOverdueBooks = true;
+                        }
+                    }
+                }
+                if (!foundOverdueBooks) {
+                    tableModel.addRow(new Object[]{
+                            reportType,
+                            "No overdue books for this member."
+                    });
+                }
+                break;
+        }
+
+        return new JTable(tableModel);
+    }
+
+
+
+    public static void main(String[] args) {
+        Catalog catalog = new Catalog();
+        SwingUtilities.invokeLater(() -> {
+            ReportGUI gui = new ReportGUI(catalog);
+            gui.setVisible(true);
+        });
     }
 }
-//

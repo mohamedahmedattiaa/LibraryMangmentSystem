@@ -1,24 +1,19 @@
 package GUI;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Date;
-import Classes.*;
+import Classes.Loan;
 import GUI.Login;
 import GUI.MemberInterface.MemeberAction;
-import static Classes.Loan.*;
-//
+
 public class MemberGUI extends JFrame {
-    private DefaultTableModel tableModel;
-    private JTable bookTable;
     private CardLayout card;
     private JPanel mainPanel;
-    private static final Color BROWN_COLOR = new Color(121, 85, 72); // Define your desired brown color
-    private static final Color LIGHT_BROWN_COLOR = new Color(141, 110, 99); // Lighter brown for buttons on hover
-    private static final Color WHITE_COLOR = Color.WHITE; // White for text
+    private static final Color BROWN_COLOR = new Color(121, 85, 72); // البني الداكن
+    private static final Color LIGHT_BROWN_COLOR = new Color(141, 110, 99); // البني الفاتح
+    private static final Color WHITE_COLOR = Color.WHITE; // الأبيض للنصوص
     MemeberAction memberAction = new MemeberAction();
 
     public MemberGUI() {
@@ -43,42 +38,43 @@ public class MemberGUI extends JFrame {
     }
 
     private JPanel createNavPanel() {
-        JPanel NavPanel = new JPanel();
-        NavPanel.setLayout(new GridLayout(4, 1, 10, 10));
-        NavPanel.setPreferredSize(new Dimension(200, getHeight()));
-        NavPanel.setBackground(new Color(92, 64, 51));
+        JPanel navPanel = new JPanel();
+        navPanel.setLayout(new GridBagLayout()); // استخدام GridBagLayout
+        GridBagConstraints gbc = new GridBagConstraints();
+        navPanel.setBackground(new Color(92, 64, 51)); // خلفية بنية
 
-        addNavButton(NavPanel, "Members Action", e -> switchPage("Members Action"));
-        addNavButton(NavPanel, "Manage Books", e -> switchPage("Manage Books"));
-        addNavButton(NavPanel, "Requests", e -> switchPage("Requests"));
-        addNavButton(NavPanel, "Logout", e -> logout());
+        addNavButton(navPanel, "Members Action", e -> switchPage("Members Action"), gbc, 0);
+        addNavButton(navPanel, "Manage Books", e -> switchPage("Manage Books"), gbc, 1);
+        addNavButton(navPanel, "Requests", e -> switchPage("Requests"), gbc, 2);
+        addNavButton(navPanel, "Logout", e -> logout(), gbc, 3);
 
-        return NavPanel;
+        return navPanel;
     }
 
-    private void addNavButton(JPanel panel, String text, ActionListener actionListener) {
+    private void addNavButton(JPanel panel, String text, ActionListener actionListener, GridBagConstraints gbc, int gridy) {
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setFont(new Font("Arial", Font.PLAIN, 14));
-        button.setBackground(LIGHT_BROWN_COLOR); // Using the defined color
-        button.setForeground(WHITE_COLOR); // White text color
+        button.setBackground(LIGHT_BROWN_COLOR); // اللون البني الفاتح
+        button.setForeground(WHITE_COLOR); // اللون الأبيض للنصوص
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         button.setPreferredSize(new Dimension(150, 50));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(141, 110, 99)); // Light brown on hover
+                button.setBackground(new Color(141, 110, 99)); // تغيير اللون عند المرور
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(LIGHT_BROWN_COLOR); // Default light brown
+                button.setBackground(LIGHT_BROWN_COLOR); // العودة للون الأصلي
             }
         });
 
-        panel.add(button);
+        gbc.gridx = 0;
+        gbc.gridy = gridy;
+        panel.add(button, gbc);
     }
-
 
     private JPanel createMembersActionPanel() {
         JPanel membersActionPanel = new JPanel(new BorderLayout());
@@ -92,11 +88,11 @@ public class MemberGUI extends JFrame {
     }
 
     private JPanel createManageBookPanel() {
-        JPanel ManageBookPanel = new JPanel(new BorderLayout());
+        JPanel manageBookPanel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Request Book", memberAction.createBorrowPanel());
-        ManageBookPanel.add(tabbedPane, BorderLayout.CENTER);
-        return ManageBookPanel;
+        manageBookPanel.add(tabbedPane, BorderLayout.CENTER);
+        return manageBookPanel;
     }
 
     private JPanel createRequestPanel() {
@@ -109,25 +105,6 @@ public class MemberGUI extends JFrame {
         return requestPanel;
     }
 
-    private void styleNavButton(JButton button) {
-        button.setFont(new Font("Arial", Font.PLAIN, 14));
-        button.setBackground(new Color(121, 85, 72));
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        button.setPreferredSize(new Dimension(150, 50));
-
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(141, 110, 99));
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(121, 85, 72));
-            }
-        });
-    }
-
     private void switchPage(String pageName) {
         card.show(mainPanel, pageName);
     }
@@ -136,7 +113,8 @@ public class MemberGUI extends JFrame {
         dispose();
         new Login();
     }
+
     public static void main(String[] args) {
         new MemberGUI();
-    }//
+    }
 }
