@@ -117,6 +117,7 @@ public class Loan {
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
                     " by member " + member.getName() + "  your return date is: " + loan.getReturnDate() + ".");
         } else if (book != null && !book.getAvailablityStatus()) {
+
             System.out.println("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".");
             Loan loan = new Loan(bookId, member.getmemberId());
             PendingRequestsQueue.enqueue(loan);

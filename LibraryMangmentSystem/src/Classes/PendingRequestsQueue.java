@@ -10,18 +10,61 @@ public class PendingRequestsQueue {
     public static Queue<Loan> request = new LinkedList<>();
     private static final String FILE_NAME = "pending_requests.txt";
 
-    // Enqueue a loan request to the queue
-    public static void enqueue(Loan loan) {
-        request.add(loan);
-        System.out.println("Pending Requests request added for book " + loan.getBookId() + " by member '" + loan.getMemberId() +"loan id:"+ "'.");
+    // Static block to load pending requests from the file when the class is called
+    static {
+        try {
+            loadPendingRequestsFromFile();
+        } catch (IOException | ParseException e) {
+            System.err.println("Error initializing pending requests: " + e.getMessage());
+        }
     }
+
+    // Enqueue a loan request to the queue and add it to the file if it doesn't already exist
+    public static void enqueue(Loan loan) {
+        if (!isLoanInFile(loan.getLoanID())) { // Check if the loan is already in the file
+            request.add(loan);
+            try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, true))) {
+                writer.println(loan.getLoanID() + "," + loan.getBookId() + "," + loan.getMemberId() +
+                        "," + loan.getIssueDate() + "," + loan.getReturnDate() + "," + loan.Isactive());
+                System.out.println("Pending Requests request added for book " + loan.getBookId() +
+                        " by member '" + loan.getMemberId() + "', loan ID: " + loan.getLoanID() + ".");
+            } catch (IOException e) {
+                System.err.println("Error adding loan to file: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Loan with ID " + loan.getLoanID() + " already exists in the file. Skipping addition.");
+        }
+    }
+
+    // Helper method to check if a loan ID already exists in the file
+    private static boolean isLoanInFile(String loanID) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length > 0 && data[0].equals(loanID)) {
+                    return true; // Loan ID found in the file
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error checking loan in file: " + e.getMessage());
+        }
+        return false; // Loan ID not found in the file
+    }
+
 
     // Dequeue a loan request from the queue
     public static Loan dequeue() {
         if (request.isEmpty()) {
             return null;
         }
-        return request.poll();
+        Loan loan = request.poll();
+        try {
+            savePendingRequestsToFile(); // Update the file after removing a request
+        } catch (IOException e) {
+            System.err.println("Error updating the file after dequeue: " + e.getMessage());
+        }
+        return loan;
     }
 
     // Check if the queue is empty
@@ -33,7 +76,8 @@ public class PendingRequestsQueue {
     public static void display() {
         System.out.println("Pending Requests:");
         for (Loan loan : request) {
-            System.out.println("Loan ID: " + loan.getLoanID() + ", Book ID: " + loan.getBookId() + ", Member: " + loan.getMemberId());
+            System.out.println("Loan ID: " + loan.getLoanID() + ", Book ID: " + loan.getBookId() +
+                    ", Member: " + loan.getMemberId());
         }
     }
 
@@ -48,7 +92,12 @@ public class PendingRequestsQueue {
         loanList.sort(Comparator.comparing(Loan::getMemberId));
         request.clear();
         request.addAll(loanList);
-        System.out.println("Loan requests sorted by Member ID.");
+        try {
+            savePendingRequestsToFile(); // Save the sorted queue to the file
+            System.out.println("Loan requests sorted by Member ID.");
+        } catch (IOException e) {
+            System.err.println("Error saving sorted loans to file: " + e.getMessage());
+        }
     }
 
     // Sort loan requests by issue date
@@ -57,7 +106,12 @@ public class PendingRequestsQueue {
         loanList.sort(Comparator.comparing(Loan::getIssueDate));
         request.clear();
         request.addAll(loanList);
-        System.out.println("Loan requests sorted by date.");
+        try {
+            savePendingRequestsToFile(); // Save the sorted queue to the file
+            System.out.println("Loan requests sorted by date.");
+        } catch (IOException e) {
+            System.err.println("Error saving sorted loans to file: " + e.getMessage());
+        }
     }
 
     // Search for loans by member ID
@@ -72,7 +126,7 @@ public class PendingRequestsQueue {
     }
 
     // Save the pending requests from the queue to the file
-    public static void savePendingRequestsToFile() throws IOException {
+    private static void savePendingRequestsToFile() throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME))) {
             for (Loan loan : request) {
                 writer.println(loan.getLoanID() + "," + loan.getBookId() + "," + loan.getMemberId() +
@@ -82,7 +136,7 @@ public class PendingRequestsQueue {
     }
 
     // Load pending requests from the file into the queue
-    public static void loadPendingRequestsFromFile() throws IOException, ParseException {
+    private static void loadPendingRequestsFromFile() throws IOException, ParseException {
         File file = new File(FILE_NAME);
 
         if (!file.exists()) {
@@ -103,7 +157,7 @@ public class PendingRequestsQueue {
                     boolean isActive = Boolean.parseBoolean(data[5]);
 
                     Loan loan = new Loan(loanId, bookId, memberId, issueDate, returnDate, isActive);
-                    enqueue(loan);
+                    request.add(loan);
                 }
             }
         }
@@ -153,6 +207,7 @@ public class PendingRequestsQueue {
             }
         }
 
+        request.removeIf(loan -> loan.getLoanID().equals(loanID)); // Remove from the queue
         System.out.println("Pending loan ID " + loanID + " has been removed from the pending requests file.");
     }
 }
