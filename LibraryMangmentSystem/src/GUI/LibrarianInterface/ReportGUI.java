@@ -1,81 +1,75 @@
 package GUI.LibrarianInterface;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Collections;
-import java.util.Comparator;
 import Classes.*;
+
 public class ReportGUI {
-    private JFrame frame;
+    private JPanel mainPanel;
     private JButton generalReportButton;
     private JButton memberReportButton;
 
+    // Constructor
     public ReportGUI() {
-        frame = new JFrame("Library Reports");
-        frame.setSize(400, 200);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLayout(null);
-
-        // General Report Button
+        mainPanel = new JPanel(new GridBagLayout());
         generalReportButton = new JButton("Generate General Report");
-        generalReportButton.setBounds(50, 50, 300, 30);
-        frame.add(generalReportButton);
-
-        // Member Report Button
         memberReportButton = new JButton("Generate Member Report");
-        memberReportButton.setBounds(50, 100, 300, 30);
-        frame.add(memberReportButton);
+
+        // Create GridBagConstraints
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Adds padding around components
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Makes buttons expand horizontally
+        gbc.gridwidth = GridBagConstraints.REMAINDER; // Makes each button take a full row
+
+        // Add General Report Button
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        mainPanel.add(generalReportButton, gbc);
+
+        // Add Member Report Button
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        mainPanel.add(memberReportButton, gbc);
 
         // Action Listeners
+        addActionListeners();
+    }
+
+    // Method to set up action listeners
+    private void addActionListeners() {
         generalReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Catalog catalog = new Catalog();
                 Report.generateGeneralReport(catalog);
-                JOptionPane.showMessageDialog(frame, "General Report Generated. Check Console.");
+                JOptionPane.showMessageDialog(mainPanel, "General Report Generated. Check Console.");
             }
         });
 
         memberReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String memberID = JOptionPane.showInputDialog(frame, "Enter Member ID:");
+                String memberID = JOptionPane.showInputDialog(mainPanel, "Enter Member ID:");
                 Catalog catalog = new Catalog();
                 if (memberID != null && !memberID.trim().isEmpty()) {
                     try {
-                        Report.generateReportForMember(memberID,catalog);
+                        Report.generateReportForMember(memberID, catalog);
+                        JOptionPane.showMessageDialog(mainPanel, "Member Report Generated for ID: " + memberID + ". Check Console.");
                     } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        JOptionPane.showMessageDialog(mainPanel, "Error generating report: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                    JOptionPane.showMessageDialog(frame, "Member Report Generated for ID: " + memberID + ". Check Console.");
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Member ID cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(mainPanel, "Member ID cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            //public void generateReportForMember(String memberId, Catalog catalog) throws IOException {
-            //    System.out.println("\nGenerating report for Member ID: " + memberId);
-
-
-              //  System.out.println("\nActive Loans for Member ID: " + memberId);
-              //  displayActiveLoansForMember(memberId);
-
-
-             //   System.out.println("\nPending Requests for Member ID: " + memberId);
-             //   displayPendingLoansForMember(memberId);
-
-
-           // }
         });
+    }
 
-        frame.setVisible(true);
+    // Create the report panel to return it for use in the tabbed pane
+    public JPanel createReportPanel() {
+        return mainPanel; // Return the main panel of the report GUI
     }
 }
-
