@@ -3,6 +3,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.IOException;
+import java.text.ParseException;
+
 import Classes.Catalog;
 import Classes.Loan;
 //
@@ -85,7 +87,7 @@ public class MemeberAction extends JFrame {
                 JOptionPane.showMessageDialog(this, "Book borrowed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 bookIdField.setText("");
                 memberIdField.setText("");
-            } catch (IOException ex) {
+            } catch (IOException | ParseException ex) {
                 JOptionPane.showMessageDialog(this, "Error while borrowing book. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -135,7 +137,7 @@ public class MemeberAction extends JFrame {
                 JOptionPane.showMessageDialog(this, "Book returned successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 bookIdField.setText("");
                 memberIdField.setText("");
-            } catch (IOException ex) {
+            } catch (IOException | ParseException ex) {
                 JOptionPane.showMessageDialog(this, "Error while returning book. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });

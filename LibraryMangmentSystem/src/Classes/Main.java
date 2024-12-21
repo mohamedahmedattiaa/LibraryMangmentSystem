@@ -1,9 +1,10 @@
 package Classes;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
         Catalog catalog = new Catalog();
         PendingRequestsQueue pendingRequestsQueue = new PendingRequestsQueue();
 
@@ -13,13 +14,7 @@ public class Main {
         Book book3 = new Book("a", "Wealm sheckspear", "Dystopian");
         Book book4 = new Book("e", "Albert fred", "Fiction");
         Catalog.bookList.display();
-        Loan.borrowBook("M201","B100");
-        System.out.println("-------------");
-        Catalog.bookList.display();
-        System.out.println("-------------");
         System.out.println(Loan.activeLoans.toString());
-        Loan.returnBook("M201","B100");
-
 
     }
 
