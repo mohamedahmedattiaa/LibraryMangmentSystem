@@ -16,6 +16,10 @@ public class Main {
         Loan.borrowBook("M201","B100");
         System.out.println("-------------");
         Catalog.bookList.display();
+        System.out.println("-------------");
+        System.out.println(Loan.activeLoans.toString());
+        Loan.returnBook("M201","B100");
+
 
     }
 

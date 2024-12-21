@@ -185,7 +185,7 @@ public class Catalog {
             System.err.println("Error loading catalog from file: " + e.getMessage());
         }
     }
-    public static void updateBookAvailabilityInFile(String bookId) throws IOException {
+    public static void updateBookAvailabilityInFile(String bookId , boolean ava) throws IOException {
         File originalFile = new File("catalog.txt"); // The file where book data is stored
         File tempFile = new File("catalog_temp.txt"); // Temporary file to hold updated data
         Book book = Catalog.searchBook(bookId);
@@ -200,7 +200,7 @@ public class Catalog {
 
                 // Assuming the file format: BookID,Title,Author,Availability
                 if (data.length >= 5 && data[0].equals(bookId)) {
-                    data[4] = String.valueOf(false); // Update availability status
+                    data[4] = String.valueOf(ava); // Update availability status
                     bookFound = true;
                 }
 

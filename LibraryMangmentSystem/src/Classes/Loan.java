@@ -86,10 +86,9 @@ public class Loan {
 
         Book book = Catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
-            Catalog.updateBookAvailabilityInFile(bookId);
+            Catalog.updateBookAvailabilityInFile(bookId,false);
             Catalog.bookList.ReAdd();
 
-            // Create a new Loan and set issueDate and returnDate
             Loan loan = new Loan(bookId, member.getmemberId());
             saveLoansToFile(loan);
             addloanA(loan.getLoanID());
@@ -153,7 +152,8 @@ public class Loan {
                 }
 
 
-
+                Catalog.updateBookAvailabilityInFile(bookId,true);
+                Catalog.bookList.ReAdd();
 
                 activeLoans.remove(currentLoan);
                 addloanR(currentLoan.getLoanID());
