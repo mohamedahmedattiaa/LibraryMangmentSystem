@@ -1,7 +1,7 @@
 package GUI;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 
 public class Login extends JFrame {
     private JTextField idText;
@@ -10,27 +10,24 @@ public class Login extends JFrame {
     private JButton signUpButton;
 
     public Login() {
-        JFrame frame = new JFrame("Library Management System - Login");
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setSize(735, 956);
-        frame.setResizable(false);
-        frame.setLayout(null);
-
+        setTitle("Library Management System - Login");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(735, 956);
+        setResizable(false);
+        setLayout(null);
         ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/GUI/book.jpg"));
         JLabel backgroundLabel = new JLabel(backgroundIcon);
-        backgroundLabel.setBounds(0, 0, 735, 956);
 
-        JLabel idLabel = new JLabel("ID:");
+        backgroundLabel.setBounds(0, 0, 735, 956);
+        JLabel idLabel = new JLabel("Email/ID:");
         idLabel.setForeground(Color.WHITE);
         idLabel.setBounds(200, 300, 100, 30);
-
         idText = new JTextField(15);
         idText.setBounds(300, 300, 200, 30);
 
         JLabel passLabel = new JLabel("Password:");
         passLabel.setForeground(Color.WHITE);
         passLabel.setBounds(200, 350, 100, 30);
-
         password = new JPasswordField(15);
         password.setBounds(300, 350, 200, 30);
 
@@ -43,29 +40,35 @@ public class Login extends JFrame {
         loginButton.addActionListener(e -> {
             String id = idText.getText();
             String pass = new String(password.getPassword());
-
-            if (id.equals("user") && pass.equals("1234")) {
-                JOptionPane.showMessageDialog(frame, "Welcome Member!");
-                frame.dispose(); // Close the login window
-            } else if (id.equals("librarian") && pass.equals("5678")) {
-                JOptionPane.showMessageDialog(frame, "Welcome Librarian!");
-                frame.dispose();
-                new LibrarianGUI(); // Open Librarian GUI
+            if (id.equals("ADMIN3060") && pass.equals("U@Admin36798")) {
+                JOptionPane.showMessageDialog(this, "Welcome Admin!");
+                dispose();
+                new LibrarianGUI();
+            } else if (UserDatabase.validateUser(id, pass)) {
+                JOptionPane.showMessageDialog(this, "Welcome Member!");
+                dispose();
+                new MemberGUI();
             } else {
-                JOptionPane.showMessageDialog(frame, "Invalid ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        frame.add(idLabel);
-        frame.add(idText);
-        frame.add(passLabel);
-        frame.add(password);
-        frame.add(loginButton);
-        frame.add(signUpButton);
-        frame.add(backgroundLabel);
+        signUpButton.addActionListener(e -> {
+            dispose();
+            SwingUtilities.invokeLater(UserSignup::new);
+        });
 
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+
+        add(idLabel);
+        add(idText);
+        add(passLabel);
+        add(password);
+        add(loginButton);
+        add(signUpButton);
+        add(backgroundLabel);
+
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     private void styleButton(JButton button, int x, int y) {
@@ -73,5 +76,9 @@ public class Login extends JFrame {
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 12));
         button.setBounds(x, y, 200, 30);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Login::new);
     }
 }

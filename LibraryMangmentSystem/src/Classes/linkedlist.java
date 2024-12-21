@@ -1,5 +1,4 @@
 package Classes;
-
 public class linkedlist {
     private Node head;
 
@@ -96,6 +95,7 @@ public class linkedlist {
         return false; // Book not found
     }
     void deleteAtEnd() {
+
         if (head == null || head.next == null) {
             head = null;
             return;
@@ -207,14 +207,14 @@ public class linkedlist {
                 check = left.book.getAuthor().compareTo(right.book.getAuthor()) <= 0;
                 break;
         }
-               if (check) {
-                   left.next = merge(left.next, right, SortedBy);
-                   return left;
-               } else {
-                   right.next = merge(left, right.next, SortedBy);
-                   return right;
-               }
+        if (check) {
+            left.next = merge(left.next, right, SortedBy);
+            return left;
+        } else {
+            right.next = merge(left, right.next, SortedBy);
+            return right;
         }
+    }
 
     public boolean isEmpty() {
         return head == null;
@@ -222,7 +222,7 @@ public class linkedlist {
 
     public String toStringForMember() {
         StringBuilder result = new StringBuilder();
-        Node current = this.getHead(); // Assuming `getHead` returns the head of the list
+        Node current = this.getHead(); // Assuming getHead returns the head of the list
         while (current != null) {
             result.append(current.book.getBookID()).append(", "); // Replace with desired book details
             current = current.next;
