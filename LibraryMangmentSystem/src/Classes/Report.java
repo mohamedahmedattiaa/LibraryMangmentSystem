@@ -72,8 +72,7 @@ public class  Report {
         displayPendingLoans(catalog);
 
         displayPopularGenre(catalog);
-    }
-
+    }  //report
     public static void displayActiveLoans(Catalog catalog) {
         System.out.println("\nActive Loans in the Library:"); // multiple borrow
         for (Loan loan : Loan.activeLoans) {
