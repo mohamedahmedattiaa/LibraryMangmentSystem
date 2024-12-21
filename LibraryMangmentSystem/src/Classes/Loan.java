@@ -175,9 +175,6 @@ public class Loan {
     }
 
 
-
-
-
     private static void updateLoanInFile(String loanID, Date newReturnDate) throws IOException {
         List<String> updatedLines = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy"); // Match the date format in the file
@@ -195,7 +192,6 @@ public class Loan {
                 updatedLines.add(String.join(",", data)); // Add the updated line or unchanged line
             }
         }
-
         // Only write to the file if the return date was updated
         if (returnDateUpdated) {
             try (PrintWriter writer = new PrintWriter(new FileWriter("loans.txt"))) {
@@ -415,8 +411,6 @@ public class Loan {
         } catch (ParseException e) {
             System.out.println("Error parsing dates: " + e.getMessage());
         }
-
-        System.out.println("All active loans have been added to the activeLoans queue.");
     }
 
     public static void updateReturned(String loanID, boolean isActive) throws IOException {
