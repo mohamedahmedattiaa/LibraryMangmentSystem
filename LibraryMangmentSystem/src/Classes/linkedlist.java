@@ -1,4 +1,9 @@
 package Classes;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class linkedlist {
     private Node head;
 
@@ -75,6 +80,7 @@ public class linkedlist {
             current.next = current.next.next;
         }
     }
+
     public boolean deleteById(String bookId) {
         Node current = head;
         Node previous = null;
@@ -94,8 +100,8 @@ public class linkedlist {
         }
         return false; // Book not found
     }
-    void deleteAtEnd() {
 
+    void deleteAtEnd() {
         if (head == null || head.next == null) {
             head = null;
             return;
@@ -133,6 +139,7 @@ public class linkedlist {
         }
         return null;
     }
+
     String Findbook(String bookTitle) {
         Node temp = head;
         while (temp != null) {
@@ -167,19 +174,20 @@ public class linkedlist {
             throw new IndexOutOfBoundsException("Index out of bounce in this linked list");
         }
     }
-    public void sorting(String Sortedby){
-        head = mergeSort(head,Sortedby);
+
+    public void sorting(String Sortedby) {
+        head = mergeSort(head, Sortedby);
     }
 
-    public Node mergeSort(Node head,String SortedBy) {
-        if(head == null || head.next == null) return head;
+    public Node mergeSort(Node head, String SortedBy) {
+        if (head == null || head.next == null) return head;
         Node middle = getMiddle(head);
-        Node next =middle.next;
+        Node next = middle.next;
         middle.next = null;
 
-        Node left = mergeSort(head,SortedBy);
-        Node right = mergeSort(next,SortedBy);
-        return merge(left,right,SortedBy);
+        Node left = mergeSort(head, SortedBy);
+        Node right = mergeSort(next, SortedBy);
+        return merge(left, right, SortedBy);
     }
 
     private Node getMiddle(Node head) {
@@ -193,9 +201,9 @@ public class linkedlist {
         return slow;
     }
 
-    public  Node merge(Node left,Node right ,String SortedBy) {
-        if(left == null ) return right;
-        if(right == null ) return left;
+    public Node merge(Node left, Node right, String SortedBy) {
+        if (left == null) return right;
+        if (right == null) return left;
         boolean check = false;
         switch (SortedBy) {
             case "title":
@@ -220,9 +228,9 @@ public class linkedlist {
         return head == null;
     }
 
-    public String toStringForMember() {
+    public String toStringForMember(Catalog catalog) {
         StringBuilder result = new StringBuilder();
-        Node current = this.getHead(); // Assuming getHead returns the head of the list
+        Node current = this.getHead(); // Assuming `getHead` returns the head of the list
         while (current != null) {
             result.append(current.book.getBookID()).append(", "); // Replace with desired book details
             current = current.next;
@@ -230,5 +238,35 @@ public class linkedlist {
         return result.length() > 0 ? result.substring(0, result.length() - 2) : "No books borrowed";
     }
 
+    public void ReAdd() {
+        if (head != null) {
+            // Clear the current list before re-adding the books
+            head = null;
+        }
 
+        // Read the catalog file and add books back to the list
+        try (BufferedReader reader = new BufferedReader(new FileReader("catalog.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 5) {
+                    // Assuming the file format is: BookID, Title, Author, Genre, AvailabilityStatus
+                    String bookId = parts[0];
+                    String title = parts[1];
+                    String author = parts[2];
+                    String genre = parts[3];
+                    boolean availabilityStatus = Boolean.parseBoolean(parts[4]);
+
+                    // Create a new Book object from the data
+                    Book book = new Book(bookId, title, author, genre, availabilityStatus);
+
+                    // Add the book to the linked list
+                    insertAtEnd(book);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading catalog file: " + e.getMessage());
+        }
+    }
 }
+

@@ -1,13 +1,15 @@
 package Classes;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 
 public class  Report {
-    PendingRequestsQueue pendingRequestsQueue =new PendingRequestsQueue();
+    PendingRequestsQueue pendingRequestsQueue = new PendingRequestsQueue();
     Loan loan = new Loan();
-    public static void generateReportForMember(String memberId, Catalog catalog) throws IOException {
+    public static ActiveLoansDatabase activeLoansDatabase = new ActiveLoansDatabase();
+    public static void generateReportForMember(String memberId, Catalog catalog) throws IOException, ParseException, ClassNotFoundException {
         System.out.println("\nGenerating report for Member ID: " + memberId);
 
 
@@ -21,25 +23,30 @@ public class  Report {
 
     }
 
-    public static void displayActiveLoansForMember(String memberId) {
+    public static void displayActiveLoansForMember(String memberId) throws IOException, ClassNotFoundException, ParseException {
+        // Load active loans from the file
+        Queue<Loan> activeLoans = activeLoansDatabase.loadActiveLoansFromFile();
+
         boolean found = false;
-        for (Loan loan : Loan.activeLoans) {
+        for (Loan loan : activeLoans) {
             if (loan.getMemberId().equals(memberId)) {
                 Book book = Catalog.searchBook(loan.getBookId());
 
-                if(book != null) {
+                if (book != null) {
                     System.out.println("Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
                             " | Return Date: " + loan.getReturnDate());
-                }else{
+                } else {
                     System.out.println("The book is not available");
                 }
                 found = true;
             }
         }
+
         if (!found) {
             System.out.println("No active loans for this member.");
         }
     }
+
 
     public static void displayPendingLoansForMember(String memberId) {
         boolean found = false;
@@ -78,7 +85,7 @@ public class  Report {
         }
     }
 
-    public  static void displayOverdueBooks(Catalog catalog) {
+    public static void displayOverdueBooks(Catalog catalog) {
         Date currentDate = new Date(); // something error here
         System.out.println("\nOverdue Books:");
         for (Loan loan : Loan.activeLoans) {
@@ -87,15 +94,14 @@ public class  Report {
                 if (book != null) {
                     System.out.println("Loan ID: " + loan.getLoanID() + " | Book: " + book.getBookTitle() +
                             " | Member: " + loan.getMemberId() + " | Return Date: " + loan.getReturnDate());
-                }
-                else{
+                } else {
                     System.out.println("The book is not available");
                 }
             }
 
-            }
-        System.out.println("No overdue books found.");
         }
+        System.out.println("No overdue books found.");
+    }
 
     public static void displayPendingLoans(Catalog catalog) {
         System.out.println("\nPending Loans in the Library:");
@@ -109,45 +115,37 @@ public class  Report {
     }
     //
 
-    public static void displayPopularGenre(Catalog catalog) {
+    public static String displayPopularGenre(Catalog catalog) {
+        String output = "";
+
         if (Loan.activeLoans.isEmpty()) {
-            System.out.println("No active loans to calculate popular genres.");
-            return;
-        }
-
-        String mostPopularGenre = null;
-        int maxCount = 0;
-
-        // Iterate through all loans to determine the most popular genre
-        for (Loan loan : Loan.activeLoans) {
-            Book book = catalog.searchBook(loan.getBookId());
-            if (book != null) {
-                String genre = book.getGenere(); // Assuming `getGenere()` returns the genre of the book
-                int count = 0;
-
-                // Count occurrences of this genre in active loans
-                for (Loan innerLoan : Loan.activeLoans) {
-                    Book innerBook = catalog.searchBook(innerLoan.getBookId());
-                    if (innerBook != null && innerBook.getGenere().equals(genre)) {
-                        count++;
+            output = "No active loans to calculate popular genres.";
+        } else {
+            String mostPopularGenre = null;
+            int maxCount = 0;
+            for (Loan loan : Loan.activeLoans) {
+                Book book = catalog.searchBook(loan.getBookId());
+                if (book != null) {
+                    String genre = book.getGenere();
+                    int count = 0;
+                    for (Loan innerLoan : Loan.activeLoans) {
+                        Book innerBook = catalog.searchBook(innerLoan.getBookId());
+                        if (innerBook != null && innerBook.getGenere().equals(genre)) {
+                            count++;
+                        }
+                    }
+                    if (count > maxCount) {
+                        maxCount = count;
+                        mostPopularGenre = genre;
                     }
                 }
-
-                // Update the most popular genre if the current genre has more loans
-                if (count > maxCount) {
-                    maxCount = count;
-                    mostPopularGenre = genre;
-                }
+            }
+            if (mostPopularGenre != null) {
+                output = "Most Popular Genre: " + mostPopularGenre + " with " + maxCount + " loans.";
+            } else {
+                output = "No genres found.";
             }
         }
-
-        if (mostPopularGenre != null) {
-            System.out.println("Most Popular Genre: " + mostPopularGenre + " with " + maxCount + " loans.");
-        } else {
-            System.out.println("No genres found.");
-        }
+        return output;
     }
 }
-
-
-

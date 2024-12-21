@@ -19,6 +19,7 @@ public class Loan {
 
     public static Queue<Loan> activeLoans = new LinkedList<>();
     public static Queue<Loan> returnedLoans = new LinkedList<>();
+    public static ActiveLoansDatabase activeLoansDatabase = new ActiveLoansDatabase();
 
     public Loan(String bookId, String memberId) {
         this.loanID = IDGenerator.generateLoanID();
@@ -71,12 +72,14 @@ public class Loan {
     }
 
     public static void borrowBook(String memberID, String bookId) throws IOException {
+        // Search for the member
         Member member = Member.SearchMember(memberID);
         if (member == null) {
             System.out.println("No member found with ID: " + memberID);
             return;
         }
 
+        // Check if the member has already borrowed this book
         for (Loan loan : activeLoans) {
             if (loan.getMemberId().equals(memberID) && loan.getBookId().equals(bookId)) {
                 System.out.println("You already borrowed this book.");
@@ -84,27 +87,32 @@ public class Loan {
             }
         }
 
+        // Search for the book in the catalog
         Book book = Catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
-            book.setAvailablityStatus(false);
+            // Update the book's availability in the catalog
+            Catalog.updateBookAvailabilityInFile(bookId, false);
+            Catalog.bookList.ReAdd();
 
-            // Create a new Loan and set issueDate and returnDate
+            // Create a new loan and add it to the active loans queue
             Loan loan = new Loan(bookId, member.getmemberId());
-            saveLoansToFile(loan);
-            addloanA(loan.getLoanID());
+            activeLoans.add(loan);
 
-
+            // Save the updated active loans queue back to the file
+            activeLoansDatabase.saveActiveLoansToFile(activeLoans);
 
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
                     " by member " + member.getName() + "  your return date is: " + loan.getReturnDate() + ".");
         } else if (book != null && !book.getAvailablityStatus()) {
             System.out.println("Book " + bookId + " is not available. Adding request for member " + member.getName() + ".");
             Loan loan = new Loan(bookId, member.getmemberId());
-            PendingRequestsQueue.enqueue(loan); // Add the loan request to the queue
+            PendingRequestsQueue.enqueue(loan);
         } else {
+            // Book not found in the catalog
             System.out.println("Book with ID " + bookId + " not found in catalog.");
         }
     }
+
     public static void addloanA(String loanID){
         Loan loan = searchLoan(loanID);
         if (loan != null) {
@@ -126,7 +134,7 @@ public class Loan {
 
 
 
-    public static void returnBook(String memberId, String bookId) throws IOException {
+    public static void returnBook(String memberId, String bookId) throws IOException, ParseException {
         Book book = Catalog.searchBook(bookId);
         Member member = Member.SearchMember(memberId);
         Date returnDate = new Date(); // Current return date
@@ -135,32 +143,25 @@ public class Loan {
             if (!book.getAvailablityStatus()) {
                 book.setAvailablityStatus(true);
                 Loan currentLoan = null;
-                // Find the active loan for this member and book
                 for (Loan loan : activeLoans) {
                     if (loan.getMemberId().equals(memberId) && loan.getBookId().equals(bookId)) {
                         currentLoan = loan;
                         break;
                     }
                 }
-
-
-
-
-                // Check if the return date is overdue
                 if (returnDate.after(currentLoan.getReturnDate())) {
                     System.out.println("You have returned the book past the due date!");
                 }
 
 
-
+                Catalog.updateBookAvailabilityInFile(bookId,true);
+                Catalog.bookList.ReAdd();
 
                 activeLoans.remove(currentLoan);
+                activeLoansDatabase.removeLoanFromFile(activeLoans);
                 addloanR(currentLoan.getLoanID());
-
                 System.out.println("Book " + book.getBookTitle() + " returned by member " + member.getName() + ".");
                 System.out.println("Return Date: " + returnDate);
-
-                // Process the next pending request for the book, if any
                 if (!PendingRequestsQueue.isEmpty()) {
                     Loan nextLoan = PendingRequestsQueue.dequeue();
                     Member nextMember = Member.SearchMember(nextLoan.memberId);
@@ -401,6 +402,7 @@ public class Loan {
     public int hashCode() {
         return Objects.hash(loanID); // Hash based on loan ID
     }
+
     
     
     

@@ -2,6 +2,7 @@ package Classes;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -295,12 +296,11 @@ public class Member {
         return null;  // No member found
     }
 
-
     public void addLoan(Loan loan) {
         loans.add(loan);
     }
 
-    public static void displayBooksBorrowed(String memberID) throws IOException {
+    public static void displayBooksBorrowed(String memberID) throws IOException, ParseException, ClassNotFoundException {
         System.out.println("Books Borrowed by Member ID: " + memberID);
         Report.displayActiveLoansForMember(memberID);
     }
