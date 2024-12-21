@@ -86,7 +86,8 @@ public class Loan {
 
         Book book = Catalog.searchBook(bookId);
         if (book != null && book.getAvailablityStatus()) {
-            book.setAvailablityStatus(false);
+            Catalog.updateBookAvailabilityInFile(bookId);
+            Catalog.bookList.ReAdd();
 
             // Create a new Loan and set issueDate and returnDate
             Loan loan = new Loan(bookId, member.getmemberId());
@@ -401,6 +402,7 @@ public class Loan {
     public int hashCode() {
         return Objects.hash(loanID); // Hash based on loan ID
     }
+
     
     
     

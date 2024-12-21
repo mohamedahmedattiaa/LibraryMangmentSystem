@@ -12,9 +12,11 @@ public class Main {
         Book book2 = new Book("d", "Ibraham lincolin", "Dystopian");
         Book book3 = new Book("a", "Wealm sheckspear", "Dystopian");
         Book book4 = new Book("e", "Albert fred", "Fiction");
-        Catalog.addBook(book1);
-        Book book = Catalog.searchBook("B100");
-        System.out.println(book.getBookID());
+        Catalog.bookList.display();
+        Loan.borrowBook("M201","B100");
+        System.out.println("-------------");
+        Catalog.bookList.display();
+
     }
 
 }

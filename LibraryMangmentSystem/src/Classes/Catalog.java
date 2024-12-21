@@ -185,4 +185,45 @@ public class Catalog {
             System.err.println("Error loading catalog from file: " + e.getMessage());
         }
     }
+    public static void updateBookAvailabilityInFile(String bookId) throws IOException {
+        File originalFile = new File("catalog.txt"); // The file where book data is stored
+        File tempFile = new File("catalog_temp.txt"); // Temporary file to hold updated data
+        Book book = Catalog.searchBook(bookId);
+        boolean bookFound = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(originalFile));
+             PrintWriter writer = new PrintWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+
+                // Assuming the file format: BookID,Title,Author,Availability
+                if (data.length >= 5 && data[0].equals(bookId)) {
+                    data[4] = String.valueOf(false); // Update availability status
+                    bookFound = true;
+                }
+
+                // Write the updated or unchanged line to the temp file
+                writer.println(String.join(",", data));
+            }
+        }
+
+        // Replace the original file with the temporary file
+        if (bookFound) {
+            if (originalFile.delete()) {
+                if (!tempFile.renameTo(originalFile)) {
+                    System.out.println("Error: Could not rename temp file.");
+                } else {
+                    System.out.println("Book availability updated successfully in the file.");
+                }
+            } else {
+                System.out.println("Error: Could not delete original file.");
+            }
+        } else {
+            tempFile.delete();
+            System.out.println("Book ID not found in the file.");
+        }
+    }
+
 }
