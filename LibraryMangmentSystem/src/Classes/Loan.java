@@ -22,8 +22,7 @@ public class Loan {
     public static Queue<Loan> returnedLoans = new LinkedList<>();
     static {
         try {
-            add(activeLoans);
-            add(returnedLoans);
+            add();
         } catch (IOException | ParseException e) {
             System.out.println("Error initializing active loans: " + e.getMessage());
         }
@@ -88,7 +87,7 @@ public class Loan {
 
     public static void borrowBook(String memberID, String bookId) throws IOException, ParseException {
         Member member = Member.SearchMember(memberID);
-        add(activeLoans);
+        add();
         if (member == null) {
             System.out.println("No member found with ID: " + memberID);
             return;
@@ -108,7 +107,7 @@ public class Loan {
 
             Loan loan = new Loan(bookId, member.getmemberId());
             saveLoansToFile(loan);
-            add(activeLoans);
+            add();
 
 
 
@@ -380,9 +379,9 @@ public class Loan {
         }
         return null; // Return null if the book is not found
     }
-    public static void add(Queue<Loan> loans) throws IOException, ParseException {
+    public static void add() throws IOException, ParseException {
         // Clear the existing activeLoans queue to avoid duplicates when adding loans
-        loans.clear();
+
 
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
@@ -396,11 +395,15 @@ public class Loan {
                     Date issueDate = parseDate(data[3]);
                     Date returnDate = parseDate(data[4]);
                     boolean isActive = Boolean.parseBoolean(data[5]);
-
+                    Loan loan = new Loan(loanId, bookId, memberId, issueDate, returnDate, isActive);
                     // If the loan is active, add it to the activeLoans queue
-                    if (isActive) {
-                        Loan loan = new Loan(loanId, bookId, memberId, issueDate, returnDate, isActive);
-                        loans.add(loan);  // Add the loan to the activeLoans queue
+                    if (isActive==true) {
+                        activeLoans.clear();
+                        activeLoans.add(loan);  // Add the loan to the activeLoans queue
+                    }
+                    if (isActive==false) {
+                        returnedLoans.clear();
+                        returnedLoans.add(loan);
                     }
                 }
             }
