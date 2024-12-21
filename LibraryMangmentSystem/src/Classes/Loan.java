@@ -29,7 +29,7 @@ public class Loan {
     }
 
 
-    public Loan(String bookId, String memberId) {
+    public Loan(String bookId, String memberId) throws IOException {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = bookId;
         this.memberId = memberId;
@@ -43,7 +43,7 @@ public class Loan {
 
     
 
-    public Loan() {
+    public Loan() throws IOException {
         this.loanID = IDGenerator.generateLoanID();
         this.bookId = getBookId();
         this.memberId = getMemberId();
@@ -75,6 +75,9 @@ public class Loan {
 
     public boolean Isactive() {
         return isactive;
+    }
+    public void setLoanID() throws IOException {
+        this.loanID = IDGenerator.generateLoanID();
     }
 
     public Date getIssueDate() {

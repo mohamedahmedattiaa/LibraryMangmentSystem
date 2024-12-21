@@ -8,6 +8,9 @@ public class  Report {
     PendingRequestsQueue pendingRequestsQueue = new PendingRequestsQueue();
     Loan loan = new Loan();
 
+    public Report() throws IOException {
+    }
+
     public static void generateReportForMember(String memberId, Catalog catalog) throws IOException {
         System.out.println("\nGenerating report for Member ID: " + memberId);
 
