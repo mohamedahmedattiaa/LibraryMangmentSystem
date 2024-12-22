@@ -132,14 +132,14 @@ public class Loan {
             if (!book.getAvailablityStatus()) {
                 book.setAvailablityStatus(true);
                 Loan currentLoan = null;
-
-               add();
                 for (Loan loan : activeLoans) {
                     if (loan.getMemberId().equals(memberId) && loan.getBookId().equals(bookId)) {
                         currentLoan = loan;
                         break;
                     }
                 }
+
+
                 if (currentLoan == null) {
                     System.out.println("No active loan found for this book and member.");
                     return;
@@ -380,6 +380,8 @@ public class Loan {
     public static void add() throws IOException, ParseException {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
+            returnedLoans.clear();
+            activeLoans.clear();
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data.length == 6) {
@@ -393,11 +395,11 @@ public class Loan {
                     Loan loan = new Loan(loanId, bookId, memberId, issueDate, returnDate, isActive);
                     // If the loan is active, add it to the activeLoans queue
                     if (isActive==true) {
-                        activeLoans.clear();
+
                         activeLoans.add(loan);  // Add the loan to the activeLoans queue
                     }
                     if (isActive==false) {
-                        returnedLoans.clear();
+
                         returnedLoans.add(loan);
                     }
                 }

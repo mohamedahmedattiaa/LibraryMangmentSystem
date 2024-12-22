@@ -14,10 +14,10 @@ public class Main {
         Book book3 = new Book("a", "Wealm sheckspear", "Dystopian");
         Book book4 = new Book("e", "Albert fred", "Fiction");
 //        System.out.println("-------------------");
-        Loan.borrowBook("M201","B100");
-        Loan.borrowBook("M202","B100");
-        Loan.borrowBook("M201","B101");
-        Loan.returnBook("M201","B100");
+        Loan.borrowBook("M201","B100"); // borrow
+        Loan.borrowBook("M202","B100"); //pending
+        Loan.borrowBook("M201","B101"); //borrow
+        Loan.returnBook("M201","B100");// return
 
         Report.generateGeneralReport(catalog);
     }

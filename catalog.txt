@@ -1,4 +1,4 @@
 B100,c,George washonton,Fiction,false
-B101,d,Ibraham lincolin,Dystopian,true
+B101,d,Ibraham lincolin,Dystopian,false
 B102,a,Wealm sheckspear,Dystopian,true
 B103,e,Albert fred,Fiction,true
