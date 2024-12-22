@@ -1,5 +1,4 @@
 package GUI;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,29 +8,41 @@ import GUI.Login;
 import GUI.MemberInterface.MemeberAction;
 
 public class MemberGUI extends JFrame {
-    private CardLayout card;
-    private JPanel mainPanel;
     private static final Color BROWN_COLOR = new Color(121, 85, 72); // البني الداكن
     private static final Color LIGHT_BROWN_COLOR = new Color(141, 110, 99); // البني الفاتح
     private static final Color WHITE_COLOR = Color.WHITE; // الأبيض للنصوص
-    MemeberAction memberAction = new MemeberAction();
+    private MemeberAction memberAction;  // Declare memberAction as a class-level field
+    private String memberId;
+    private CardLayout card;
+    private JPanel mainPanel;
 
-    public MemberGUI() {
+    public MemberGUI(String memberId) {
+        this.memberId = memberId;  // Set the memberId passed from the Login class
+
+        // Initialize memberAction with the memberId
+        memberAction = new MemeberAction(memberId);
+
+        // Set up JFrame
         setTitle("Member Panel");
         setSize(800, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        // Welcome message
+        JLabel welcomeLabel = new JLabel("Welcome, User " + memberId, SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        welcomeLabel.setForeground(Color.WHITE); // White color for text
+        welcomeLabel.setOpaque(true);
+        welcomeLabel.setBackground(new Color(92, 64, 51)); // Brown background
+        add(welcomeLabel, BorderLayout.NORTH);
+
+        // Initialize card layout and main panelq
         card = new CardLayout();
         mainPanel = new JPanel(card);
-
         mainPanel.add(createMembersActionPanel(), "Members Action");
-        mainPanel.add(createManageBookPanel(), "Manage Books");
-        mainPanel.add(createRequestPanel(), "Requests");
-
+        mainPanel.add(createManageBookPanel(), "DashBoard");
         add(mainPanel, BorderLayout.CENTER);
-
-        JPanel navPanel = createNavPanel();
-        add(navPanel, BorderLayout.WEST);
+        add(createNavPanel(), BorderLayout.WEST);
 
         setLocationRelativeTo(null);
         setVisible(true);
@@ -39,15 +50,14 @@ public class MemberGUI extends JFrame {
 
     private JPanel createNavPanel() {
         JPanel navPanel = new JPanel();
-        navPanel.setLayout(new GridBagLayout()); // استخدام GridBagLayout
+        navPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        navPanel.setBackground(new Color(92, 64, 51)); // خلفية بنية
-
+        navPanel.setLayout(new GridLayout(3, 1, 10, 10));
+        navPanel.setPreferredSize(new Dimension(200, getHeight()));
+        navPanel.setBackground(new Color(92, 64, 51)); // Background color
         addNavButton(navPanel, "Members Action", e -> switchPage("Members Action"), gbc, 0);
-        addNavButton(navPanel, "Manage Books", e -> switchPage("Manage Books"), gbc, 1);
-        addNavButton(navPanel, "Requests", e -> switchPage("Requests"), gbc, 2);
+        addNavButton(navPanel, "Manage Books", e -> switchPage("Dashboard"), gbc, 1);
         addNavButton(navPanel, "Logout", e -> logout(), gbc, 3);
-
         return navPanel;
     }
 
@@ -55,19 +65,19 @@ public class MemberGUI extends JFrame {
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setFont(new Font("Arial", Font.PLAIN, 14));
-        button.setBackground(LIGHT_BROWN_COLOR); // اللون البني الفاتح
-        button.setForeground(WHITE_COLOR); // اللون الأبيض للنصوص
+        button.setBackground(LIGHT_BROWN_COLOR); // Light brown color
+        button.setForeground(WHITE_COLOR); // White text color
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         button.setPreferredSize(new Dimension(150, 50));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(141, 110, 99)); // تغيير اللون عند المرور
+                button.setBackground(new Color(141, 110, 99));
             }
 
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(LIGHT_BROWN_COLOR); // العودة للون الأصلي
+                button.setBackground(LIGHT_BROWN_COLOR);
             }
         });
 
@@ -114,7 +124,8 @@ public class MemberGUI extends JFrame {
         new Login();
     }
 
-    public static void main(String[] args) {
-        new MemberGUI();
-    }
+
+//    public static void main(String[] args) {
+//        new MemberGUI();
+//    }
 }

@@ -1,5 +1,7 @@
 package GUI;
 
+import Classes.Member;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -38,16 +40,17 @@ public class Login extends JFrame {
         styleButton(signUpButton, 300, 500);
 
         loginButton.addActionListener(e -> {
-            String id = idText.getText();
+            String email = idText.getText();  // Get email (used as ID)
             String pass = new String(password.getPassword());
-            if (id.equals("ADMIN3060") && pass.equals("U@Admin36798")) {
+            String memberId = Member.validateUser(email, pass);  // Get the memberId after validation
+            if (memberId != null) {
+                JOptionPane.showMessageDialog(this, "Welcome Member!");
+                dispose();
+                new MemberGUI(memberId);
+            } else if (email.equals("ADMIN3060") && pass.equals("U@Admin36798")) {
                 JOptionPane.showMessageDialog(this, "Welcome Admin!");
                 dispose();
                 new LibrarianGUI();
-            } else if (UserDatabase.validateUser(id, pass)) {
-                JOptionPane.showMessageDialog(this, "Welcome Member!");
-                dispose();
-                new MemberGUI();
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid ID or Password", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -57,8 +60,6 @@ public class Login extends JFrame {
             dispose();
             SwingUtilities.invokeLater(UserSignup::new);
         });
-
-
         add(idLabel);
         add(idText);
         add(passLabel);

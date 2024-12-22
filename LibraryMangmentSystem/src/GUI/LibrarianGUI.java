@@ -105,8 +105,7 @@ public class LibrarianGUI extends JFrame {
 
     private JPanel createCombinedManageMemberTabbed() {
         JPanel manageMemberPanel = new JPanel(new BorderLayout());
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Add Member", manage.createAddMemberPanel());
+        JTabbedPane tabbedPane = new JTabbedPane();;
         tabbedPane.addTab("Remove Member", manage.createRemoveMemberPanel());
         tabbedPane.addTab("Update Member", manage.createUpdateMemberPanel());
         tabbedPane.addTab("Search Member", manage.createSearchMemberPanel());
