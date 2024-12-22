@@ -22,7 +22,28 @@ public class  Report {
         System.out.println("\nPending Requests for Member ID: " + memberId);
         displayPendingLoansForMember(memberId);
 
+        System.out.println("\nOverDue Loans for Member ID: " + memberId);
+        displayOverdueLoansForMember(memberId);
+    }
 
+    public static void displayOverdueLoansForMember(String memberId) {
+        boolean found = false;
+        for (Loan loan : Loan.returnedLoans) {
+            if (loan.getMemberId().equals(memberId)) {
+                Book book = Catalog.searchBook(loan.getBookId());
+
+                if (book != null) {
+                    System.out.println("Loan ID: " + loan.getLoanID() + " | Book Title: " + book.getBookTitle() +
+                            " | Return Date: " + loan.getReturnDate());
+                } else {
+                    System.out.println("The book is not available");
+                }
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No Overdue loans for this member.");
+        }
     }
 
     public static void displayActiveLoansForMember(String memberId) {

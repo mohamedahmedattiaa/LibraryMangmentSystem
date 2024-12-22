@@ -111,9 +111,6 @@ public class Loan {
             Loan loan = new Loan(bookId, member.getmemberId());
             saveLoansToFile(loan);
             add();
-
-
-
             System.out.println("Loan successfully created: " + loan.getLoanID() + " for book " + book.getBookTitle() +
                     " by member " + member.getName() + "  your return date is: " + loan.getReturnDate() + ".");
         } else if (book != null && !book.getAvailablityStatus()) {
@@ -136,7 +133,7 @@ public class Loan {
                 book.setAvailablityStatus(true);
                 Loan currentLoan = null;
 
-
+               add();
                 for (Loan loan : activeLoans) {
                     if (loan.getMemberId().equals(memberId) && loan.getBookId().equals(bookId)) {
                         currentLoan = loan;
@@ -147,7 +144,6 @@ public class Loan {
                     System.out.println("No active loan found for this book and member.");
                     return;
                 }
-
                 if (returnDate.after(currentLoan.getReturnDate())) {
                     System.out.println("You have returned the book past the due date!");
                 }

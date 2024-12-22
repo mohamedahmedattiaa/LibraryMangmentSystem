@@ -73,35 +73,35 @@ public class IDGenerator {
     private static final String Loans = "loans.txt";
 
     public static String generateLoanID() throws IOException {
-        return "L" + getNextAvailableLoanID();
+        return "L" + loanCounter++;
     }
 
-    private static int getNextAvailableLoanID() throws IOException {
-        int maxLoanID = loanCounter; // Start from L300
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(Loans))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (!line.trim().isEmpty()) { // Skip empty lines
-                    String[] loanData = line.split(",");
-                    if (loanData.length > 0) {
-                        String loanID = loanData[0];
-                        if (loanID.startsWith("L") && loanID.length() > 1) {
-                            try {
-                                int currentLoanID = Integer.parseInt(loanID.substring(1));
-                                maxLoanID = Math.max(maxLoanID, currentLoanID);
-                            } catch (NumberFormatException e) {
-                                System.err.println("Invalid loan ID format: " + loanID);
-                            }
-                        } else {
-                            System.err.println("Skipping invalid ID: " + loanID);
-                        }
-                    }
-                }
-            }
-        }
-        return Math.max(maxLoanID, loanCounter) + 1;
-    }
+//    private static int getNextAvailableLoanID() throws IOException {
+//        int maxLoanID = loanCounter; // Start from L300
+//
+//        try (BufferedReader reader = new BufferedReader(new FileReader(Loans))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                if (!line.trim().isEmpty()) { // Skip empty lines
+//                    String[] loanData = line.split(",");
+//                    if (loanData.length > 0) {
+//                        String loanID = loanData[0];
+//                        if (loanID.startsWith("L") && loanID.length() > 1) {
+//                            try {
+//                                int currentLoanID = Integer.parseInt(loanID.substring(1));
+//                                maxLoanID = Math.max(maxLoanID, currentLoanID);
+//                            } catch (NumberFormatException e) {
+//                                System.err.println("Invalid loan ID format: " + loanID);
+//                            }
+//                        } else {
+//                            System.err.println("Skipping invalid ID: " + loanID);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return Math.max(maxLoanID, loanCounter) + 1;
+//    }
 
 }
 

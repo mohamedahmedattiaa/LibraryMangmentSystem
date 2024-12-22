@@ -13,13 +13,13 @@ public class Main {
         Book book2 = new Book("d", "Ibraham lincolin", "Dystopian");
         Book book3 = new Book("a", "Wealm sheckspear", "Dystopian");
         Book book4 = new Book("e", "Albert fred", "Fiction");
-        System.out.println("-------------------");
+//        System.out.println("-------------------");
         Loan.borrowBook("M201","B100");
+        Loan.borrowBook("M202","B100");
         Loan.borrowBook("M201","B101");
-        Loan.borrowBook("M201","B100");
-        PendingRequestsQueue.display();
-        System.out.println(PendingRequestsQueue.searchLoans("M201").toString());
+        Loan.returnBook("M201","B100");
 
+        Report.generateGeneralReport(catalog);
     }
 }
 
