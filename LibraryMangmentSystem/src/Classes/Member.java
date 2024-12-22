@@ -19,6 +19,7 @@ public class Member {
     static BufferedReader reader;
     private List<Loan> loans;
     private static Node membersList;
+    private static String currentMemberId;
 
     public Member(String name, String Email, String password) throws IOException {
         if (Email.contains("@") && Email.contains(".")) {
@@ -87,13 +88,14 @@ public class Member {
             throw new RuntimeException(e);
         }
     }
-
     // Display all members' details
+
     public static String display() throws IOException {
         String line;
         System.out.println("Member Details:");
 
         // Initialize a BufferedReader to read from the file
+
         try (BufferedReader reader = new BufferedReader(new FileReader("TempMembers.txt"))) {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
@@ -126,8 +128,8 @@ public class Member {
     }
 
 
-
     // Search for a member by memberID
+
     public static Member SearchMember(String memberID) throws IOException {
         if (memberID == null || memberID.isEmpty()) {
             return null;
@@ -327,37 +329,82 @@ public class Member {
     public static void sortMembers(String sortBy) throws IOException {
         File inputFile = new File("TempMembers.txt");
         List<String> memberLines = new ArrayList<>();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 memberLines.add(line);
             }
         }
+
+        // Sort based on the chosen criteria
         switch (sortBy.toLowerCase().trim()) {
             case "memberid":
+                // Sorting by Member ID in ascending order
                 memberLines.sort(Comparator.comparing(line -> line.split(",")[0].trim()));
                 break;
             case "name":
-                memberLines.sort(Comparator.comparing(line -> line.split(",")[1].trim()));
-                break;
-            case "email":
-                memberLines.sort(Comparator.comparing(line -> line.split(",")[2].trim()));
+                memberLines.sort(Comparator.comparing(line -> {
+                    String name = line.split(",")[1].trim();  // Get full name
+                    return name.toLowerCase();
+                }));
                 break;
             default:
-                System.out.println("Invalid sorting criteria. Please choose 'memberID', 'name', or 'email'.");
+                System.out.println("Invalid sorting criteria. Please choose 'memberid', 'name'");
                 return;
         }
-        System.out.println("Sorted Members by " + sortBy + ":");
-        for (String line : memberLines) {
-            String[] data = line.split(",");
-            if (data.length >= 4) {
-                System.out.println("Member ID: " + data[0].trim());
-                System.out.println("Name: " + data[1].trim());
-                System.out.println("Email: " + data[2].trim());
-                System.out.println("Password: " + data[3].trim());
-                System.out.println("----------");
+
+        // Write the sorted data back to the file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(inputFile))) {
+            for (String line : memberLines) {
+                writer.write(line);
+                writer.newLine();
             }
         }
+    }
+
+
+
+
+    public static boolean isEmailTaken(String email) {
+        try (Scanner scanner = new Scanner(new File("TempMembers.txt"))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(",");
+                if (parts.length > 2 && parts[2].equals(email)) {
+                    return true;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Database file not found: " + e.getMessage());
+        }
+        return false;
+    }
+
+
+    public static String validateUser(String email, String password) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("TempMembers.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] memberData = line.split(",");
+                if (memberData.length >= 4) {
+                    String storedEmail = memberData[2].trim();
+                    String storedPassword = memberData[3].trim();
+                    if (storedEmail.equalsIgnoreCase(email) && storedPassword.equals(password)) {
+                        // If match, return the member ID
+                        return memberData[0].trim(); // Return member ID
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error during validation: " + e.getMessage());
+        }
+        return null; // Return null if no match found
+    }
+
+
+    public static String getCurrentMemberId() {
+        return currentMemberId;
     }
 
 }
