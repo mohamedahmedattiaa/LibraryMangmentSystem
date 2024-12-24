@@ -132,19 +132,22 @@ public class Catalog {
     public static Node FindBookByTitleOrAuthor(String searchQuery, String sortedBy) {
         Node foundBooks = null;
 
-        // Traverse all the books and check if the title or author matches the query
-        Node temp = bookList.getHead(); // Traverse the linked list using the head of bookList
+        String normalizedQuery = searchQuery.replaceAll("\\s+", "").toLowerCase();
+        Node temp = bookList.getHead();
         while (temp != null) {
             Book book = temp.book;
-            if (book.getBookTitle().contains(searchQuery) || book.getAuthor().contains(searchQuery)) {
+            String normalizedTitle = book.getBookTitle().replaceAll("\\s+", "").toLowerCase();  // Normalize book title
+            String normalizedAuthor = book.getAuthor().replaceAll("\\s+", "").toLowerCase();  // Normalize author name
+
+            if (normalizedTitle.contains(normalizedQuery) || normalizedAuthor.contains(normalizedQuery)) {
                 Node newNode = new Node(book);
                 foundBooks = bookList.merge(foundBooks, newNode, sortedBy); // Sort the books using the merge function
             }
-            temp = temp.next; // Move to the next node
+            temp = temp.next;
         }
-
         return foundBooks;
     }
+
 
     public static void Sorting(String SortedBy) {
         bookList.sorting(SortedBy);

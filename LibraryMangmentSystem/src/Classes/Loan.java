@@ -454,8 +454,4 @@ public class Loan {
             }
         }
     }
-
-
-
-
 }

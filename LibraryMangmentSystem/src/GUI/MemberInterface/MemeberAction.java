@@ -1,14 +1,14 @@
 package GUI.MemberInterface;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
+
 import Classes.*;
-//
 public class MemeberAction extends JFrame {
     private DefaultTableModel tableModel;
     private JTable searchResultsTable;
@@ -59,6 +59,7 @@ public class MemeberAction extends JFrame {
         return navigationPanel;
     }
 
+    // Borrow Book Panel
     public JPanel createBorrowPanel() {
         JPanel borrowPanel = new JPanel(new GridBagLayout());
         borrowPanel.setBackground(BROWN_COLOR);
@@ -69,37 +70,31 @@ public class MemeberAction extends JFrame {
         JLabel bookIdLabel = createStyledLabel("Book ID:");
         JTextField bookIdField = createStyledTextField();
 
-        // Set the Member ID field as read-only and pre-fill it with the passed memberId
         JLabel memberIdLabel = createStyledLabel("Member ID:");
         JTextField memberIdField = createStyledTextField();
-        memberIdField.setText(memberId);  // Pre-fill Member ID field with the passed memberId
-        memberIdField.setEditable(false);  // Make the field read-only
+        memberIdField.setText(memberId);
+        memberIdField.setEditable(false);
 
         JButton borrowButton = createStyledButton("Borrow");
         JButton clearButton = createStyledButton("Clear");
 
         borrowButton.addActionListener(e -> {
             String bookId = bookIdField.getText().trim();
-
             if (bookId.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             try {
-                System.out.println("Attempting to borrow book with ID: " + bookId);
-                Loan.borrowBook(memberId, bookId);  // Use the memberId passed during initialization
+                Loan.borrowBook(memberId, bookId);
                 JOptionPane.showMessageDialog(this, "Book borrowed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 bookIdField.setText("");
+                refreshTableData();  // Refresh the table after borrowing a book
             } catch (IOException | ParseException ex) {
-                ex.printStackTrace();  // Print the stack trace to the console for debugging
                 JOptionPane.showMessageDialog(this, "Error while borrowing book. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        clearButton.addActionListener(e -> {
-            bookIdField.setText("");
-        });
+        clearButton.addActionListener(e -> bookIdField.setText(""));
 
         gbc.gridx = 0; gbc.gridy = 0; borrowPanel.add(bookIdLabel, gbc);
         gbc.gridx = 1; borrowPanel.add(bookIdField, gbc);
@@ -111,7 +106,7 @@ public class MemeberAction extends JFrame {
         return borrowPanel;
     }
 
-    // Similar changes for Return Panel:
+    // Return Book Panel
     public JPanel createReturnPanel() {
         JPanel returnPanel = new JPanel(new GridBagLayout());
         returnPanel.setBackground(BROWN_COLOR);
@@ -122,35 +117,31 @@ public class MemeberAction extends JFrame {
         JLabel bookIdLabel = createStyledLabel("Book ID:");
         JTextField bookIdField = createStyledTextField();
 
-        // Set the Member ID field as read-only and pre-fill it with the passed memberId
         JLabel memberIdLabel = createStyledLabel("Member ID:");
         JTextField memberIdField = createStyledTextField();
-        memberIdField.setText(memberId);  // Pre-fill Member ID field with the passed memberId
-        memberIdField.setEditable(false);  // Make the field read-only
+        memberIdField.setText(memberId);
+        memberIdField.setEditable(false);
 
         JButton returnButton = createStyledButton("Return");
         JButton clearButton = createStyledButton("Clear");
 
         returnButton.addActionListener(e -> {
             String bookId = bookIdField.getText().trim();
-
             if (bookId.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             try {
-                Loan.returnBook(memberId, bookId);  // Use the memberId passed during initialization
+                Loan.returnBook(memberId, bookId);
                 JOptionPane.showMessageDialog(this, "Book returned successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 bookIdField.setText("");
+                refreshTableData();
             } catch (IOException | ParseException ex) {
                 JOptionPane.showMessageDialog(this, "Error while returning book. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        clearButton.addActionListener(e -> {
-            bookIdField.setText("");
-        });
+        clearButton.addActionListener(e -> bookIdField.setText(""));
 
         gbc.gridx = 0; gbc.gridy = 0; returnPanel.add(bookIdLabel, gbc);
         gbc.gridx = 1; returnPanel.add(bookIdField, gbc);
@@ -162,38 +153,37 @@ public class MemeberAction extends JFrame {
         return returnPanel;
     }
 
-
+    // Search Book Panel
     public JPanel createSearchPanel() {
         JPanel searchPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        searchPanel.setBackground(Color.WHITE);  // White background for the search panel
+        searchPanel.setBackground(Color.WHITE);
 
-        // Search Field and Labels
         JLabel searchLabel = new JLabel("Search Book by Title or Author:");
         searchLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        searchLabel.setForeground(new Color(0, 51, 102));  // Navy Blue for the label
+        searchLabel.setForeground(new Color(0, 51, 102));
         JTextField searchField = createStyledTextField();
-        searchField.setPreferredSize(new Dimension(250, 40)); // Increase height of the search field
+        searchField.setPreferredSize(new Dimension(250, 40));
 
         JButton searchButton = createStyledButton("Search");
         JButton clearButton = createStyledButton("Clear");
+        JButton sortButton = createStyledButton("Sort");
+        JButton refreshButton = createStyledButton("Refresh");
 
-        // Sorting ComboBox
         String[] sortingOptions = {"Title", "Author"};
         JComboBox<String> sortComboBox = new JComboBox<>(sortingOptions);
-        sortComboBox.setSelectedIndex(0);  // Default to sorting by Title
+        sortComboBox.setSelectedIndex(0);
 
-// Setting up layout for Search Panel
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2; // Take more horizontal space for the label
+        gbc.gridwidth = 2;
         searchPanel.add(searchLabel, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
-        searchPanel.add(searchField, gbc);  // Adding the search field
+        searchPanel.add(searchField, gbc);
 
         gbc.gridx = 2;
         gbc.gridwidth = 1;
@@ -208,43 +198,31 @@ public class MemeberAction extends JFrame {
         gbc.gridx = 5;
         searchPanel.add(sortComboBox, gbc);
 
-        // Panel for the Table (Below search panel)
+        gbc.gridx = 6;
+        searchPanel.add(sortButton, gbc);
+
+        gbc.gridx = 7;
+        searchPanel.add(refreshButton, gbc);
+
+        // Table Setup
         DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Book ID", "Title", "Author", "Genre", "Availability"}, 0);
         JTable searchResultsTable = new JTable(tableModel);
-        searchResultsTable.setFillsViewportHeight(true);  // Fill the viewport with the table
-
-        // Set the table's cell renderer to handle text wrapping
-        searchResultsTable.setDefaultRenderer(Object.class, new TableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JTextArea textArea = new JTextArea(value.toString());
-                textArea.setWrapStyleWord(true);
-                textArea.setLineWrap(true);
-                textArea.setOpaque(false);
-                textArea.setEditable(false);
-                textArea.setFont(table.getFont());
-                textArea.setPreferredSize(new Dimension(table.getColumnModel().getColumn(column).getWidth(), 0)); // Adjust height based on content
-                return textArea;
-            }
-        });
-
-        // Set row height based on the content (dynamic resizing)
-        searchResultsTable.setRowHeight(25);  // Default height for rows, adjust if needed
-
-        searchResultsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS); // Resize columns as per content
+        searchResultsTable.setFillsViewportHeight(true);
 
         JScrollPane scrollPane = new JScrollPane(searchResultsTable);
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Action Listeners for buttons
+        // Action Listener for Search
         searchButton.addActionListener(e -> {
             String query = searchField.getText().trim();
+            tableModel.setRowCount(0);
+
             if (query.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Search query cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                loadBooksFromFile(tableModel);
                 return;
             }
-            tableModel.setRowCount(0); // Clear previous results
 
             String sortedBy = (String) sortComboBox.getSelectedItem();
             Node foundBooks = Catalog.FindBookByTitleOrAuthor(query, sortedBy);
@@ -252,52 +230,64 @@ public class MemeberAction extends JFrame {
                 Node temp = foundBooks;
                 while (temp != null) {
                     Book book = temp.getBook();
-                    tableModel.addRow(new Object[]{book.getBookID(), book.getBookTitle(), book.getAuthor(), book.getGenere(), book.getAvailablityStatus()});
-
-                    // Set title color to Navy Blue if the book is found
-                    JLabel titleLabel = new JLabel(book.getBookTitle());
-                    titleLabel.setForeground(new Color(0, 51, 102));  // Navy Blue color for title
+                    if (book != null) {
+                        tableModel.addRow(new Object[]{book.getBookID(), book.getBookTitle(), book.getAuthor(), book.getGenere(), book.getAvailablityStatus()});
+                    }
                     temp = temp.getNext();
+                }
+
+                if (tableModel.getRowCount() == 0) {
+                    JOptionPane.showMessageDialog(this, "No books found matching the search criteria.", "Info", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "No books found.", "Info", JOptionPane.INFORMATION_MESSAGE);
             }
+
+            refreshTableData();
         });
 
-        clearButton.addActionListener(e -> searchField.setText(""));
+        clearButton.addActionListener(e -> {
+            searchField.setText("");
+            tableModel.setRowCount(0);
+            loadBooksFromFile(tableModel);
+        });
 
-        // Main layout for search and table
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add(searchPanel, BorderLayout.NORTH);  // Add search panel at the top
-        mainPanel.add(tablePanel, BorderLayout.CENTER);  // Add table panel below search panel
-
-// Load books from the file and display them
-        loadBooksFromFile(tableModel);
-
-        return mainPanel;
-    }
-
-
-    private void loadBooksFromFile(DefaultTableModel tableModel) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("catalog.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Parse the line to create a Book object
-                String[] parts = line.split(",");
-                if (parts.length == 5) {
-                    String bookId = parts[0];
-                    String title = parts[1];
-                    String author = parts[2];
-                    String genre = parts[3];
-                    boolean availabilityStatus = Boolean.parseBoolean(parts[4]);
-
-                    // Add the book to the table model
-                    tableModel.addRow(new Object[]{bookId, title, author, genre, availabilityStatus});
+        sortButton.addActionListener(e -> {
+            String sortedBy = (String) sortComboBox.getSelectedItem();
+            tableModel.setRowCount(0);  // Clear table before sorting
+            // Perform sorting and refresh table with sorted data
+            Catalog.Sorting(sortedBy);
+            Node sortedBooks = Catalog.bookList.getHead();
+            if (sortedBooks != null) {
+                Node temp = sortedBooks;
+                while (temp != null) {
+                    Book book = temp.getBook();
+                    if (book != null) {
+                        tableModel.addRow(new Object[]{book.getBookID(), book.getBookTitle(), book.getAuthor(), book.getGenere(), book.getAvailablityStatus()});
+                    }
+                    temp = temp.getNext();
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Error reading book file: " + e.getMessage());
-        }
+        });
+
+        // Action Listener for Refresh
+        refreshButton.addActionListener(e -> {
+            tableModel.setRowCount(0);  // Clear the table
+            loadBooksFromFile(tableModel);  // Reload the books from the file or data source
+        });
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 8; searchPanel.add(tablePanel, gbc);
+
+        return searchPanel;
+    }
+
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(BUTTON_FONT);
+        button.setBackground(LIGHT_BROWN_COLOR);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        return button;
     }
 
     private JLabel createStyledLabel(String text) {
@@ -308,19 +298,30 @@ public class MemeberAction extends JFrame {
     }
 
     private JTextField createStyledTextField() {
-        JTextField textField = new JTextField(20);
-        textField.setFont(new Font("Arial", Font.PLAIN, 14));
-        textField.setBackground(LIGHT_BROWN_COLOR);
-        textField.setForeground(Color.WHITE);
+        JTextField textField = new JTextField();
+        textField.setPreferredSize(new Dimension(200, 30));
         return textField;
     }
 
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(BUTTON_FONT);
-        button.setBackground(LIGHT_BROWN_COLOR);
-        button.setForeground(Color.WHITE);
-        return button;
+    // Method to refresh the table data
+    private void refreshTableData() {
+        DefaultTableModel tableModel = (DefaultTableModel) searchResultsTable.getModel();
+        tableModel.setRowCount(0);  // Clear existing rows
+
+        // Add updated data
+        loadBooksFromFile(tableModel);  // Reload the books from the file or data source
+    }
+
+    // This method loads book data into the table
+    private void loadBooksFromFile(DefaultTableModel tableModel) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("books.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] bookData = line.split(",");
+                tableModel.addRow(bookData);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
-

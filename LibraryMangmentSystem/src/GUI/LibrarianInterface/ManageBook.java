@@ -549,7 +549,7 @@ public class ManageBook extends JPanel {
         // Clear existing rows in the table model
         tableModel.setRowCount(0);
 
-// Add new rows (from the catalog or the data source)
+        // Add new rows (from the catalog or the data source)
         Node temp = Catalog.bookList.getHead();  // Assuming the linked list is correct
         while (temp != null) {
             Book book = temp.getBook();
@@ -562,5 +562,8 @@ public class ManageBook extends JPanel {
             tableModel.addRow(row);  // Add the row to the table model
             temp = temp.getNext();  // Move to the next book in the list
         }
+        booksTable.revalidate();
+        booksTable.repaint();
     }
+
 }

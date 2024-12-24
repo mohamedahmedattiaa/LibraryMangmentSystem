@@ -208,11 +208,11 @@ public class linkedlist {
         switch (SortedBy) {
             case "title":
             case "Title":
-                check = left.book.getBookTitle().compareTo(right.book.getBookTitle()) <= 0;
+                check = left.book.getBookTitle().toLowerCase().compareTo(right.book.getBookTitle().toLowerCase()) <= 0;
                 break;
             case "Author":
             case "author":
-                check = left.book.getAuthor().compareTo(right.book.getAuthor()) <= 0;
+                check = left.book.getAuthor().toLowerCase().compareTo(right.book.getAuthor().toLowerCase()) <= 0;
                 break;
         }
         if (check) {

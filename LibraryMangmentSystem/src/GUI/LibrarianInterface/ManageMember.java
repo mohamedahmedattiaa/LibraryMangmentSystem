@@ -8,22 +8,21 @@ import java.io.FileReader;
 import java.io.IOException;
     public class ManageMember extends JPanel {
         private JPanel cards;
+        private JTable table;
         private CardLayout cardLayout;
         private DefaultTableModel tableModel;
         public ManageMember() {
             cardLayout = new CardLayout();
             cards = new JPanel(cardLayout);
-
-            // Adding individual action panels
-            cards.add(createAddMemberPanel(), "Add Member");
-            cards.add(createRemoveMemberPanel(), "Remove Member");
-            cards.add(createUpdateMemberPanel(), "Update Member");
-            cards.add(createDisplayMembersPanel(), "Display Members");
-
+            tableModel = new DefaultTableModel(new Object[]{"Member ID", "Name", "Email", "Password"}, 0);
+            table = new JTable(tableModel);
+            JScrollPane tableScrollPane = new JScrollPane(table);
+            add(tableScrollPane, BorderLayout.CENTER);
+//            cards.add(createRemoveMemberPanel(), "Remove Member");
+//            cards.add(createUpdateMemberPanel(), "Update Member");
+//            cards.add(createDisplayMembersPanel(), "Display Members");
             setLayout(new BorderLayout());
             add(cards, BorderLayout.CENTER);
-
-            // Add a tabbed pane or buttons to switch between actions (Add, Remove, etc.)
             JPanel navigationPanel = createNavigationPanel();
             add(navigationPanel, BorderLayout.NORTH);
         }
@@ -47,124 +46,6 @@ import java.io.IOException;
             navigationPanel.add(displayButton);
 
             return navigationPanel;
-        }
-
-        // Method for Add Member Panel
-        public JPanel createAddMemberPanel() {
-            JPanel addMemberPanel = new JPanel(new GridBagLayout());
-            addMemberPanel.setBackground(new Color(121, 85, 72));
-
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(10, 10, 10, 10);
-
-            JLabel idLabel = new JLabel("Name:");
-            idLabel.setFont(new Font("Caveat", Font.BOLD, 24));
-            idLabel.setForeground(Color.WHITE);
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            addMemberPanel.add(idLabel, gbc);
-
-            JTextField idField = new JTextField(20);
-            idField.setFont(new Font("Caveat", Font.PLAIN, 16));
-            gbc.gridx = 1;
-            gbc.gridy = 0;
-            addMemberPanel.add(idField, gbc);
-
-            JLabel nameLabel = new JLabel("MemberID:");
-            nameLabel.setFont(new Font("Caveat", Font.BOLD, 24));
-            nameLabel.setForeground(Color.WHITE);
-            gbc.gridx = 0;
-            gbc.gridy = 1;
-            addMemberPanel.add(nameLabel, gbc);
-
-            JTextField nameField = new JTextField(20);
-            nameField.setFont(new Font("Caveat", Font.PLAIN, 16));
-            gbc.gridx = 1;
-            gbc.gridy = 1;
-            addMemberPanel.add(nameField, gbc);
-
-            JLabel successMessageLabel = new JLabel("");
-            successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            successMessageLabel.setForeground(Color.GREEN);
-            gbc.gridx = 1;
-            gbc.gridy = 3;
-            gbc.gridwidth = 2;
-            gbc.anchor = GridBagConstraints.SOUTH;
-            addMemberPanel.add(successMessageLabel, gbc);
-
-            JButton addButton = new JButton("Add");
-            addButton.setPreferredSize(new Dimension(100, 40));
-            addButton.setFont(new Font("Arial", Font.PLAIN, 16));
-            addButton.setBackground(new Color(141, 110, 99));
-            addButton.setForeground(Color.WHITE);
-
-            // Add button action
-            addButton.addActionListener(e -> {
-                String memberId = idField.getText().trim();
-                String name = nameField.getText().trim();
-
-                if (memberId.isEmpty() || name.isEmpty()) {
-                    JOptionPane.showMessageDialog(addMemberPanel, "Both MemberID and Name are required!", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Fetch member by ID and Name
-                Member member = Member.getMemberByIDandName(memberId, name);
-
-                if (member == null) {
-                    JOptionPane.showMessageDialog(addMemberPanel, "No member found with the provided ID and Name.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Check if the member already exists in the table
-                boolean exists = false;
-                for (int i = 0; i < tableModel.getRowCount(); i++) {
-                    String existingId = tableModel.getValueAt(i, 0).toString();
-                    String existingName = tableModel.getValueAt(i, 1).toString();
-                    if (memberId.equals(existingId) && name.equals(existingName)) {
-                        exists = true;
-                        break;
-                    }
-                }
-
-                if (exists) {
-                    JOptionPane.showMessageDialog(addMemberPanel, "This member is already added!", "Duplicate Member", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                // Add the member's data to the table
-                tableModel.addRow(new Object[] { member.getmemberId(), member.getName(), member.getEmail(), member.getPassword() });
-                successMessageLabel.setText("Member added successfully!");
-
-                // Clear fields after successful addition
-                idField.setText("");
-                nameField.setText("");
-            });
-
-            JButton clearButton = new JButton("Clear");
-            clearButton.setPreferredSize(new Dimension(100, 40));
-            clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
-            clearButton.setBackground(new Color(141, 110, 99));
-            clearButton.setForeground(Color.WHITE);
-
-            // Clear button action
-            clearButton.addActionListener(e -> {
-                idField.setText("");
-                nameField.setText("");
-                successMessageLabel.setText("");
-            });
-
-            gbc.gridx = 1;
-            gbc.gridy = 2;
-            gbc.gridwidth = 2;
-            gbc.anchor = GridBagConstraints.CENTER;
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-            buttonPanel.setBackground(new Color(121, 85, 72));
-            buttonPanel.add(addButton);
-            buttonPanel.add(clearButton);
-            addMemberPanel.add(buttonPanel, gbc);
-
-            return addMemberPanel;
         }
         public JPanel createRemoveMemberPanel() {
             JPanel removeMemberPanel = new JPanel(new GridBagLayout());
@@ -301,8 +182,7 @@ import java.io.IOException;
             gbc.gridx = 1;
             gbc.gridy = 3;
             updateMemberPanel.add(newPasswordField, gbc);
-//
-// Initialize the success message label here
+
             JLabel successMessageLabel = new JLabel("");
             successMessageLabel.setFont(new Font("Arial", Font.BOLD, 16));
             successMessageLabel.setForeground(Color.GREEN);
@@ -313,6 +193,7 @@ import java.io.IOException;
             gbc.insets = new Insets(10, 10, 10, 10);
             updateMemberPanel.add(successMessageLabel, gbc);
 
+            // Update Button
             JButton updateButton = new JButton("Update");
             updateButton.setPreferredSize(new Dimension(100, 40));
             updateButton.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -329,39 +210,72 @@ import java.io.IOException;
                     return;
                 }
 
-                boolean memberFound = false;
-                for (int i = 0; i < tableModel.getRowCount(); i++) {
-                    String tableMemberId = tableModel.getValueAt(i, 0).toString().trim();
-                    if (tableMemberId.equals(memberId)) {
-                        tableModel.setValueAt(newName, i, 1);   // Update Name
-                        tableModel.setValueAt(newEmail, i, 2);  // Update Email
-                        tableModel.setValueAt(newPassword, i, 3); // Update Password
-                        memberFound = true;
-                        break;
+                try {
+                    // Search for the member first
+                    Member member = Member.SearchMember(memberId); // Search for the member
+
+                    if (member != null) { // If the member exists
+                        boolean fileUpdated = Member.updateMember(memberId, newName, newEmail, newPassword);
+                        if (fileUpdated) {
+                            // Update the table model if member data is updated
+                            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                                String tableMemberId = tableModel.getValueAt(i, 0).toString().trim();
+                                if (tableMemberId.equals(memberId)) {
+                                    tableModel.setValueAt(newName, i, 1);  // Update Name
+                                    tableModel.setValueAt(newEmail, i, 2); // Update Email
+                                    tableModel.setValueAt(newPassword, i, 3); // Update Password
+                                    break;
+                                }
+                            }
+                            successMessageLabel.setText("Member updated successfully in table and file!");
+                            successMessageLabel.setForeground(Color.GREEN);
+                        } else {
+                            successMessageLabel.setText("Error updating member data in file.");
+                            successMessageLabel.setForeground(Color.RED);
+                        }
+                    } else {
+                        successMessageLabel.setText("No member found with ID: " + memberId);
+                        successMessageLabel.setForeground(Color.RED);
                     }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(updateMemberPanel, "Error updating file.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
 
-                if (memberFound) {
-                    successMessageLabel.setText("Member updated successfully!");
-                    successMessageLabel.setForeground(Color.GREEN);
+                // Clear the fields after the update
+                memberIdField.setText("");
+                newNameField.setText("");
+                newEmailField.setText("");
+                newPasswordField.setText("");
+            });
 
-                    // Clear the fields after successful update
-                    memberIdField.setText("");
-                    newNameField.setText("");
-                    newEmailField.setText("");
-                    newPasswordField.setText("");
-                } else {
-                    successMessageLabel.setText("No member found!");
-                    successMessageLabel.setForeground(Color.RED);
-                }
+
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            updateMemberPanel.add(updateButton, gbc);
+
+            // Clear Button
+            JButton clearButton = new JButton("Clear");
+            clearButton.setPreferredSize(new Dimension(100, 40));
+            clearButton.setFont(new Font("Arial", Font.PLAIN, 16));
+            clearButton.setBackground(new Color(141, 110, 99));
+            clearButton.setForeground(Color.WHITE);
+            clearButton.addActionListener(e -> {
+                memberIdField.setText("");
+                newNameField.setText("");
+                newEmailField.setText("");
+                newPasswordField.setText("");
+                successMessageLabel.setText(""); // Clear the success message
             });
 
             gbc.gridx = 1;
             gbc.gridy = 4;
-            updateMemberPanel.add(updateButton, gbc);
+            updateMemberPanel.add(clearButton, gbc);
 
             return updateMemberPanel;
         }
+
+
 
         public JPanel createSearchMemberPanel() {
             JPanel searchMemberPanel = new JPanel(new GridBagLayout());
@@ -389,7 +303,6 @@ import java.io.IOException;
             gbc.anchor = GridBagConstraints.CENTER;
             searchMemberPanel.add(searchField, gbc);
 
-// Search button
             JButton searchButton = new JButton("Search");
             searchButton.setPreferredSize(new Dimension(100, 40));
             searchButton.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -460,8 +373,7 @@ import java.io.IOException;
 
         // Method for Display Members Panel
         public JPanel createDisplayMembersPanel() {
-            JPanel displayMembersPanel = new JPanel();
-            displayMembersPanel.setLayout(new BorderLayout());  // Use BorderLayout for proper table display
+            JPanel displayMembersPanel = new JPanel(new BorderLayout());  // Main layout is BorderLayout
 
             // Create column names for the table
             String[] columnNames = {"Member ID", "Name", "Email", "Password"};
@@ -472,21 +384,103 @@ import java.io.IOException;
             // Create the table using DefaultTableModel
             DefaultTableModel model = new DefaultTableModel(data, columnNames);
             JTable memberTable = new JTable(model);
+            memberTable.setFont(new Font("Arial", Font.PLAIN, 14));
+            memberTable.setRowHeight(25);
 
             // Add table to JScrollPane for scroll functionality
             JScrollPane scrollPane = new JScrollPane(memberTable);
-            displayMembersPanel.add(scrollPane, BorderLayout.CENTER);
+            displayMembersPanel.add(scrollPane, BorderLayout.CENTER);  // Add the table to the center of BorderLayout
 
+            // Create a subpanel for buttons and other components using GridBagLayout
+            JPanel buttonPanel = new JPanel(new GridBagLayout());  // Use GridBagLayout for button panel
+            buttonPanel.setBackground(new Color(245, 245, 245));  // Light background color for button panel
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10);  // Spacing for components
+
+            // Create the ComboBox for sorting options
+            String[] sortOptions = {"Sort by", "memberid", "name"};
+            JComboBox<String> sortComboBox = new JComboBox<>(sortOptions);
+            sortComboBox.setPreferredSize(new Dimension(180, 30));
+            sortComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
+            sortComboBox.setBackground(new Color(141, 110, 99));
+            sortComboBox.setForeground(Color.WHITE);
+
+            // Add action listener for sorting options
+            sortComboBox.addActionListener(e -> {
+                String selectedOption = (String) sortComboBox.getSelectedItem();
+                if (selectedOption != null && !selectedOption.equals("Sort by")) {
+                    try {
+                        // Call the sorting method on the Member class
+                        Member.sortMembers(selectedOption.toLowerCase());  // Sort by selected option
+
+                        // After sorting, read the sorted data and refresh the table
+                        Object[][] sortedData = readMemberData();
+                        model.setDataVector(sortedData, columnNames);  // Refresh the table data
+
+                        // Revalidate and repaint to reflect the new order
+                        memberTable.revalidate();
+                        memberTable.repaint();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(displayMembersPanel, "Error sorting the members.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
+            // Add JComboBox for sorting to the button panel with proper GBC configuration
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            buttonPanel.add(sortComboBox, gbc);
+
+            // Create the Refresh button with enhanced styling
+            JButton refreshButton = new JButton("Refresh");
+            refreshButton.setPreferredSize(new Dimension(150, 40));
+            refreshButton.setFont(new Font("Arial", Font.PLAIN, 16));
+            refreshButton.setBackground(new Color(141, 110, 99));
+            refreshButton.setForeground(Color.WHITE);
+            refreshButton.setFocusPainted(false);
+            refreshButton.setBorderPainted(false);
+            refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            refreshButton.addActionListener(e -> {
+                Object[][] refreshedData = readMemberData();
+                model.setDataVector(refreshedData, columnNames);
+                memberTable.revalidate();
+                memberTable.repaint();
+            });
+
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+            buttonPanel.add(refreshButton, gbc);
+
+            // Create padding between the buttons and the table
+            JPanel paddingPanel = new JPanel();
+            paddingPanel.setPreferredSize(new Dimension(10, 10));
+            buttonPanel.add(paddingPanel, gbc);
+
+            // Add the button panel to the bottom of the main panel
+            displayMembersPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+            // Return the main panel
             return displayMembersPanel;
         }
 
-        // This method reads member data from the file and returns it as an Object[][] array
+        private void refreshTable(DefaultTableModel model, JTable table) {
+            Object[][] refreshedData = readMemberData();
+            model.setDataVector(refreshedData, new String[]{"Member ID", "Name", "Email", "Password"});
+            table.revalidate();
+            table.repaint();
+        }
+
+
+
+
+
         private Object[][] readMemberData() {
             String line;
             Object[][] data = new Object[100][4];  // Adjust size if needed
             int rowIndex = 0;
 
-            try (BufferedReader reader = new BufferedReader(new FileReader("Members.txt"))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader("TempMembers.txt"))) {
                 while ((line = reader.readLine()) != null) {
                     String[] memberData = line.split(",");
                     if (memberData.length >= 4) {
@@ -507,9 +501,9 @@ import java.io.IOException;
                 e.printStackTrace();
             }
 
-            // Resize array to fit actual number of rows
             Object[][] resizedData = new Object[rowIndex][4];
             System.arraycopy(data, 0, resizedData, 0, rowIndex);
             return resizedData;
         }
+
     }

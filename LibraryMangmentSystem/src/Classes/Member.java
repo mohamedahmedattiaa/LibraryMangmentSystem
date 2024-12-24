@@ -391,8 +391,7 @@ public class Member {
                     String storedEmail = memberData[2].trim();
                     String storedPassword = memberData[3].trim();
                     if (storedEmail.equalsIgnoreCase(email) && storedPassword.equals(password)) {
-                        // If match, return the member ID
-                        return memberData[0].trim(); // Return member ID
+                        return memberData[0].trim();
                     }
                 }
             }
@@ -402,9 +401,22 @@ public class Member {
         return null; // Return null if no match found
     }
 
-
-    public static String getCurrentMemberId() {
-        return currentMemberId;
+    public static String validateIDUser(String id,String password) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("TempMembers.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] memberData = line.split(",");
+                if (memberData.length >= 4) {
+                    String storedID = memberData[0].trim();
+                    String storedPassword = memberData[3].trim();
+                    if (storedID.equalsIgnoreCase(id) && storedPassword.equals(password)) {
+                        return storedID;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error during validation: " + e.getMessage());
+        }
+        return null;
     }
-
 }
